@@ -8,10 +8,10 @@ import textwrap
 import threading
 import time
 from os import mkdir, path, remove
-from PIL import Image
 
-import img2pdf
 import requests
+from PIL import Image
+from retrying import retry
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
@@ -40,7 +40,7 @@ def splitThreads(data, num):
         start = i * num
         end = min((i + 1) * num, len(data))
         yield data[start:end]
-        
+
 def requireInt(msg, notNull):
     while True:
         userInput = input(msg)
@@ -56,7 +56,7 @@ class Comic:
         self.rootPath = rootPath
         info(f'初始化漫画 ID {comicID}')
         self.headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.56',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
             'referer': f'https://manga.bilibili.com/detail/mc{comicID}?from=manga_homepage',
             'cookie': f'SESSDATA={sessdata}'
@@ -74,17 +74,17 @@ class Comic:
         detailUrl = 'https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web'
         payload = {"comic_id": self.comicID}
         with console.status('正在访问 BiliBili Manga'):
-            res = requests.post(detailUrl, data=payload, headers=self.headers)
-            if not res.ok:
-                error('请求错误 / 网络错误!')
-                error(f'详细信息: {res.status_code}')
-                error("请检查输入信息是否正确!")
-                exit(1)
+            @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+            def _():
+                res = requests.post(detailUrl, data=payload, headers=self.headers)
+                if res.status_code != 200:
+                    raise requests.HTTPError(f'{self.title} 爬取漫画信息失败! {res.status_code} {res.reason}\n请检查输入信息是否正确!')
+                return res
 
         # 解析漫画信息
         info('已获取漫画信息!')
         info('开始解析...')
-        data = res.json()
+        data = _().json()
         if data['code']: error(f'漫画信息有误! 请仔细检查! (提示信息{data["msg"]})')
         self.title = data['data']['title']
         self.authorName = data['data']['author_name']
@@ -119,7 +119,7 @@ class Comic:
             epList.reverse()
             for episode in epList:
                 epi = Episode(episode, self.sessdata, self.comicID, self.savePath)
-                if start <= epi.ord <= end and epi.getAvailable():
+                if start <= epi.ord <= end and epi.isAvailable():
                     self.episodes.append(epi)
 
         # 打印章节信息
@@ -142,19 +142,18 @@ class Comic:
         else:
             mkdir(self.savePath)
 
-        # 多线程爬取
-        with Progress() as progress:
-            epiTask = progress.add_task(f'正在下载 <{self.title}>', total=len(self.episodes))
-            for epis in splitThreads(self.episodes, self.threads):
-                threads = []
-                for epi in epis:
-                    t = threading.Thread(target=epi.download)
-                    t.start()
-                    threads.append(t)
+        from concurrent.futures import ThreadPoolExecutor, as_completed
 
-                for t in threads:
-                    t.join()
+        # 创建线程池爬取漫画
+        with ThreadPoolExecutor(max_workers=16) as executor, Progress() as progress:
+            epiTask = progress.add_task(f'正在下载 <{self.title}>', total=len(self.episodes))
+            # 将下载任务提交到线程池中执行
+            future_to_epi = {executor.submit(epi.download): epi for epi in self.episodes}
+            # 等待所有任务完成
+            for future in as_completed(future_to_epi):
+                if future.done():
                     progress.update(epiTask, advance=1)
+
         info('任务完成!')
 
 class Episode:
@@ -165,7 +164,7 @@ class Episode:
         self.title = re.sub(r'[\\/:*?"<>|]', ' ', episode['short_title'] + ' ' + episode['title'])
         
         self.headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.56',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
             'referer': f'https://manga.bilibili.com/detail/mc{comicID}/{self.id}?from=manga_homepage',
             'cookie': f'SESSDATA={sessData}'
@@ -173,41 +172,51 @@ class Episode:
         }
         self.savePath = savePath
     
-    def getAvailable(self ) -> bool:
+    def isAvailable(self) -> bool:
+        """
+        判断章节是否可用
+        True: 已解锁章节
+        False: 需付费章节
+        """
         return self.available
     
-    def download(self) -> bool:
+    def download(self) -> None:
+        """
+        下载章节内所有图片 并合并为PDF
+        """
+        
         # 相同文件名已经存在 跳过下载
         if os.path.exists(f'{self.savePath}/{self.title}.pdf'):
             return False
         
         # 获取图片列表
         GetImageIndexURL = 'https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web'
-        res = requests.post(GetImageIndexURL, data={'ep_id': self.id}, headers=self.headers)
-        if res.ok:
-            data = res.json()
-            images = data['data']['images']
-            paths = [img['path'] for img in images]
-        else:
-            error(f'获取图片列表失败! {res.status_code} {res.reason}')
-            exit(1)
-        
+        @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+        def _():
+            res = requests.post(GetImageIndexURL, data={'ep_id': self.id}, headers=self.headers)
+            if res.status_code != 200:
+                raise requests.HTTPError(f'{self.title} 获取图片列表失败! {res.status_code} {res.reason}')
+            return res
+        images = _().json()['data']['images']
+        paths = [img['path'] for img in images]
+
         # 获取图片token
         ImageTokenURL = "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=pc&platform=web"
-        res = requests.post(ImageTokenURL, data={"urls": json.dumps(paths)}, headers=self.headers)
-        if res.ok:
-            imgs = [
-                self.downloadImg(index, img['url'], img['token'])
-                for index, img in enumerate(res.json()['data'], start=1)
-            ]
-        else:
-            error(f'获取图片token失败! {res.status_code} {res.reason}')
-            exit(1)
-            
-        # 旧方法，偶尔会出现pdf打不开的情况
+        @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+        def _():
+            res = requests.post(ImageTokenURL, data={"urls": json.dumps(paths)}, headers=self.headers)
+            if res.status_code != 200:
+                raise requests.HTTPError(f'{self.title} 获取图片token失败! {res.status_code} {res.reason}')
+            return res
+        imgs = [
+            self.downloadImg(index, img['url'], img['token'])
+            for index, img in enumerate(_().json()['data'], start=1)
+        ]
+
+        # 旧方法，偶尔会出现pdf打不开的情况, 猜测可能是img文件信道的问题
+        # import img2pdf
         # with open(os.path.join(self.savePath, f"{self.title}.pdf"), 'wb') as f:
         #     f.write(img2pdf.convert(imgs))
-            
 
         # 新方法
         tempImgs = [Image.open(x) for x in imgs]
@@ -215,22 +224,21 @@ class Episode:
             if img.mode != 'RGB':
                 tempImgs[i] = img.convert('RGB')
         tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:])
-        
 
         for img in imgs:
             remove(img)
-            
-        info(f'已下载 <{self.title}>')
-        return True
 
+        info(f'已下载 <{self.title}>')
+
+    @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
     def downloadImg(self, index: int, url: str, token: str) -> None:
-        
-        while True:
-            url = f"{url}?token={token}"
-            file = requests.get(url)
-            if file.headers['Etag'] == hashlib.md5(file.content).hexdigest():
-                break
-            error(f"{self.title} 下载内容Checksum不正确! {file.headers['Etag']} ≠ {hashlib.md5(file.content).hexdigest()}")
+        """
+        根据 url 和 token 下载图片
+        """
+        url = f"{url}?token={token}"
+        file = requests.get(url)
+        if file.headers['Etag'] != hashlib.md5(file.content).hexdigest():
+            raise ValueError(f"{self.title} 下载内容Checksum不正确! {file.headers['Etag']} ≠ {hashlib.md5(file.content).hexdigest()}")
 
         pathToSave = os.path.join(self.savePath, f"{self.ord}_{index}.jpg")
         with open(pathToSave, 'wb') as f:
