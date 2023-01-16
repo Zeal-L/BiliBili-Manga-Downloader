@@ -1,13 +1,10 @@
 import datetime
 import hashlib
 import json
-import math
 import os
 import re
 import textwrap
-import threading
 import time
-from os import mkdir, path, remove
 
 import requests
 from PIL import Image
@@ -34,13 +31,6 @@ def error(msg):
     logStr = f"{timeStr()} [b]|[rgb(204, 0, 0)]ERROR[/]|[/b] {msg}"
     print(logStr)
 
-
-def splitThreads(data, num):
-    for i in range(math.ceil((len(data) / num))):
-        start = i * num
-        end = min((i + 1) * num, len(data))
-        yield data[start:end]
-
 def requireInt(msg, notNull):
     while True:
         userInput = input(msg)
@@ -61,7 +51,6 @@ class Comic:
             'referer': f'https://manga.bilibili.com/detail/mc{comicID}?from=manga_homepage',
             'cookie': f'SESSDATA={sessdata}'
         }
-        self.threads = 16
         self.analyzeData()
 
     def analyzeData(self) -> None:
@@ -74,7 +63,7 @@ class Comic:
         detailUrl = 'https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web'
         payload = {"comic_id": self.comicID}
         with console.status('正在访问 BiliBili Manga'):
-            @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+            @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
             def _():
                 res = requests.post(detailUrl, data=payload, headers=self.headers)
                 if res.status_code != 200:
@@ -125,7 +114,7 @@ class Comic:
         # 打印章节信息
         print("已选中章节:")
         for episode in self.episodes:
-            print(f"\t{episode.title}")
+            print(f"\t<{episode.title}>")
         info(f'分析结束 将爬取章节数: {len(self.episodes)} 输入回车开始爬取!')
         input()
 
@@ -135,17 +124,17 @@ class Comic:
         Fetch and download comic data using multiple threads.
         """
         # 初始化储存文件夹
-        if not path.exists(self.rootPath):
-            mkdir(self.rootPath)
-        if path.exists(self.savePath) and path.isdir(self.savePath):
+        if not os.path.exists(self.rootPath):
+            os.mkdir(self.rootPath)
+        if os.path.exists(self.savePath) and os.path.isdir(self.savePath):
             info('存在历史下载 将避免下载相同文件!')
         else:
-            mkdir(self.savePath)
+            os.mkdir(self.savePath)
 
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         # 创建线程池爬取漫画
-        with ThreadPoolExecutor(max_workers=16) as executor, Progress() as progress:
+        with ThreadPoolExecutor(max_workers=8) as executor, Progress() as progress:
             epiTask = progress.add_task(f'正在下载 <{self.title}>', total=len(self.episodes))
             # 将下载任务提交到线程池中执行
             future_to_epi = {executor.submit(epi.download): epi for epi in self.episodes}
@@ -161,14 +150,32 @@ class Episode:
         self.id = episode['id']
         self.available = not episode['is_locked']
         self.ord = episode['ord']
-        self.title = re.sub(r'[\\/:*?"<>|]', ' ', episode['short_title'] + ' ' + episode['title'])
+        
+        # 修复标题中的特殊字符
+        episode['short_title'] = re.sub(r'[\\/:*?"<>|]', ' ', episode['short_title'])
+        episode['short_title'] = re.sub(r'\s+$', '', episode['short_title'])
+        episode['title'] =  re.sub(r'[\\/:*?"<>|]', ' ', episode['title'])
+        episode['title'] =  re.sub(r'\s+$', '', episode['title'])
+        
+        # 修复短标题中的数字
+        if re.search(r'^\d+$', episode['short_title']):
+            new_short_title = f"第{episode['short_title']}话"
+        elif re.search(r'^\d+话', episode['short_title']):
+            new_short_title = f"第{episode['short_title']}"
+        else:
+            new_short_title = episode['short_title']
+
+        # 修复标题
+        if episode['short_title'] == episode['title'] or episode['title'] == '':
+            self.title = new_short_title
+        else:
+            self.title = f"{new_short_title} {episode['title']}"
         
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
             'referer': f'https://manga.bilibili.com/detail/mc{comicID}/{self.id}?from=manga_homepage',
             'cookie': f'SESSDATA={sessData}'
-
         }
         self.savePath = savePath
     
@@ -191,7 +198,7 @@ class Episode:
         
         # 获取图片列表
         GetImageIndexURL = 'https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web'
-        @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+        @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
         def _():
             res = requests.post(GetImageIndexURL, data={'ep_id': self.id}, headers=self.headers)
             if res.status_code != 200:
@@ -202,7 +209,7 @@ class Episode:
 
         # 获取图片token
         ImageTokenURL = "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=pc&platform=web"
-        @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+        @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
         def _():
             res = requests.post(ImageTokenURL, data={"urls": json.dumps(paths)}, headers=self.headers)
             if res.status_code != 200:
@@ -226,17 +233,19 @@ class Episode:
         tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:])
 
         for img in imgs:
-            remove(img)
+            os.remove(img)
 
         info(f'已下载 <{self.title}>')
 
-    @retry(stop_max_delay=10000, wait_exponential_multiplier=1000)
+    @retry(stop_max_delay=10000, wait_exponential_multiplier=200)
     def downloadImg(self, index: int, url: str, token: str) -> None:
         """
         根据 url 和 token 下载图片
         """
         url = f"{url}?token={token}"
         file = requests.get(url)
+        if file.status_code != 200:
+            raise requests.HTTPError(f"{self.title} 下载图片失败! {file.status_code} {file.reason}")
         if file.headers['Etag'] != hashlib.md5(file.content).hexdigest():
             raise ValueError(f"{self.title} 下载内容Checksum不正确! {file.headers['Etag']} ≠ {hashlib.md5(file.content).hexdigest()}")
 
@@ -252,7 +261,8 @@ if __name__ == '__main__':
     # comicID = requireInt('请输入漫画ID: ', True)
     # userInput = input('请输入SESSDATA (免费漫画请直接按下enter): ')
     
-    comicID = 24442
+    comicID = 'mc25332'
+    comicID = re.sub(r'^mc', '', comicID)
     # sessdata = '6a2f415f%2C1689285165%2C3ac9d%2A11'
     sessdata = 'f5230c77%2C1689341122%2Cd6518%2A11'
     manga = Comic(comicID, sessdata, rootPath)
