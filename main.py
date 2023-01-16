@@ -5,6 +5,7 @@ import os
 import re
 import textwrap
 import time
+import logging
 
 import requests
 from PIL import Image
@@ -15,6 +16,13 @@ from rich.progress import Progress
 from rich.table import Table
 
 console = Console()
+logging.basicConfig(filename='ERRORrecord.log', 
+                    level=logging.INFO,
+                    format='%(asctime)s | %(levelname)s | 模块:%(module)s | 函数:%(funcName)s %(lineno) d行 | %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    encoding="utf-8")
+
+logger = logging.getLogger(__name__)
 
 def timeStr():
     t = datetime.datetime.fromtimestamp(time.time())
@@ -67,14 +75,25 @@ class Comic:
             def _():
                 res = requests.post(detailUrl, data=payload, headers=self.headers)
                 if res.status_code != 200:
-                    raise requests.HTTPError(f'{self.title} 爬取漫画信息失败! {res.status_code} {res.reason}\n请检查输入信息是否正确!')
+                    logger.warning(f'{self.comicID} 爬取漫画信息失败! {res.status_code} {res.reason} 重试中...')
+                    raise requests.HTTPError()
                 return res
-
+        try:
+            data = _()
+        except Exception as e:
+            logger.error(f'{self.comicID} 重复解析漫画信息多次后失败! {e}')
+            raise requests.HTTPError(f'{self.comicID} 爬取漫画信息失败!\n请检查输入信息是否正确!也可以查看日志文件或者联系作者')
+        
         # 解析漫画信息
         info('已获取漫画信息!')
         info('开始解析...')
-        data = _().json()
-        if data['code']: error(f'漫画信息有误! 请仔细检查! (提示信息{data["msg"]})')
+        data = data.json()
+        if data['code']: 
+            error(f'漫画信息有误! 请仔细检查! (提示信息{data["msg"]})')
+            logger.warning(f'{self.comicID} 漫画信息有误! {data["msg"]}')
+            raise ValueError()
+        
+        
         self.title = data['data']['title']
         self.authorName = data['data']['author_name']
         self.styles = data['data']['styles']
@@ -136,6 +155,7 @@ class Comic:
         # 创建线程池爬取漫画
         with ThreadPoolExecutor(max_workers=8) as executor, Progress() as progress:
             epiTask = progress.add_task(f'正在下载 <{self.title}>', total=len(self.episodes))
+            logger.info(f'开始下载 <{self.title} - 下载章节数:{len(self.episodes)}>')
             # 将下载任务提交到线程池中执行
             future_to_epi = {executor.submit(epi.download): epi for epi in self.episodes}
             # 等待所有任务完成
@@ -202,9 +222,16 @@ class Episode:
         def _():
             res = requests.post(GetImageIndexURL, data={'ep_id': self.id}, headers=self.headers)
             if res.status_code != 200:
-                raise requests.HTTPError(f'{self.title} 获取图片列表失败! {res.status_code} {res.reason}')
+                logger.warning(f'{self.title} 获取图片列表失败! {res.status_code} {res.reason} 重试中...')
+                raise requests.HTTPError()
             return res
-        images = _().json()['data']['images']
+        try:
+            data = _()
+        except Exception as e:
+            logger.error(f'{self.title} 重复获取图片列表多次后失败! {e}')
+            raise requests.HTTPError(f'{self.title} 重复获取图片列表多次后失败!, 请查看日志文件或者联系作者')
+        
+        images = data.json()['data']['images']
         paths = [img['path'] for img in images]
 
         # 获取图片token
@@ -213,12 +240,22 @@ class Episode:
         def _():
             res = requests.post(ImageTokenURL, data={"urls": json.dumps(paths)}, headers=self.headers)
             if res.status_code != 200:
-                raise requests.HTTPError(f'{self.title} 获取图片token失败! {res.status_code} {res.reason}')
+                logger.warning(f'{self.title} 获取图片token失败! {res.status_code} {res.reason} 重试中...')
+                raise requests.HTTPError()
             return res
-        imgs = [
-            self.downloadImg(index, img['url'], img['token'])
-            for index, img in enumerate(_().json()['data'], start=1)
-        ]
+        try:
+            data = _()
+        except Exception as e:
+            logger.error(f'{self.title} 重复获取图片token多次后失败! {e}')
+            raise requests.HTTPError(f'{self.title} 重复获取图片token多次后失败!, 请查看日志文件或者联系作者')
+        
+        imgs = []
+        for index, img in enumerate(data.json()['data'], start=1):
+            try:
+                imgs.append(self.downloadImg(index, img['url'], img['token']))
+            except Exception as e:
+                logger.error(f"{self.title} - {index, img['url'], img['token']} - 重复下载图片多次后失败! - {e}")
+                raise requests.HTTPError(f'{self.title} 重复下载图片多次后失败!, 请查看日志文件或者联系作者')
 
         # 旧方法，偶尔会出现pdf打不开的情况, 猜测可能是img文件信道的问题
         # import img2pdf
@@ -230,7 +267,12 @@ class Episode:
         for i,img in enumerate(tempImgs):
             if img.mode != 'RGB':
                 tempImgs[i] = img.convert('RGB')
-        tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:])
+
+        try:
+            tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:])
+        except Exception as e:
+            logger.error(f'{self.title} 合并PDF失败! {e} - {imgs}')
+            raise ValueError(f'{self.title} 合并PDF失败!, 请查看日志文件或者联系作者')
 
         for img in imgs:
             os.remove(img)
@@ -238,16 +280,18 @@ class Episode:
         info(f'已下载 <{self.title}>')
 
     @retry(stop_max_delay=10000, wait_exponential_multiplier=200)
-    def downloadImg(self, index: int, url: str, token: str) -> None:
+    def downloadImg(self, index: int, url: str, token: str) -> str:
         """
         根据 url 和 token 下载图片
         """
         url = f"{url}?token={token}"
         file = requests.get(url)
         if file.status_code != 200:
-            raise requests.HTTPError(f"{self.title} 下载图片失败! {file.status_code} {file.reason}")
+            logger.error(f"{self.title} - {index, url} - 下载图片失败! 重试中... {file.status_code} {file.reason}")
+            raise requests.HTTPError()
         if file.headers['Etag'] != hashlib.md5(file.content).hexdigest():
-            raise ValueError(f"{self.title} 下载内容Checksum不正确! {file.headers['Etag']} ≠ {hashlib.md5(file.content).hexdigest()}")
+            logger.error(f"{self.title} - {index, url} - 下载内容Checksum不正确! 重试中... {file.headers['Etag']} ≠ {hashlib.md5(file.content).hexdigest()}")
+            raise ValueError()
 
         pathToSave = os.path.join(self.savePath, f"{self.ord}_{index}.jpg")
         with open(pathToSave, 'wb') as f:
@@ -261,7 +305,7 @@ if __name__ == '__main__':
     # comicID = requireInt('请输入漫画ID: ', True)
     # userInput = input('请输入SESSDATA (免费漫画请直接按下enter): ')
     
-    comicID = 'mc25332'
+    comicID = 'mc26551'
     comicID = re.sub(r'^mc', '', comicID)
     # sessdata = '6a2f415f%2C1689285165%2C3ac9d%2A11'
     sessdata = 'f5230c77%2C1689341122%2Cd6518%2A11'
