@@ -1,27 +1,71 @@
 import sys
 import json
 import os
-from PySide6.QtWidgets import QApplication, QPushButton, QSizePolicy, QCheckBox, QWidget, QRadioButton, QGroupBox, QVBoxLayout, QHBoxLayout, QButtonGroup, QFileDialog
+from PySide6.QtWidgets import QApplication, QPushButton, QSizePolicy, QCheckBox, QWidget, QRadioButton, QGroupBox, QVBoxLayout, QHBoxLayout, QButtonGroup, QFileDialog, QMessageBox
 from ui_mainWidget import Ui_MainWidget
 from src.utils import *
+import logging
+from logging import handlers
+from MyAbout import MyAbout
 
 class MyGui(QWidget, Ui_MainWidget): 
+    
     def __init__(self): 
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("哔哩哔哩漫画下载器 v0.0.1") 
-
-        # 读取配置文件
+        self.clearUserData = False
+        self.aboutWindow = MyAbout()
+        
+        ############################################################
+        # 获取应用程序数据目录
         appdata_path = os.getenv("APPDATA")
         self.app_folder = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
         if not os.path.exists(self.app_folder):
             os.mkdir(self.app_folder)
+        
+        ############################################################
+        # 配置日志记录器
+        self.logPath = os.path.join(appdata_path, "BiliBili-Manga-Downloader", "logs")
+        if not os.path.exists(self.logPath):
+            os.mkdir(self.logPath)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        logHandler = handlers.TimedRotatingFileHandler(os.path.join(self.logPath, "ERROR.log"), when='D', interval=1, backupCount=5, encoding="utf-8")
+        
+        logHandler.setFormatter(logging.Formatter(
+            '%(asctime)s | %(levelname)s | 模块:%(module)s | 函数:%(funcName)s %(lineno) d行 | %(message)s', 
+            datefmt='%Y-%m-%d %H:%M:%S'))
+        
+        logger.addHandler(logHandler)
+        self.logger = logger
+
+        ############################################################
+        # 读取配置文件
         self.configPath = os.path.join(self.app_folder, "config.json")
         self.config = None
         self.label_save_path = None
 
+        ############################################################
+        # 初始化
         self.settingUI()
-        
+
+    ############################################################
+    # 重写关闭事件，清除用户数据
+    def closeEvent(self, event):
+        def _(path):
+            for file in os.listdir(path):
+                file_path = os.path.join(path, file)
+                if os.path.isdir(file_path):
+                    _(file_path)
+                else:
+                    os.remove(file_path)
+            os.rmdir(path)
+        logging.shutdown()
+        if self.clearUserData and os.path.exists(self.app_folder):
+            _(self.app_folder)
+        event.accept()
+    
     def getConfig(self, key: str):
         if self.config:
             return self.config.get(key)
@@ -37,9 +81,6 @@ class MyGui(QWidget, Ui_MainWidget):
 
     def updateConfig(self, key: str, value):
         self.config[key] = value
-        # 只会在用户清除数据后触发，不再产生新的配置文件，所有新配置只在当前会话有效
-        if not os.path.exists(self.configPath):
-            return
         with open(self.configPath, 'w+', encoding='utf-8') as f:
             # ensure_ascii=False 保证中文不被转义
             json.dump(self.config, f, indent=4, ensure_ascii=False)
@@ -92,17 +133,16 @@ class MyGui(QWidget, Ui_MainWidget):
         
         ############################################################
         # 绑定清理用户数据设置
-        def __(path):
-            for file in os.listdir(path):
-                file_path = os.path.join(path, file)
-                if os.path.isdir(file_path):
-                    __(file_path)
-                else:
-                    os.remove(file_path)
-            os.rmdir(path)
         def _():
-            if os.path.exists(self.app_folder):
-                __(self.app_folder)
+            res = QMessageBox.information(self, "提示", "清除所有用户数据，不包括已下载漫画\n只包括Cookie和其他程序缓存文件\n\n注意：清除后将无法恢复\n当前会话不再产生新的配置文件，所有新配置只在当前会话有效", QMessageBox.Yes | QMessageBox.No)
+            if res == QMessageBox.Yes:
+                self.clearUserData = True
         self.pushButton_clear_data.clicked.connect(_)
-        self.pushButton_clear_data.setToolTip("清除所有用户数据，不包括已下载漫画\n只包括Cookie和下载路径和其他程序缓存文件\n注意：清除后将无法恢复\n当前会话不再产生新的配置文件，所有新配置只在当前会话有效")
+        
+        ############################################################
+        # 绑定打开日志文件, 在新窗口用rich库打印日志
+        self.pushButton_open_log.clicked.connect(lambda: os.startfile(os.path.join(self.logPath, "ERROR.log")))
 
+        ############################################################
+        # 绑定关于按钮
+        self.pushButton_about.clicked.connect(lambda: self.aboutWindow.show())

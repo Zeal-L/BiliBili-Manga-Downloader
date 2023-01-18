@@ -611,19 +611,6 @@
           <number>50</number>
          </property>
          <item>
-          <widget class="QPushButton" name="pushButton_output_termial">
-           <property name="maximumSize">
-            <size>
-             <width>200</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>输出终端</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="pushButton_open_log">
            <property name="maximumSize">
             <size>

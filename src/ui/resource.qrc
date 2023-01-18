@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>imgs/blinblin.png</file>
     <file>imgs/BiliBili_favicon.ico</file>
     <file>imgs/别当哥哥了.jpg</file>
   </qresource>

@@ -12,13 +12,6 @@ from src.utils import *
 from src.Comic import Comic
 
 console = Console()
-logging.basicConfig(filename='ERRORrecord.log', 
-                    level=logging.INFO,
-                    format='%(asctime)s | %(levelname)s | 模块:%(module)s | 函数:%(funcName)s %(lineno) d行 | %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    encoding="utf-8")
-
-logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     rootPath = "C://Users//Zeal//Desktop//漫画"

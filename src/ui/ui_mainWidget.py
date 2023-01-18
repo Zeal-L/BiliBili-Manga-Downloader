@@ -418,12 +418,6 @@ class Ui_MainWidget(object):
         self.h_Layout_buttons = QHBoxLayout()
         self.h_Layout_buttons.setSpacing(50)
         self.h_Layout_buttons.setObjectName(u"h_Layout_buttons")
-        self.pushButton_output_termial = QPushButton(self.tab_setting)
-        self.pushButton_output_termial.setObjectName(u"pushButton_output_termial")
-        self.pushButton_output_termial.setMaximumSize(QSize(200, 16777215))
-
-        self.h_Layout_buttons.addWidget(self.pushButton_output_termial)
-
         self.pushButton_open_log = QPushButton(self.tab_setting)
         self.pushButton_open_log.setObjectName(u"pushButton_open_log")
         self.pushButton_open_log.setMaximumSize(QSize(200, 16777215))
@@ -500,7 +494,6 @@ class Ui_MainWidget(object):
         self.pushButton_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6d4f\u89c8...", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWidget", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWidget", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a8\uff09", None))
-        self.pushButton_output_termial.setText(QCoreApplication.translate("MainWidget", u"\u8f93\u51fa\u7ec8\u7aef", None))
         self.pushButton_open_log.setText(QCoreApplication.translate("MainWidget", u"\u6253\u5f00\u65e5\u5fd7", None))
         self.pushButton_clear_data.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7a7a\u7528\u6237\u6570\u636e", None))
         self.pushButton_about.setText(QCoreApplication.translate("MainWidget", u"\u5173\u4e8e", None))
