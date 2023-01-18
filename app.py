@@ -21,8 +21,7 @@ if __name__ == '__main__':
     
     # comicID = 'mc26551'
     # comicID = re.sub(r'^mc', '', comicID)
-    # # sessdata = '6a2f415f%2C1689285165%2C3ac9d%2A11'
-    # sessdata = 'f5230c77%2C1689341122%2Cd6518%2A11'
+    # sessdata = '160df8b2%2C1689459707%2C66993%2A11'
     # manga = Comic(logger, comicID, sessdata, rootPath)
     # manga.fetch()
     

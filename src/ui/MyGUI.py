@@ -1,12 +1,24 @@
-import sys
 import json
-import os
-from PySide6.QtWidgets import QApplication, QPushButton, QSizePolicy, QCheckBox, QWidget, QRadioButton, QGroupBox, QVBoxLayout, QHBoxLayout, QButtonGroup, QFileDialog, QMessageBox
-from ui_mainWidget import Ui_MainWidget
-from src.utils import *
 import logging
+import os
+import re
+import sys
 from logging import handlers
+
 from MyAbout import MyAbout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import (QStandardItem, QStandardItemModel, QTextCharFormat,
+                           QTextCursor, QFont)
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
+                               QFileDialog, QGroupBox, QHBoxLayout, QLabel,
+                               QListView, QListWidget, QListWidgetItem,
+                               QMessageBox, QPushButton, QRadioButton,
+                               QSizePolicy, QVBoxLayout, QWidget, QLayout)
+from ui_mainWidget import Ui_MainWidget
+from src.Comic import Comic
+from src.searchComic import SearchComic
+from src.utils import *
+
 
 class MyGui(QWidget, Ui_MainWidget): 
     
@@ -16,6 +28,10 @@ class MyGui(QWidget, Ui_MainWidget):
         self.setWindowTitle("哔哩哔哩漫画下载器 v0.0.1") 
         self.clearUserData = False
         self.aboutWindow = MyAbout()
+        
+        # 改变窗口内所有文字的大小
+        self.setFont(QFont("Microsoft YaHei", 10))
+        
         
         ############################################################
         # 获取应用程序数据目录
@@ -44,11 +60,39 @@ class MyGui(QWidget, Ui_MainWidget):
         # 读取配置文件
         self.configPath = os.path.join(self.app_folder, "config.json")
         self.config = None
-        self.label_save_path = None
 
         ############################################################
-        # 初始化
+        # 初始化UI绑定事件
         self.settingUI()
+        self.mangaUI()
+        
+        
+    def mangaUI(self):
+        ############################################################
+        # 重写关闭事件，清除用户数据
+        data = SearchComic(self.logger, self.lineEdit_manga_search_name.text(), self.getConfig("cookie")).getResults()['data']['list']
+        def _():
+            print(data)
+            self.listWidget_manga_search.clear()
+            self.label_manga_search.setText(f"找到：{len(data)}条结果")
+            for item in data:
+                # 替换所有html标签
+                item['title'] = re.sub(r'</[^>]+>', '</span>', item['title'])
+                item['title'] = re.sub(r'<[^/>]+>', '<span style="color:red;font-weight:bold">', item['title'])
+
+                temp = QListWidgetItem()
+                self.listWidget_manga_search.addItem(temp)
+                self.listWidget_manga_search.setItemWidget(temp, QLabel(f"{item['title']} by <span style='color:blue'>{item['author_name'][0]}</span>"))
+        self.lineEdit_manga_search_name.returnPressed.connect(_)
+        self.pushButton_manga_search_name.clicked.connect(_)
+        
+        def _(item):
+            index = self.listWidget_manga_search.indexFromItem(item).row()
+            comic = Comic(self.logger, data[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"))
+            
+        self.listWidget_manga_search.itemDoubleClicked.connect(_)
+        
+        
 
     ############################################################
     # 重写关闭事件，清除用户数据

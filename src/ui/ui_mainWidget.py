@@ -27,7 +27,7 @@ class Ui_MainWidget(object):
     def setupUi(self, MainWidget):
         if not MainWidget.objectName():
             MainWidget.setObjectName(u"MainWidget")
-        MainWidget.resize(1058, 673)
+        MainWidget.resize(1058, 726)
         icon = QIcon()
         icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWidget.setWindowIcon(icon)
@@ -66,9 +66,10 @@ class Ui_MainWidget(object):
 
         self.h_Layout_manga_search.addWidget(self.pushButton_manga_search_name)
 
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.label_manga_search = QLabel(self.tab_manga_search)
+        self.label_manga_search.setObjectName(u"label_manga_search")
 
-        self.h_Layout_manga_search.addItem(self.horizontalSpacer_9)
+        self.h_Layout_manga_search.addWidget(self.label_manga_search)
 
         self.h_Layout_manga_search.setStretch(1, 1)
 
@@ -137,6 +138,8 @@ class Ui_MainWidget(object):
 
         self.v_lLayout_my_manga.addWidget(self.groupBox_my_manga)
 
+        self.v_lLayout_my_manga.setStretch(0, 1)
+        self.v_lLayout_my_manga.setStretch(1, 1)
 
         self.horizontalLayout_19.addLayout(self.v_lLayout_my_manga)
 
@@ -451,7 +454,7 @@ class Ui_MainWidget(object):
 
         self.retranslateUi(MainWidget)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.tabWidget_my_manga.setCurrentIndex(0)
         self.tabWidget_download_list.setCurrentIndex(0)
 
@@ -462,8 +465,9 @@ class Ui_MainWidget(object):
     def retranslateUi(self, MainWidget):
         MainWidget.setWindowTitle(QCoreApplication.translate("MainWidget", u"Form", None))
         self.label_8.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u540d", None))
-        self.lineEdit_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u522b\u5f53\u54e5\u54e5\u4e86\uff01", None))
+        self.lineEdit_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u522b\u5f53\u4e86", None))
         self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u641c\u7d22", None))
+        self.label_manga_search.setText("")
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWidget", u"\u641c\u7d22\u6f2b\u753b", None))
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_local_storage), QCoreApplication.translate("MainWidget", u"\u672c\u5730\u5e93\u5b58", None))
         self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fe1\u606f", None))

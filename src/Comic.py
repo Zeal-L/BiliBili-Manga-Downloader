@@ -10,18 +10,18 @@ import logging
 from src.utils import *
 
 import requests
-from PIL import Image
 from retrying import retry
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
 from src.Episode import Episode
+from logging import Logger
 
 console = Console()
 
 class Comic:
-    def __init__(self, logger: logging.Logger, comicID: int, sessdata: str, rootPath: str) -> None:
+    def __init__(self, logger: Logger, comicID: int, sessdata: str, rootPath: str) -> None:
         self.logger = logger
         self.comicID = comicID
         self.sessdata = sessdata
@@ -52,11 +52,11 @@ class Comic:
                     self.logger.warning(f'{self.comicID} 爬取漫画信息失败! {res.status_code} {res.reason} 重试中...')
                     raise requests.HTTPError()
                 return res
-        try:
-            data = _()
-        except Exception as e:
-            self.logger.error(f'{self.comicID} 重复解析漫画信息多次后失败! {e}')
-            raise requests.HTTPError(f'{self.comicID} 爬取漫画信息失败!\n请检查输入信息是否正确!也可以查看日志文件或者联系作者')
+            try:
+                data = _()
+            except Exception as e:
+                self.logger.error(f'{self.comicID} 重复解析漫画信息多次后失败! {e}')
+                raise requests.HTTPError(f'{self.comicID} 爬取漫画信息失败!\n请检查输入信息是否正确!也可以查看日志文件或者联系作者')
         
         # 解析漫画信息
         info('已获取漫画信息!')

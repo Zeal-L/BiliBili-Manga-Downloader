@@ -3,15 +3,10 @@ import json
 import logging
 import os
 import re
-import textwrap
 
 import requests
 from PIL import Image
 from retrying import retry
-from rich import print
-from rich.progress import Progress
-from rich.table import Table
-
 from src.utils import *
 
 

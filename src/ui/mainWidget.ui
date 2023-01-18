@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1058</width>
-    <height>673</height>
+    <height>726</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
       <bool>false</bool>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_my_manga">
       <attribute name="title">
@@ -32,7 +32,7 @@
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_19">
        <item>
-        <layout class="QVBoxLayout" name="v_lLayout_my_manga">
+        <layout class="QVBoxLayout" name="v_lLayout_my_manga" stretch="1,1">
          <item>
           <widget class="QTabWidget" name="tabWidget_my_manga">
            <property name="currentIndex">
@@ -61,7 +61,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>别当哥哥了！</string>
+                  <string>别当了</string>
                  </property>
                 </widget>
                </item>
@@ -73,17 +73,11 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_9">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                <widget class="QLabel" name="label_manga_search">
+                 <property name="text">
+                  <string/>
                  </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
+                </widget>
                </item>
               </layout>
              </item>
