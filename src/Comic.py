@@ -27,7 +27,7 @@ class Comic:
         self.sessdata = sessdata
         self.rootPath = rootPath
         self.num_thread = num_thread
-        self.info = {}
+        self.numDownloaded = 0
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
@@ -67,26 +67,23 @@ class Comic:
 
         self.data['author_name'] = ', '.join(self.data['author_name'])
         self.data['styles'] = ', '.join(self.data['styles'])
-        self.info['savePath'] = f"{self.rootPath}/《{self.data['title']}》 作者：{self.data['author_name']}"
+        self.data['savePath'] = f"{self.rootPath}/《{self.data['title']}》 作者：{self.data['author_name']}"
         return self.data
         
-    def xxx(self):
+    def getEpisodeInfo(self) -> list:
+        # 解析章节
+        self.episodes = []
+        checkDownloaded = False
+        epList = self.data['ep_list']
+        for episode in reversed(epList):
+            epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.data['savePath'])
+            self.episodes.append(epi)
+            if epi.isDownloaded():
+                self.numDownloaded += 1
+        return [(epi.title, epi.isAvailable(), epi.isDownloaded()) for epi in self.episodes]
 
-        # # 解析章节
-        # self.episodes = []
-        # with console.status('正在解析详细章节...'):
-        #     epList = self.info['data']['ep_list']
-        #     epList.reverse()
-        #     for episode in epList:
-        #         epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.savePath)
-        #         if start <= epi.ord <= end and epi.isAvailable():
-        #             self.episodes.append(epi)
-
-        # 打印章节信息
-        print("已选中章节:")
-        for episode in self.episodes:
-            print(f"\t<{episode.title}>")
-
+    def getNumDownloaded(self) -> int:
+        return self.numDownloaded
 
     def fetch(self) -> None:
         """

@@ -8,14 +8,14 @@ from logging import handlers
 import requests
 
 from MyAbout import MyAbout
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtCore import Qt, QEvent, QSize, QTimer
 from PySide6.QtGui import (QStandardItem, QStandardItemModel, QTextCharFormat,
-                           QTextCursor, QFont, QPixmap, QImage)
+                           QTextCursor, QFont, QPixmap, QImage, QColor)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
                                QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                                QListView, QListWidget, QListWidgetItem,
                                QMessageBox, QPushButton, QRadioButton,
-                               QSizePolicy, QVBoxLayout, QWidget, QLayout)
+                               QSizePolicy, QVBoxLayout, QWidget, QLayout, QMenu)
 from ui_mainWidget import Ui_MainWidget
 from src.Comic import Comic
 from src.searchComic import SearchComic
@@ -30,9 +30,10 @@ class MyGui(QWidget, Ui_MainWidget):
         self.setWindowTitle("哔哩哔哩漫画下载器 v0.0.1") 
         self.clearUserData = False
         self.aboutWindow = MyAbout()
-        
-        # 改变窗口内所有文字的大小
+        self.listWidget_chp_detail.setDragEnabled(False)
         self.setFont(QFont("Microsoft YaHei", 10))
+        self.currComic = None
+        self.numSelected = 0
         
         
         ############################################################
@@ -67,6 +68,7 @@ class MyGui(QWidget, Ui_MainWidget):
         # 初始化UI绑定事件
         self.settingUI()
         self.mangaUI()
+        self.episodesUI()
         
         
     def mangaUI(self):
@@ -94,12 +96,13 @@ class MyGui(QWidget, Ui_MainWidget):
         # 绑定双击显示漫画详情事件
         def _(item):
             index = self.listWidget_manga_search.indexFromItem(item).row()
-            comic = Comic(self.logger, self.searchInfo[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"), self.getConfig("num_thread"))
-            data = comic.getComicInfo()
+            self.currComic = Comic(self.logger, self.searchInfo[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"), self.getConfig("num_thread"))
+            data = self.currComic.getComicInfo()
             self.label_manga_title.setText("<span style='color:blue;font-weight:bold'>标题：</span>" + data['title'])
             self.label_manga_author.setText("<span style='color:blue;font-weight:bold'>作者：</span>" + data['author_name'])
-            self.label_manga_style.setText("<span style='color:blue;font-weight:bold'>标签：</span>" + data['styles'] if data['styles'] else "标签：无")
-            self.label_manga_outline.setText("<span style='color:blue;font-weight:bold'>概要：</span>" + data['evaluate'] if data['evaluate'] else "概要：无")
+            self.label_manga_style.setText(f"<span style='color:blue;font-weight:bold'>标签：</span>{data['styles'] or '无'}")
+            self.label_manga_isFinish.setText(f"<span style='color:blue;font-weight:bold'>状态：</span>{'已完结' if self.searchInfo[index]['is_finish'] else '连载中'}")
+            self.label_manga_outline.setText(f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}")
             self.labelImg = QPixmap.fromImage(QImage.fromData(requests.get(data['vertical_cover']).content))
             
             ############################################################
@@ -113,10 +116,105 @@ class MyGui(QWidget, Ui_MainWidget):
                 self.label_manga_image.setAlignment(Qt.AlignTop)
             self.label_manga_image.resizeEvent = __
             __()
+            
+            self.updateEpisodes()
 
         self.listWidget_manga_search.itemDoubleClicked.connect(_)
         
         
+    ############################################################
+    # 更新漫画章节详情
+    def updateEpisodes(self):
+        ############################################################
+        # 添加章节列表
+        self.listWidget_chp_detail.clear()
+        self.numSelected = 0
+        num_unlocked = 0
+        if self.currComic:
+            epiList = self.currComic.getEpisodeInfo()
+        for (title, isAvailable, isDownloaded) in epiList:
+            temp = QListWidgetItem(title)
+            temp.setCheckState(Qt.Unchecked)
+            if isDownloaded:
+                temp.setFlags(Qt.NoItemFlags)
+                temp.setCheckState(Qt.Checked)
+                temp.setBackground(QColor(0, 255, 0, 50))
+            if not isAvailable:
+                temp.setFlags(Qt.NoItemFlags)
+            else:
+                num_unlocked += 1
+            temp.setSizeHint(QSize(160, 20))
+            temp.setTextAlignment(Qt.AlignLeft)
+            temp.setToolTip(title)
+            self.listWidget_chp_detail.addItem(temp)
+            
+        ############################################################
+        # 绑定总章节数和已下载章节数等等的显示
+        self.label_chp_detail_total_chp.setText(f"总章数：{len(epiList)}")
+        self.label_chp_detail_num_unlocked.setText(f"已解锁：{num_unlocked}")
+        self.label_chp_detail_num_downloaded.setText(f"已下载：{self.currComic.getNumDownloaded()}")
+        self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
+        
+        
+    ############################################################
+    # 绑定双击显示漫画章节详情事件
+    def episodesUI(self):
+        ############################################################
+        # 绑定鼠标点击选择信号
+        def _(item):
+            if item.flags() == Qt.NoItemFlags:
+                return
+            if item.checkState() == Qt.Checked:
+                item.setCheckState(Qt.Unchecked)
+                self.numSelected -= 1
+            elif item.checkState() == Qt.Unchecked:
+                item.setCheckState(Qt.Checked)
+                self.numSelected += 1
+            self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
+        self.listWidget_chp_detail.itemClicked.connect(_)
+        
+        ############################################################
+        # 绑定右键菜单，让用户可以勾选或者全选等        
+        def checkSelected():
+            for item in self.listWidget_chp_detail.selectedItems():
+                if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Unchecked:
+                    item.setCheckState(Qt.Checked)
+                    self.numSelected += 1
+            self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
+        
+        def uncheckSelected():
+            for item in self.listWidget_chp_detail.selectedItems():
+                if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Checked:
+                    item.setCheckState(Qt.Unchecked)
+                    self.numSelected -= 1
+            self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
+        
+        def checkAll():
+            self.numSelected = 0
+            for i in range(self.listWidget_chp_detail.count()):
+                if self.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags:
+                    self.listWidget_chp_detail.item(i).setCheckState(Qt.Checked)
+                    self.numSelected += 1
+            self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
+        
+        def uncheckAll():
+            self.numSelected = 0
+            for i in range(self.listWidget_chp_detail.count()):
+                if self.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags:
+                    self.listWidget_chp_detail.item(i).setCheckState(Qt.Unchecked)
+            self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
+
+        def myMenu(pos):
+            menu = QMenu()
+            menu.addAction("勾选", checkSelected)
+            menu.addAction("取消勾选", uncheckSelected)
+            menu.addAction("全选", checkAll)
+            menu.addAction("取消全选", uncheckAll)
+            menu.exec_(self.listWidget_chp_detail.mapToGlobal(pos))
+
+        self.listWidget_chp_detail.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.listWidget_chp_detail.customContextMenuRequested.connect(myMenu)
+
 
     ############################################################
     # 重写关闭事件，清除用户数据

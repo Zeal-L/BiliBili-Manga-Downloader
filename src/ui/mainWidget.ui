@@ -61,7 +61,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>别当了</string>
+                  <string>非人</string>
                  </property>
                 </widget>
                </item>
@@ -156,7 +156,7 @@
              </layout>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="v_Layout_manga_detail" stretch="0,0,0,1">
+             <layout class="QVBoxLayout" name="v_Layout_manga_detail" stretch="0,0,0,0,1">
               <property name="spacing">
                <number>6</number>
               </property>
@@ -176,6 +176,13 @@
               </item>
               <item>
                <widget class="QLabel" name="label_manga_style">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_manga_isFinish">
                 <property name="text">
                  <string/>
                 </property>
@@ -216,7 +223,7 @@
             <item>
              <widget class="QLabel" name="label_chp_detail_total_chp">
               <property name="text">
-               <string>总章节数：70</string>
+               <string>总章数：</string>
               </property>
              </widget>
             </item>
@@ -230,7 +237,7 @@
             <item>
              <widget class="QLabel" name="label_chp_detail_num_unlocked">
               <property name="text">
-               <string>已解锁：10章</string>
+               <string>已解锁：</string>
               </property>
              </widget>
             </item>
@@ -244,7 +251,7 @@
             <item>
              <widget class="QLabel" name="label_chp_detail_num_downloaded">
               <property name="text">
-               <string>已下载：0章</string>
+               <string>已下载：</string>
               </property>
              </widget>
             </item>
@@ -258,7 +265,7 @@
             <item>
              <widget class="QLabel" name="label_chp_detail_num_selected">
               <property name="text">
-               <string>已选中：15章</string>
+               <string>已选中：</string>
               </property>
              </widget>
             </item>
@@ -299,17 +306,38 @@
           </item>
           <item>
            <widget class="QListWidget" name="listWidget_chp_detail">
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="dragEnabled">
+             <bool>true</bool>
+            </property>
             <property name="selectionMode">
              <enum>QAbstractItemView::ExtendedSelection</enum>
             </property>
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectRows</enum>
             </property>
+            <property name="isWrapping" stdset="0">
+             <bool>true</bool>
+            </property>
             <property name="resizeMode">
              <enum>QListView::Adjust</enum>
             </property>
+            <property name="spacing">
+             <number>5</number>
+            </property>
             <property name="viewMode">
              <enum>QListView::IconMode</enum>
+            </property>
+            <property name="uniformItemSizes">
+             <bool>true</bool>
+            </property>
+            <property name="batchSize">
+             <number>100</number>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

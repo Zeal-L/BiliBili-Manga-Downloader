@@ -22,11 +22,10 @@ class Episode:
         episode['short_title'] = re.sub(r'\s+$', '', episode['short_title'])
         episode['title'] =  re.sub(r'[\\/:*?"<>|]', ' ', episode['title'])
         episode['title'] =  re.sub(r'\s+$', '', episode['title'])
-        
         # 修复短标题中的数字
-        if re.search(r'^\d+$', episode['short_title']):
+        if re.search(r'^[0-9\-]+$', episode['short_title']):
             new_short_title = f"第{episode['short_title']}话"
-        elif re.search(r'^\d+话', episode['short_title']):
+        elif re.search(r'^[0-9\-]+话', episode['short_title']):
             new_short_title = f"第{episode['short_title']}"
         else:
             new_short_title = episode['short_title']
@@ -52,6 +51,14 @@ class Episode:
         False: 需付费章节
         """
         return self.available
+    
+    def isDownloaded(self) -> bool:
+        """
+        判断章节是否已下载
+        True: 已下载
+        False: 未下载
+        """
+        return os.path.exists(f'{self.savePath}/{self.title}.pdf')
     
     def download(self) -> None:
         """

@@ -4,6 +4,7 @@ from src.utils import *
 import requests
 from retrying import retry
 from logging import Logger
+from rich import print
 
 class SearchComic:
     def __init__(self, logger: Logger, comicName: str, sessdata: str) -> None:

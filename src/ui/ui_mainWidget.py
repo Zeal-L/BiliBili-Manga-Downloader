@@ -140,13 +140,18 @@ class Ui_MainWidget(object):
 
         self.v_Layout_manga_detail.addWidget(self.label_manga_style)
 
+        self.label_manga_isFinish = QLabel(self.groupBox_my_manga)
+        self.label_manga_isFinish.setObjectName(u"label_manga_isFinish")
+
+        self.v_Layout_manga_detail.addWidget(self.label_manga_isFinish)
+
         self.label_manga_outline = QLabel(self.groupBox_my_manga)
         self.label_manga_outline.setObjectName(u"label_manga_outline")
         self.label_manga_outline.setWordWrap(True)
 
         self.v_Layout_manga_detail.addWidget(self.label_manga_outline, 0, Qt.AlignTop)
 
-        self.v_Layout_manga_detail.setStretch(3, 1)
+        self.v_Layout_manga_detail.setStretch(4, 1)
 
         self.horizontalLayout_8.addLayout(self.v_Layout_manga_detail)
 
@@ -237,10 +242,17 @@ class Ui_MainWidget(object):
 
         self.listWidget_chp_detail = QListWidget(self.groupBox_chp_detail)
         self.listWidget_chp_detail.setObjectName(u"listWidget_chp_detail")
+        self.listWidget_chp_detail.setAutoFillBackground(True)
+        self.listWidget_chp_detail.setDragEnabled(True)
         self.listWidget_chp_detail.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.listWidget_chp_detail.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.listWidget_chp_detail.setProperty("isWrapping", True)
         self.listWidget_chp_detail.setResizeMode(QListView.Adjust)
+        self.listWidget_chp_detail.setSpacing(5)
         self.listWidget_chp_detail.setViewMode(QListView.IconMode)
+        self.listWidget_chp_detail.setUniformItemSizes(True)
+        self.listWidget_chp_detail.setBatchSize(100)
+        self.listWidget_chp_detail.setWordWrap(False)
 
         self.verticalLayout_4.addWidget(self.listWidget_chp_detail)
 
@@ -481,7 +493,7 @@ class Ui_MainWidget(object):
     def retranslateUi(self, MainWidget):
         MainWidget.setWindowTitle(QCoreApplication.translate("MainWidget", u"Form", None))
         self.label_8.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u540d", None))
-        self.lineEdit_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u522b\u5f53\u4e86", None))
+        self.lineEdit_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u975e\u4eba", None))
         self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u641c\u7d22", None))
         self.label_manga_search.setText("")
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWidget", u"\u641c\u7d22\u6f2b\u753b", None))
@@ -491,12 +503,13 @@ class Ui_MainWidget(object):
         self.label_manga_title.setText("")
         self.label_manga_author.setText("")
         self.label_manga_style.setText("")
+        self.label_manga_isFinish.setText("")
         self.label_manga_outline.setText("")
         self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWidget", u"\u7ae0\u8282\u8be6\u60c5", None))
-        self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWidget", u"\u603b\u7ae0\u8282\u6570\uff1a70", None))
-        self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u89e3\u9501\uff1a10\u7ae0", None))
-        self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u4e0b\u8f7d\uff1a0\u7ae0", None))
-        self.label_chp_detail_num_selected.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u9009\u4e2d\uff1a15\u7ae0", None))
+        self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWidget", u"\u603b\u7ae0\u6570\uff1a", None))
+        self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u89e3\u9501\uff1a", None))
+        self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u4e0b\u8f7d\uff1a", None))
+        self.label_chp_detail_num_selected.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u9009\u4e2d\uff1a", None))
         self.pushButton_chp_detail_download_selected.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u9009\u4e2d\u7ae0\u8282", None))
         self.pushButton_chp_detail_download_all.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u5168\u90e8\u7ae0\u8282", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWidget", u"\u6211\u7684\u6f2b\u753b", None))
