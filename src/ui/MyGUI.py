@@ -5,10 +5,12 @@ import re
 import sys
 from logging import handlers
 
+import requests
+
 from MyAbout import MyAbout
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import (QStandardItem, QStandardItemModel, QTextCharFormat,
-                           QTextCursor, QFont)
+                           QTextCursor, QFont, QPixmap, QImage)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
                                QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                                QListView, QListWidget, QListWidgetItem,
@@ -69,27 +71,49 @@ class MyGui(QWidget, Ui_MainWidget):
         
     def mangaUI(self):
         ############################################################
-        # 重写关闭事件，清除用户数据
-        data = SearchComic(self.logger, self.lineEdit_manga_search_name.text(), self.getConfig("cookie")).getResults()['data']['list']
+        # 链接搜索漫画功能
         def _():
-            print(data)
+            if not self.getConfig("cookie"):
+                QMessageBox.critical(self, "Critical",  "请先在设置界面填写自己的Cookie！")
+                return
+                
+            self.searchInfo = SearchComic(self.logger, self.lineEdit_manga_search_name.text(), self.getConfig("cookie")).getResults()['data']['list']
             self.listWidget_manga_search.clear()
-            self.label_manga_search.setText(f"找到：{len(data)}条结果")
-            for item in data:
-                # 替换所有html标签
+            self.label_manga_search.setText(f"找到：{len(self.searchInfo)}条结果")
+            for item in self.searchInfo:
+                # 替换爬取信息里的html标签
                 item['title'] = re.sub(r'</[^>]+>', '</span>', item['title'])
                 item['title'] = re.sub(r'<[^/>]+>', '<span style="color:red;font-weight:bold">', item['title'])
-
                 temp = QListWidgetItem()
                 self.listWidget_manga_search.addItem(temp)
                 self.listWidget_manga_search.setItemWidget(temp, QLabel(f"{item['title']} by <span style='color:blue'>{item['author_name'][0]}</span>"))
         self.lineEdit_manga_search_name.returnPressed.connect(_)
         self.pushButton_manga_search_name.clicked.connect(_)
         
+        ############################################################
+        # 绑定双击显示漫画详情事件
         def _(item):
             index = self.listWidget_manga_search.indexFromItem(item).row()
-            comic = Comic(self.logger, data[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"))
+            comic = Comic(self.logger, self.searchInfo[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"), self.getConfig("num_thread"))
+            data = comic.getComicInfo()
+            self.label_manga_title.setText("<span style='color:blue;font-weight:bold'>标题：</span>" + data['title'])
+            self.label_manga_author.setText("<span style='color:blue;font-weight:bold'>作者：</span>" + data['author_name'])
+            self.label_manga_style.setText("<span style='color:blue;font-weight:bold'>标签：</span>" + data['styles'] if data['styles'] else "标签：无")
+            self.label_manga_outline.setText("<span style='color:blue;font-weight:bold'>概要：</span>" + data['evaluate'] if data['evaluate'] else "概要：无")
+            self.labelImg = QPixmap.fromImage(QImage.fromData(requests.get(data['vertical_cover']).content))
             
+            ############################################################
+            # 重写图片大小改变事件，使图片不会变形
+            def __(event=None):
+                newSize = event.size() if event else self.label_manga_image.size()
+                if newSize.width() < 200:
+                    newSize.setWidth(200)
+                img = self.labelImg.scaled(newSize, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.label_manga_image.setPixmap(img)
+                self.label_manga_image.setAlignment(Qt.AlignTop)
+            self.label_manga_image.resizeEvent = __
+            __()
+
         self.listWidget_manga_search.itemDoubleClicked.connect(_)
         
         

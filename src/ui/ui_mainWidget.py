@@ -27,7 +27,7 @@ class Ui_MainWidget(object):
     def setupUi(self, MainWidget):
         if not MainWidget.objectName():
             MainWidget.setObjectName(u"MainWidget")
-        MainWidget.resize(1058, 726)
+        MainWidget.resize(1185, 704)
         icon = QIcon()
         icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWidget.setWindowIcon(icon)
@@ -66,6 +66,10 @@ class Ui_MainWidget(object):
 
         self.h_Layout_manga_search.addWidget(self.pushButton_manga_search_name)
 
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.h_Layout_manga_search.addItem(self.horizontalSpacer)
+
         self.label_manga_search = QLabel(self.tab_manga_search)
         self.label_manga_search.setObjectName(u"label_manga_search")
 
@@ -98,14 +102,25 @@ class Ui_MainWidget(object):
         self.groupBox_my_manga.setObjectName(u"groupBox_my_manga")
         self.horizontalLayout_8 = QHBoxLayout(self.groupBox_my_manga)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.label_manga_image = QLabel(self.groupBox_my_manga)
         self.label_manga_image.setObjectName(u"label_manga_image")
         self.label_manga_image.setEnabled(True)
-        self.label_manga_image.setPixmap(QPixmap(u":/imgs/\u522b\u5f53\u54e5\u54e5\u4e86.jpg"))
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_manga_image.sizePolicy().hasHeightForWidth())
+        self.label_manga_image.setSizePolicy(sizePolicy)
+        self.label_manga_image.setMinimumSize(QSize(200, 200))
+        self.label_manga_image.setMaximumSize(QSize(16777215, 16777215))
         self.label_manga_image.setScaledContents(False)
         self.label_manga_image.setWordWrap(False)
 
-        self.horizontalLayout_8.addWidget(self.label_manga_image, 0, Qt.AlignTop)
+        self.verticalLayout.addWidget(self.label_manga_image)
+
+
+        self.horizontalLayout_8.addLayout(self.verticalLayout)
 
         self.v_Layout_manga_detail = QVBoxLayout()
         self.v_Layout_manga_detail.setSpacing(6)
@@ -120,10 +135,10 @@ class Ui_MainWidget(object):
 
         self.v_Layout_manga_detail.addWidget(self.label_manga_author)
 
-        self.label_manga_tag = QLabel(self.groupBox_my_manga)
-        self.label_manga_tag.setObjectName(u"label_manga_tag")
+        self.label_manga_style = QLabel(self.groupBox_my_manga)
+        self.label_manga_style.setObjectName(u"label_manga_style")
 
-        self.v_Layout_manga_detail.addWidget(self.label_manga_tag)
+        self.v_Layout_manga_detail.addWidget(self.label_manga_style)
 
         self.label_manga_outline = QLabel(self.groupBox_my_manga)
         self.label_manga_outline.setObjectName(u"label_manga_outline")
@@ -135,10 +150,11 @@ class Ui_MainWidget(object):
 
         self.horizontalLayout_8.addLayout(self.v_Layout_manga_detail)
 
+        self.horizontalLayout_8.setStretch(0, 1)
+        self.horizontalLayout_8.setStretch(1, 1)
 
         self.v_lLayout_my_manga.addWidget(self.groupBox_my_manga)
 
-        self.v_lLayout_my_manga.setStretch(0, 1)
         self.v_lLayout_my_manga.setStretch(1, 1)
 
         self.horizontalLayout_19.addLayout(self.v_lLayout_my_manga)
@@ -206,13 +222,13 @@ class Ui_MainWidget(object):
 
         self.pushButton_chp_detail_download_selected = QPushButton(self.groupBox_chp_detail)
         self.pushButton_chp_detail_download_selected.setObjectName(u"pushButton_chp_detail_download_selected")
-        self.pushButton_chp_detail_download_selected.setMaximumSize(QSize(120, 25))
+        self.pushButton_chp_detail_download_selected.setMaximumSize(QSize(200, 25))
 
         self.h_Layout_chp_detail.addWidget(self.pushButton_chp_detail_download_selected)
 
         self.pushButton_chp_detail_download_all = QPushButton(self.groupBox_chp_detail)
         self.pushButton_chp_detail_download_all.setObjectName(u"pushButton_chp_detail_download_all")
-        self.pushButton_chp_detail_download_all.setMaximumSize(QSize(120, 25))
+        self.pushButton_chp_detail_download_all.setMaximumSize(QSize(200, 25))
 
         self.h_Layout_chp_detail.addWidget(self.pushButton_chp_detail_download_all)
 
@@ -472,10 +488,10 @@ class Ui_MainWidget(object):
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_local_storage), QCoreApplication.translate("MainWidget", u"\u672c\u5730\u5e93\u5b58", None))
         self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fe1\u606f", None))
         self.label_manga_image.setText("")
-        self.label_manga_title.setText(QCoreApplication.translate("MainWidget", u"\u6807\u9898\uff1a\u522b\u5f53\u54e5\u54e5\u4e86\uff01", None))
-        self.label_manga_author.setText(QCoreApplication.translate("MainWidget", u"\u4f5c\u8005\uff1a\u732b\u8c46\u8150\uff0c\u4e00\u8fc5\u793e", None))
-        self.label_manga_tag.setText(QCoreApplication.translate("MainWidget", u"\u6807\u7b7e\uff1a\u90fd\u5e02", None))
-        self.label_manga_outline.setText(QCoreApplication.translate("MainWidget", u"\u6982\u8981\uff1a  \u6b64\u6f2b\u753b\u7684\u7ffb\u8bd1\u7531\u7248\u6743\u65b9\u63d0\u4f9b\u3011\u6e38\u620f\u5b85\u7eea\u5c71\u771f\u5bfb\u67d0\u5929\u4e00\u89c9\u9192\u6765\u540e\u53d1\u73b0\u81ea\u5df1\u53d8\u6210\u5973\u751f\u4e86\uff01\u539f\u6765\u662f\u59b9\u59b9\u7f8e\u6ce2\u91cc\u4e3a\u4e86\u8fdb\u884c\u89c2\u5bdf\u5b9e\u9a8c\u800c\u5bf9\u4ed6\u4e0b\u836f\u6539\u9020\u3002\u4e8e\u662f\u771f\u5bfb\u88ab\u8feb\u5f00\u59cb\u4e86\u5973\u751f\u751f\u6d3b\uff0c\u4ed6\u80fd\u5426\u9002\u5e94\u5fc3\u8eab\u7684\u6539\u53d8\uff0c\u53c8\u662f\u5426\u53ef\u4ee5\u7ee7\u7eed\u5f53\u54e5\u54e5\u5462\uff1f  ", None))
+        self.label_manga_title.setText("")
+        self.label_manga_author.setText("")
+        self.label_manga_style.setText("")
+        self.label_manga_outline.setText("")
         self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWidget", u"\u7ae0\u8282\u8be6\u60c5", None))
         self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWidget", u"\u603b\u7ae0\u8282\u6570\uff1a70", None))
         self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u89e3\u9501\uff1a10\u7ae0", None))

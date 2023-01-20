@@ -21,21 +21,21 @@ from logging import Logger
 console = Console()
 
 class Comic:
-    def __init__(self, logger: Logger, comicID: int, sessdata: str, rootPath: str) -> None:
+    def __init__(self, logger: Logger, comicID: int, sessdata: str, rootPath: str, num_thread: int) -> None:
         self.logger = logger
         self.comicID = comicID
         self.sessdata = sessdata
         self.rootPath = rootPath
-        info(f'初始化漫画 ID {comicID}')
+        self.num_thread = num_thread
+        self.info = {}
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
             'referer': f'https://manga.bilibili.com/detail/mc{comicID}?from=manga_homepage',
             'cookie': f'SESSDATA={sessdata}'
         }
-        self.analyzeData()
 
-    def analyzeData(self) -> None:
+    def getComicInfo(self) -> dict:
         """
         使用哔哩哔哩漫画 API 分析漫画数据。
         Analyze data of a comic using the Bilibili Manga API.
@@ -44,72 +44,49 @@ class Comic:
         # 爬取漫画信息
         detailUrl = 'https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web'
         payload = {"comic_id": self.comicID}
-        with console.status('正在访问 BiliBili Manga'):
-            @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
-            def _():
-                res = requests.post(detailUrl, data=payload, headers=self.headers)
-                if res.status_code != 200:
-                    self.logger.warning(f'{self.comicID} 爬取漫画信息失败! {res.status_code} {res.reason} 重试中...')
-                    raise requests.HTTPError()
-                return res
-            try:
-                data = _()
-            except Exception as e:
-                self.logger.error(f'{self.comicID} 重复解析漫画信息多次后失败! {e}')
-                raise requests.HTTPError(f'{self.comicID} 爬取漫画信息失败!\n请检查输入信息是否正确!也可以查看日志文件或者联系作者')
+        
+        @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
+        def _():
+            res = requests.post(detailUrl, data=payload, headers=self.headers)
+            if res.status_code != 200:
+                self.logger.warning(f'{self.comicID} 爬取漫画信息失败! {res.status_code} {res.reason} 重试中...')
+                raise requests.HTTPError()
+            return res
+        try:
+            data = _()
+        except Exception as e:
+            self.logger.error(f'{self.comicID} 重复解析漫画信息多次后失败! {e}')
+            raise requests.HTTPError(f'{self.comicID} 爬取漫画信息失败!\n请检查输入信息是否正确!也可以查看日志文件或者联系作者')
         
         # 解析漫画信息
-        info('已获取漫画信息!')
-        info('开始解析...')
         data = data.json()
         if data['code']: 
-            error(f'漫画信息有误! 请仔细检查! (提示信息{data["msg"]})')
             self.logger.warning(f'{self.comicID} 漫画信息有误! {data["msg"]}')
             raise ValueError()
-        
-        
-        self.title = data['data']['title']
-        self.authorName = data['data']['author_name']
-        self.styles = data['data']['styles']
-        self.evaluate = data['data']['evaluate']
-        self.total = data['data']['total']
-        self.savePath = f"{self.rootPath}/《{self.title}》 作者：{', '.join(self.authorName)}"
+        self.data = data['data']
 
-        # 打印漫画信息
-        t = Table(title='漫画作品详情')
-        t.add_column('[green bold]作品标题[/green bold]')
-        t.add_column('[green bold]作者[/green bold]')
-        t.add_column('[green bold]标签[/green bold]')
-        t.add_column('[green bold]概要[/green bold]')
-        t.add_column('[green bold]总章节数[/green bold]')
-        t.add_row(self.title, ', '.join(self.authorName), ''.join(self.styles), textwrap.fill(self.evaluate, width=30), str(self.total))
-        print(t)
-
-        # 选择下载章节
-        while True:
-            start = requireInt('开始章节(不输入则不限制): ', False)
-            start = 0 if start is None else start
-            end = requireInt('结束章节(不输入则不限制): ', False)
-            end = 2147483647 if end is None else end
-            if start <= end: break
-            error('开始章节必须小于结束章节!')
+        self.data['author_name'] = ', '.join(self.data['author_name'])
+        self.data['styles'] = ', '.join(self.data['styles'])
+        self.info['savePath'] = f"{self.rootPath}/《{self.data['title']}》 作者：{self.data['author_name']}"
+        return self.data
         
-        # 解析章节
-        self.episodes = []
-        with console.status('正在解析详细章节...'):
-            epList = data['data']['ep_list']
-            epList.reverse()
-            for episode in epList:
-                epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.savePath)
-                if start <= epi.ord <= end and epi.isAvailable():
-                    self.episodes.append(epi)
+    def xxx(self):
+
+        # # 解析章节
+        # self.episodes = []
+        # with console.status('正在解析详细章节...'):
+        #     epList = self.info['data']['ep_list']
+        #     epList.reverse()
+        #     for episode in epList:
+        #         epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.savePath)
+        #         if start <= epi.ord <= end and epi.isAvailable():
+        #             self.episodes.append(epi)
 
         # 打印章节信息
         print("已选中章节:")
         for episode in self.episodes:
             print(f"\t<{episode.title}>")
-        info(f'分析结束 将爬取章节数: {len(self.episodes)} 输入回车开始爬取!')
-        input()
+
 
     def fetch(self) -> None:
         """
@@ -120,7 +97,7 @@ class Comic:
         if not os.path.exists(self.rootPath):
             os.mkdir(self.rootPath)
         if os.path.exists(self.savePath) and os.path.isdir(self.savePath):
-            info('存在历史下载 将避免下载相同文件!')
+            pass
         else:
             os.mkdir(self.savePath)
 
@@ -136,5 +113,3 @@ class Comic:
             for future in as_completed(future_to_epi):
                 if future.done():
                     progress.update(epiTask, advance=1)
-
-        info('任务完成!')

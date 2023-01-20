@@ -123,8 +123,6 @@ class Episode:
         for img in imgs:
             os.remove(img)
 
-        info(f'已下载 <{self.title}>')
-
     @retry(stop_max_delay=10000, wait_exponential_multiplier=200)
     def downloadImg(self, index: int, url: str, token: str) -> str:
         """
