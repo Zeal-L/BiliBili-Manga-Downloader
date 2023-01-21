@@ -36,7 +36,7 @@
          <item>
           <widget class="QTabWidget" name="tabWidget_my_manga">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tab_manga_search">
             <attribute name="title">
@@ -99,13 +99,59 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="tab_local_storage">
+           <widget class="QWidget" name="tab_myLibrary">
             <attribute name="title">
              <string>本地库存</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_10">
+            <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0">
              <item>
-              <widget class="QListWidget" name="listWidget_local_storage"/>
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <item>
+                <widget class="QLabel" name="label_myLibrary_count">
+                 <property name="text">
+                  <string>库存：</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_myLibrary_update">
+                 <property name="text">
+                  <string>检查更新</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QScrollArea" name="scrollArea_myLibrary">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_myLibrary">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>541</width>
+                  <height>191</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
+               </widget>
+              </widget>
              </item>
             </layout>
            </widget>

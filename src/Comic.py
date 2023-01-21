@@ -28,12 +28,14 @@ class Comic:
         self.rootPath = rootPath
         self.num_thread = num_thread
         self.numDownloaded = 0
+        self.episodes = []
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
             'referer': f'https://manga.bilibili.com/detail/mc{comicID}?from=manga_homepage',
             'cookie': f'SESSDATA={sessdata}'
         }
+        
 
     def getComicInfo(self) -> dict:
         """
@@ -67,13 +69,15 @@ class Comic:
 
         self.data['author_name'] = ', '.join(self.data['author_name'])
         self.data['styles'] = ', '.join(self.data['styles'])
-        self.data['savePath'] = f"{self.rootPath}/《{self.data['title']}》 作者：{self.data['author_name']}"
+        self.data['savePath'] = f"{self.rootPath}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comicID}"
+        self.data['ID'] = self.comicID
         return self.data
         
     def getEpisodeInfo(self) -> list:
         # 解析章节
-        self.episodes = []
-        checkDownloaded = False
+        if self.episodes:
+            return [(epi.title, epi.isAvailable(), epi.isDownloaded()) for epi in self.episodes]
+        
         epList = self.data['ep_list']
         for episode in reversed(epList):
             epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.data['savePath'])

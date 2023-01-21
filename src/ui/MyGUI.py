@@ -3,20 +3,24 @@ import logging
 import os
 import re
 import sys
+from functools import partial
 from logging import handlers
 
 import requests
-
 from MyAbout import MyAbout
-from PySide6.QtCore import Qt, QEvent, QSize, QTimer
-from PySide6.QtGui import (QStandardItem, QStandardItemModel, QTextCharFormat,
-                           QTextCursor, QFont, QPixmap, QImage, QColor)
+from PySide6.QtCore import (Q_ARG, QEvent, QMetaObject, QSize, Qt, QThread,
+                            QTimer, QUrl, Slot)
+from PySide6.QtGui import (QColor, QDesktopServices, QFont, QImage, QPixmap,
+                           QStandardItem, QStandardItemModel, QTextCharFormat,
+                           QTextCursor)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
                                QFileDialog, QGroupBox, QHBoxLayout, QLabel,
-                               QListView, QListWidget, QListWidgetItem,
-                               QMessageBox, QPushButton, QRadioButton,
-                               QSizePolicy, QVBoxLayout, QWidget, QLayout, QMenu)
+                               QLayout, QListView, QListWidget,
+                               QListWidgetItem, QMenu, QMessageBox,
+                               QPushButton, QRadioButton, QSizePolicy,
+                               QVBoxLayout, QWidget)
 from ui_mainWidget import Ui_MainWidget
+
 from src.Comic import Comic
 from src.searchComic import SearchComic
 from src.utils import *
@@ -32,9 +36,7 @@ class MyGui(QWidget, Ui_MainWidget):
         self.aboutWindow = MyAbout()
         self.listWidget_chp_detail.setDragEnabled(False)
         self.setFont(QFont("Microsoft YaHei", 10))
-        self.currComic = None
         self.numSelected = 0
-        
         
         ############################################################
         # 获取应用程序数据目录
@@ -70,7 +72,45 @@ class MyGui(QWidget, Ui_MainWidget):
         self.mangaUI()
         self.episodesUI()
         
+    ############################################################
+    # 更新我的库存
+    def UpdateMyLibrary(self):
+        # 清理v_Layout_myLibrary里的所有控件
+        for i in reversed(range(self.v_Layout_myLibrary.count())):
+            self.v_Layout_myLibrary.itemAt(i).widget().setParent(None)
         
+        # 读取本地库存
+        path = self.getConfig("save_path")
+        myLibrary = []
+        for item in os.listdir(path):
+            if re.search(r'ID-\d+', item):
+                myLibrary.append(int(re.search(r'ID-(\d+)', item)[1]))
+        self.label_myLibrary_count.setText(f"我的库存：{len(myLibrary)}部")
+        
+        # 添加漫画
+        for id in myLibrary:
+            comic = Comic(self.logger, id, self.getConfig("cookie"), self.getConfig("save_path"), self.getConfig("num_thread"))
+            data = comic.getComicInfo()
+            epiList = comic.getEpisodeInfo()
+            h_Layout_myLibrary = QHBoxLayout()
+            h_Layout_myLibrary.addWidget(QLabel(f"<span style='color:blue;font-weight:bold'>{data['title']}</span> by {data['author_name']}"))
+            h_Layout_myLibrary.addStretch(1)
+            h_Layout_myLibrary.addWidget(QLabel(f"{comic.getNumDownloaded()}/{len(epiList)}"))
+            
+            widget = QWidget()
+            widget.setStyleSheet("font-size: 10pt;")
+
+            # 绑定点击事件
+            def _(event, widget: QWidget):
+                for i in range(self.v_Layout_myLibrary.count()):
+                    temp = self.v_Layout_myLibrary.itemAt(i).widget()
+                    temp.setStyleSheet("font-size: 10pt;")
+                
+                widget.setStyleSheet("background-color:rgb(200, 200, 255); font-size: 10pt;")
+            widget.mousePressEvent = partial(_, widget=widget)
+            widget.mouseDoubleClickEvent = partial(self.updateComicInfo, comic)
+            widget.setLayout(h_Layout_myLibrary)
+            self.v_Layout_myLibrary.addWidget(widget)
     def mangaUI(self):
         ############################################################
         # 链接搜索漫画功能
@@ -96,42 +136,63 @@ class MyGui(QWidget, Ui_MainWidget):
         # 绑定双击显示漫画详情事件
         def _(item):
             index = self.listWidget_manga_search.indexFromItem(item).row()
-            self.currComic = Comic(self.logger, self.searchInfo[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"), self.getConfig("num_thread"))
-            data = self.currComic.getComicInfo()
-            self.label_manga_title.setText("<span style='color:blue;font-weight:bold'>标题：</span>" + data['title'])
-            self.label_manga_author.setText("<span style='color:blue;font-weight:bold'>作者：</span>" + data['author_name'])
-            self.label_manga_style.setText(f"<span style='color:blue;font-weight:bold'>标签：</span>{data['styles'] or '无'}")
-            self.label_manga_isFinish.setText(f"<span style='color:blue;font-weight:bold'>状态：</span>{'已完结' if self.searchInfo[index]['is_finish'] else '连载中'}")
-            self.label_manga_outline.setText(f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}")
-            self.labelImg = QPixmap.fromImage(QImage.fromData(requests.get(data['vertical_cover']).content))
-            
-            ############################################################
-            # 重写图片大小改变事件，使图片不会变形
-            def __(event=None):
-                newSize = event.size() if event else self.label_manga_image.size()
-                if newSize.width() < 200:
-                    newSize.setWidth(200)
-                img = self.labelImg.scaled(newSize, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                self.label_manga_image.setPixmap(img)
-                self.label_manga_image.setAlignment(Qt.AlignTop)
-            self.label_manga_image.resizeEvent = __
-            __()
-            
-            self.updateEpisodes()
+            comic = Comic(self.logger, self.searchInfo[index]['id'], self.getConfig("cookie"), self.getConfig("save_path"), self.getConfig("num_thread"))
+            self.updateComicInfo(comic)
 
         self.listWidget_manga_search.itemDoubleClicked.connect(_)
         
+        ############################################################
+        # 初始化我的库存
+        self.UpdateMyLibrary()
+        def _():
+            self.UpdateMyLibrary()
+            QMessageBox.information(self, "通知",  "更新完成！")
+        self.pushButton_myLibrary_update.clicked.connect(_)
+
+        
+    ############################################################
+    # 更新漫画信息详情
+    def updateComicInfo(self, comic: Comic, event=None):
+        data = comic.getComicInfo()
+        self.label_manga_title.setText("<span style='color:blue;font-weight:bold'>标题：</span>" + data['title'])
+        self.label_manga_author.setText("<span style='color:blue;font-weight:bold'>作者：</span>" + data['author_name'])
+        self.label_manga_style.setText(f"<span style='color:blue;font-weight:bold'>标签：</span>{data['styles'] or '无'}")
+        self.label_manga_isFinish.setText(f"<span style='color:blue;font-weight:bold'>状态：</span>{'已完结' if data['is_finish'] else '连载中'}")
+        self.label_manga_outline.setText(f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}")
+        
+        # 加载图片，以及绑定双击和悬停事件
+        self.labelImg = QPixmap.fromImage(QImage.fromData(requests.get(data['vertical_cover']).content))
+        self.label_manga_image.mouseDoubleClickEvent = lambda event: QDesktopServices.openUrl(QUrl(f"https://manga.bilibili.com/detail/mc{data['ID']}"))
+        self.label_manga_image.setToolTip(f"双击打开漫画详情页\nhttps://manga.bilibili.com/detail/mc{data['ID']}")
+        
+        ############################################################
+        # 重写图片大小改变事件，使图片不会变形
+        def __(event=None):
+            newSize = event.size() if event else self.label_manga_image.size()
+            if newSize.width() < 200:
+                newSize.setWidth(200)
+            img = self.labelImg.scaled(newSize, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.label_manga_image.setPixmap(img)
+            self.label_manga_image.setAlignment(Qt.AlignTop)
+        self.label_manga_image.resizeEvent = __
+        __()
+        
+        self.updateEpisodes(comic)
+
+
+
+
         
     ############################################################
     # 更新漫画章节详情
-    def updateEpisodes(self):
+    def updateEpisodes(self, comic: Comic):
         ############################################################
         # 添加章节列表
         self.listWidget_chp_detail.clear()
         self.numSelected = 0
         num_unlocked = 0
-        if self.currComic:
-            epiList = self.currComic.getEpisodeInfo()
+        if comic:
+            epiList = comic.getEpisodeInfo()
         for (title, isAvailable, isDownloaded) in epiList:
             temp = QListWidgetItem(title)
             temp.setCheckState(Qt.Unchecked)
@@ -152,7 +213,7 @@ class MyGui(QWidget, Ui_MainWidget):
         # 绑定总章节数和已下载章节数等等的显示
         self.label_chp_detail_total_chp.setText(f"总章数：{len(epiList)}")
         self.label_chp_detail_num_unlocked.setText(f"已解锁：{num_unlocked}")
-        self.label_chp_detail_num_downloaded.setText(f"已下载：{self.currComic.getNumDownloaded()}")
+        self.label_chp_detail_num_downloaded.setText(f"已下载：{comic.getNumDownloaded()}")
         self.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
         
         

@@ -18,9 +18,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGroupBox,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QListView, QListWidget, QListWidgetItem, QProgressBar,
-    QPushButton, QSizePolicy, QSlider, QSpacerItem,
-    QTabWidget, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+    QPushButton, QScrollArea, QSizePolicy, QSlider,
+    QSpacerItem, QTabWidget, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_MainWidget(object):
@@ -85,16 +85,42 @@ class Ui_MainWidget(object):
         self.verticalLayout_17.addWidget(self.listWidget_manga_search)
 
         self.tabWidget_my_manga.addTab(self.tab_manga_search, "")
-        self.tab_local_storage = QWidget()
-        self.tab_local_storage.setObjectName(u"tab_local_storage")
-        self.verticalLayout_10 = QVBoxLayout(self.tab_local_storage)
+        self.tab_myLibrary = QWidget()
+        self.tab_myLibrary.setObjectName(u"tab_myLibrary")
+        self.verticalLayout_10 = QVBoxLayout(self.tab_myLibrary)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.listWidget_local_storage = QListWidget(self.tab_local_storage)
-        self.listWidget_local_storage.setObjectName(u"listWidget_local_storage")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.label_myLibrary_count = QLabel(self.tab_myLibrary)
+        self.label_myLibrary_count.setObjectName(u"label_myLibrary_count")
 
-        self.verticalLayout_10.addWidget(self.listWidget_local_storage)
+        self.horizontalLayout.addWidget(self.label_myLibrary_count)
 
-        self.tabWidget_my_manga.addTab(self.tab_local_storage, "")
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_3)
+
+        self.pushButton_myLibrary_update = QPushButton(self.tab_myLibrary)
+        self.pushButton_myLibrary_update.setObjectName(u"pushButton_myLibrary_update")
+
+        self.horizontalLayout.addWidget(self.pushButton_myLibrary_update)
+
+
+        self.verticalLayout_10.addLayout(self.horizontalLayout)
+
+        self.scrollArea_myLibrary = QScrollArea(self.tab_myLibrary)
+        self.scrollArea_myLibrary.setObjectName(u"scrollArea_myLibrary")
+        self.scrollArea_myLibrary.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_myLibrary = QWidget()
+        self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 541, 191))
+        self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
+        self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
+        self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
+
+        self.verticalLayout_10.addWidget(self.scrollArea_myLibrary)
+
+        self.tabWidget_my_manga.addTab(self.tab_myLibrary, "")
 
         self.v_lLayout_my_manga.addWidget(self.tabWidget_my_manga)
 
@@ -483,7 +509,7 @@ class Ui_MainWidget(object):
         self.retranslateUi(MainWidget)
 
         self.tabWidget.setCurrentIndex(0)
-        self.tabWidget_my_manga.setCurrentIndex(0)
+        self.tabWidget_my_manga.setCurrentIndex(1)
         self.tabWidget_download_list.setCurrentIndex(0)
 
 
@@ -497,7 +523,9 @@ class Ui_MainWidget(object):
         self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u641c\u7d22", None))
         self.label_manga_search.setText("")
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWidget", u"\u641c\u7d22\u6f2b\u753b", None))
-        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_local_storage), QCoreApplication.translate("MainWidget", u"\u672c\u5730\u5e93\u5b58", None))
+        self.label_myLibrary_count.setText(QCoreApplication.translate("MainWidget", u"\u5e93\u5b58\uff1a", None))
+        self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWidget", u"\u68c0\u67e5\u66f4\u65b0", None))
+        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myLibrary), QCoreApplication.translate("MainWidget", u"\u672c\u5730\u5e93\u5b58", None))
         self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fe1\u606f", None))
         self.label_manga_image.setText("")
         self.label_manga_title.setText("")

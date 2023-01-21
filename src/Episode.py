@@ -22,20 +22,24 @@ class Episode:
         episode['short_title'] = re.sub(r'\s+$', '', episode['short_title'])
         episode['title'] =  re.sub(r'[\\/:*?"<>|]', ' ', episode['title'])
         episode['title'] =  re.sub(r'\s+$', '', episode['title'])
-        # 修复短标题中的数字
-        if re.search(r'^[0-9\-]+$', episode['short_title']):
-            new_short_title = f"第{episode['short_title']}话"
-        elif re.search(r'^[0-9\-]+话', episode['short_title']):
-            new_short_title = f"第{episode['short_title']}"
-        else:
-            new_short_title = episode['short_title']
-
-        # 修复标题
-        if episode['short_title'] == episode['title'] or episode['title'] == '':
-            self.title = new_short_title
-        else:
-            self.title = f"{new_short_title} {episode['title']}"
         
+        # 修复重复标题
+        if episode['short_title'] == episode['title'] or episode['title'] == '':
+            self.title = episode['short_title']
+        else:
+            self.title = f"{episode['short_title']} {episode['title']}"
+        temp = re.search(r'^(\d+)\s+第(\d+)话', self.title)
+        if temp and temp[1] == temp[2]:
+            self.title = re.sub(r"^\d+\s+(第\d+话)", r"\1", self.title)
+        if re.search(r'^特别篇\s+特别篇', self.title):
+            self.title = re.sub(r'^特别篇\s+特别篇', r"特别篇", self.title)
+
+        # 修复短标题中的数字
+        if re.search(r'^[0-9\-]+话', self.title):
+            self.title = re.sub(r'^([0-9\-]+)', r'第\1', self.title)
+        elif re.search(r'^[0-9\-]+', self.title):
+            self.title = re.sub(r'^([0-9\-]+)', r'第\1话', self.title)
+
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
@@ -64,10 +68,6 @@ class Episode:
         """
         下载章节内所有图片 并合并为PDF
         """
-        
-        # 相同文件名已经存在 跳过下载
-        if os.path.exists(f'{self.savePath}/{self.title}.pdf'):
-            return False
         
         # 获取图片列表
         GetImageIndexURL = 'https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web'
