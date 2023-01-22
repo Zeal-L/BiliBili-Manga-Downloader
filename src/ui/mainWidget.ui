@@ -24,7 +24,7 @@
       <bool>false</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_my_manga">
       <attribute name="title">
@@ -36,7 +36,7 @@
          <item>
           <widget class="QTabWidget" name="tabWidget_my_manga">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="tab_manga_search">
             <attribute name="title">
@@ -392,7 +392,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_download_list">
+     <widget class="QWidget" name="tab_download">
       <attribute name="title">
        <string>下载列表</string>
       </attribute>
@@ -415,7 +415,7 @@
             <bool>true</bool>
            </property>
            <property name="value">
-            <number>50</number>
+            <number>100</number>
            </property>
           </widget>
          </item>
@@ -424,7 +424,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget_download_list">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab_processing">
           <attribute name="title">
@@ -493,7 +493,22 @@
               </layout>
              </item>
              <item>
-              <widget class="QTableWidget" name="tableWidget_processing"/>
+              <widget class="QScrollArea" name="scrollArea_processing">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_finished_2">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>1115</width>
+                  <height>526</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_3"/>
+               </widget>
+              </widget>
              </item>
             </layout>
            </item>
@@ -507,7 +522,22 @@
            <item>
             <layout class="QVBoxLayout" name="v_Layout_finished" stretch="0,0">
              <item>
-              <widget class="QTableWidget" name="tableWidget_finished"/>
+              <widget class="QScrollArea" name="scrollArea_finished">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_finished">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>1115</width>
+                  <height>526</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_8"/>
+               </widget>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="h_Layout_finished">

@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'ui'))
 
 from PySide6.QtWidgets import QApplication
 from rich.console import Console
-from src.ui.MyGUI import MyGui
+from src.ui.MainGUI import MainGUI
 from src.utils import *
 from src.Comic import Comic
 
@@ -26,6 +26,6 @@ if __name__ == '__main__':
     # manga.fetch()
     
     app = QApplication.instance() or QApplication(sys.argv)
-    window = MyGui()
+    window = MainGUI()
     window.show()
     app.exec()

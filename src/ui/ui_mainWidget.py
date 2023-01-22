@@ -16,11 +16,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGroupBox,
-    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
-    QListView, QListWidget, QListWidgetItem, QProgressBar,
-    QPushButton, QScrollArea, QSizePolicy, QSlider,
-    QSpacerItem, QTabWidget, QTableWidget, QTableWidgetItem,
-    QVBoxLayout, QWidget)
+    QHBoxLayout, QLabel, QLineEdit, QListView,
+    QListWidget, QListWidgetItem, QProgressBar, QPushButton,
+    QScrollArea, QSizePolicy, QSlider, QSpacerItem,
+    QTabWidget, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_MainWidget(object):
@@ -286,29 +285,29 @@ class Ui_MainWidget(object):
         self.horizontalLayout_19.addWidget(self.groupBox_chp_detail)
 
         self.tabWidget.addTab(self.tab_my_manga, "")
-        self.tab_download_list = QWidget()
-        self.tab_download_list.setObjectName(u"tab_download_list")
-        self.verticalLayout_2 = QVBoxLayout(self.tab_download_list)
+        self.tab_download = QWidget()
+        self.tab_download.setObjectName(u"tab_download")
+        self.verticalLayout_2 = QVBoxLayout(self.tab_download)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.h_Layout_total_progress = QHBoxLayout()
         self.h_Layout_total_progress.setSpacing(20)
         self.h_Layout_total_progress.setObjectName(u"h_Layout_total_progress")
-        self.label_total_progress = QLabel(self.tab_download_list)
+        self.label_total_progress = QLabel(self.tab_download)
         self.label_total_progress.setObjectName(u"label_total_progress")
 
         self.h_Layout_total_progress.addWidget(self.label_total_progress)
 
-        self.progressBar_total_progress = QProgressBar(self.tab_download_list)
+        self.progressBar_total_progress = QProgressBar(self.tab_download)
         self.progressBar_total_progress.setObjectName(u"progressBar_total_progress")
         self.progressBar_total_progress.setEnabled(True)
-        self.progressBar_total_progress.setValue(50)
+        self.progressBar_total_progress.setValue(100)
 
         self.h_Layout_total_progress.addWidget(self.progressBar_total_progress)
 
 
         self.verticalLayout_2.addLayout(self.h_Layout_total_progress)
 
-        self.tabWidget_download_list = QTabWidget(self.tab_download_list)
+        self.tabWidget_download_list = QTabWidget(self.tab_download)
         self.tabWidget_download_list.setObjectName(u"tabWidget_download_list")
         self.tab_processing = QWidget()
         self.tab_processing.setObjectName(u"tab_processing")
@@ -344,10 +343,17 @@ class Ui_MainWidget(object):
 
         self.v_Layout_processing.addLayout(self.h_Layout_processing)
 
-        self.tableWidget_processing = QTableWidget(self.tab_processing)
-        self.tableWidget_processing.setObjectName(u"tableWidget_processing")
+        self.scrollArea_processing = QScrollArea(self.tab_processing)
+        self.scrollArea_processing.setObjectName(u"scrollArea_processing")
+        self.scrollArea_processing.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_finished_2 = QWidget()
+        self.scrollAreaWidgetContents_finished_2.setObjectName(u"scrollAreaWidgetContents_finished_2")
+        self.scrollAreaWidgetContents_finished_2.setGeometry(QRect(0, 0, 1115, 526))
+        self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_finished_2)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_finished_2)
 
-        self.v_Layout_processing.addWidget(self.tableWidget_processing)
+        self.v_Layout_processing.addWidget(self.scrollArea_processing)
 
 
         self.verticalLayout_6.addLayout(self.v_Layout_processing)
@@ -359,10 +365,17 @@ class Ui_MainWidget(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.v_Layout_finished = QVBoxLayout()
         self.v_Layout_finished.setObjectName(u"v_Layout_finished")
-        self.tableWidget_finished = QTableWidget(self.tab_finished)
-        self.tableWidget_finished.setObjectName(u"tableWidget_finished")
+        self.scrollArea_finished = QScrollArea(self.tab_finished)
+        self.scrollArea_finished.setObjectName(u"scrollArea_finished")
+        self.scrollArea_finished.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_finished = QWidget()
+        self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 1115, 526))
+        self.verticalLayout_8 = QVBoxLayout(self.scrollAreaWidgetContents_finished)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
 
-        self.v_Layout_finished.addWidget(self.tableWidget_finished)
+        self.v_Layout_finished.addWidget(self.scrollArea_finished)
 
         self.h_Layout_finished = QHBoxLayout()
         self.h_Layout_finished.setObjectName(u"h_Layout_finished")
@@ -386,7 +399,7 @@ class Ui_MainWidget(object):
 
         self.verticalLayout_2.addWidget(self.tabWidget_download_list)
 
-        self.tabWidget.addTab(self.tab_download_list, "")
+        self.tabWidget.addTab(self.tab_download, "")
         self.tab_setting = QWidget()
         self.tab_setting.setObjectName(u"tab_setting")
         self.verticalLayout_5 = QVBoxLayout(self.tab_setting)
@@ -508,9 +521,9 @@ class Ui_MainWidget(object):
 
         self.retranslateUi(MainWidget)
 
-        self.tabWidget.setCurrentIndex(0)
-        self.tabWidget_my_manga.setCurrentIndex(1)
-        self.tabWidget_download_list.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget_my_manga.setCurrentIndex(0)
+        self.tabWidget_download_list.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWidget)
@@ -548,7 +561,7 @@ class Ui_MainWidget(object):
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_processing), QCoreApplication.translate("MainWidget", u"\u8fdb\u884c\u4e2d", None))
         self.pushButton_clear_tasks.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7406\u5df2\u5b8c\u6210\u4efb\u52a1", None))
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_finished), QCoreApplication.translate("MainWidget", u"\u5df2\u5b8c\u6210", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_download_list), QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u5217\u8868", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_download), QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u5217\u8868", None))
         self.label_my_cookie.setText(QCoreApplication.translate("MainWidget", u"\u6211\u7684Cookie\uff1a", None))
         self.pushButton_my_cookie.setText(QCoreApplication.translate("MainWidget", u"\u786e\u8ba4", None))
         self.label_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\uff1a", None))
