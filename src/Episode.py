@@ -5,17 +5,19 @@ import os
 import re
 
 import requests
-from PIL import Image
 from retrying import retry
 from src.utils import *
-
+from PySide6.QtCore import SignalInstance
+from PIL import Image
 
 class Episode:
-    def __init__(self, logger: logging.Logger, episode: dict, sessData: str, comicID: str, savePath: str) -> None:
+    def __init__(self, logger: logging.Logger, episode: dict, sessData: str, comicID: str, comicName: str, savePath: str) -> None:
         self.logger = logger
         self.id = episode['id']
         self.available = not episode['is_locked']
         self.ord = episode['ord']
+        self.comicName = comicName
+        self.contentSize = 0
         
         # 修复标题中的特殊字符
         episode['short_title'] = re.sub(r'[\\/:*?"<>|]', ' ', episode['short_title'])
@@ -64,10 +66,12 @@ class Episode:
         """
         return os.path.exists(f'{self.savePath}/{self.title}.pdf')
     
-    def download(self) -> None:
+    def download(self, rate_progress: SignalInstance, taskID: str) -> None:
         """
         下载章节内所有图片 并合并为PDF
         """
+        
+        self.taskID = taskID
         
         # 获取图片列表
         GetImageIndexURL = 'https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web'
@@ -102,41 +106,75 @@ class Episode:
             self.logger.error(f'{self.title} 重复获取图片token多次后失败! {e}')
             raise requests.HTTPError(f'{self.title} 重复获取图片token多次后失败!, 请查看日志文件或者联系作者')
         
+        # 获取图片大小
+        for index, img in enumerate(data.json()['data'], start=1):
+            try:
+                self.calculateEpiSize(index, img['url'], img['token'])
+            except Exception as e:
+                self.logger.error(f"{self.title} - {index, img['url'], img['token']} - 重复获取图片大小多次后失败! - {e}")
+                raise requests.HTTPError(f'{self.title} 重复获取图片大小多次后失败!, 请查看日志文件或者联系作者')
+        
+        # 下载所有图片
         imgs = []
         for index, img in enumerate(data.json()['data'], start=1):
             try:
                 imgs.append(self.downloadImg(index, img['url'], img['token']))
+                rate_progress.emit({
+                    "taskID": self.taskID,
+                    "rate": int((index / len(data.json()['data'])) * 100),
+                    "path": f"{self.savePath}/{self.title}.pdf"
+                })
             except Exception as e:
                 self.logger.error(f"{self.title} - {index, img['url'], img['token']} - 重复下载图片多次后失败! - {e}")
                 raise requests.HTTPError(f'{self.title} 重复下载图片多次后失败!, 请查看日志文件或者联系作者')
 
-        # 旧方法，偶尔会出现pdf打不开的情况, 猜测可能是img文件信道的问题
-        # import img2pdf
-        # with open(os.path.join(self.savePath, f"{self.title}.pdf"), 'wb') as f:
-        #     f.write(img2pdf.convert(imgs))
-
-        # 新方法
+        # 统一转换为RGB模式
         tempImgs = [Image.open(x) for x in imgs]
         for i,img in enumerate(tempImgs):
             if img.mode != 'RGB':
                 tempImgs[i] = img.convert('RGB')
 
+        # 合并PDF
         try:
-            tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:])
+            tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:], quality=95)
+            
         except Exception as e:
             self.logger.error(f'{self.title} 合并PDF失败! {e} - {imgs}')
             raise ValueError(f'{self.title} 合并PDF失败!, 请查看日志文件或者联系作者')
 
+        # 删除临时图片
         for img in imgs:
             os.remove(img)
 
+    @retry(stop_max_delay=10000, wait_exponential_multiplier=200)
+    def calculateEpiSize(self, index: int, url: str, token: str) -> str:
+        """
+        根据 url 和 token 计算图片大小
+        """
+        url = f"{url}?token={token}"
+        head = requests.head(url)
+        if head.status_code != 200:
+            self.logger.error(f"{self.title} - {index, url} - 获取图片大小失败! 重试中... {head.status_code} {head.reason}")
+            raise requests.HTTPError()
+        
+        self.contentSize += int(head.headers['Content-Length'])
+
+
+    def getEpiSize(self):
+        """
+        获取章节大小
+        """
+        return self.contentSize
+    
     @retry(stop_max_delay=10000, wait_exponential_multiplier=200)
     def downloadImg(self, index: int, url: str, token: str) -> str:
         """
         根据 url 和 token 下载图片
         """
         url = f"{url}?token={token}"
+        
         file = requests.get(url)
+        
         if file.status_code != 200:
             self.logger.error(f"{self.title} - {index, url} - 下载图片失败! 重试中... {file.status_code} {file.reason}")
             raise requests.HTTPError()

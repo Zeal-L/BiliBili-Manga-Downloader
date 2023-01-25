@@ -36,7 +36,7 @@
          <item>
           <widget class="QTabWidget" name="tabWidget_my_manga">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tab_manga_search">
             <attribute name="title">
@@ -417,6 +417,16 @@
            <property name="value">
             <number>100</number>
            </property>
+           <property name="textVisible">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_total_progress_timer">
+           <property name="text">
+            <string>预计剩余时间：</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -497,7 +507,7 @@
                <property name="widgetResizable">
                 <bool>true</bool>
                </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents_finished_2">
+               <widget class="QWidget" name="scrollAreaWidgetContents_processing">
                 <property name="geometry">
                  <rect>
                   <x>0</x>
@@ -506,7 +516,7 @@
                   <height>526</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_3"/>
+                <layout class="QVBoxLayout" name="verticalLayout_processing"/>
                </widget>
               </widget>
              </item>
@@ -535,7 +545,7 @@
                   <height>526</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_8"/>
+                <layout class="QVBoxLayout" name="verticalLayout_finished"/>
                </widget>
               </widget>
              </item>

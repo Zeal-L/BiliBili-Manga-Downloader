@@ -67,8 +67,8 @@ class Comic:
             raise ValueError()
         self.data = data['data']
 
-        self.data['author_name'] = ', '.join(self.data['author_name'])
-        self.data['styles'] = ', '.join(self.data['styles'])
+        self.data['author_name'] = '，'.join(self.data['author_name'])
+        self.data['styles'] = '，'.join(self.data['styles'])
         self.data['savePath'] = f"{self.rootPath}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comicID}"
         self.data['ID'] = self.comicID
         return self.data
@@ -76,41 +76,16 @@ class Comic:
     def getEpisodeInfo(self) -> list:
         # 解析章节
         if self.episodes:
-            return [(epi.title, epi.isAvailable(), epi.isDownloaded()) for epi in self.episodes]
+            return self.episodes
         
         epList = self.data['ep_list']
         for episode in reversed(epList):
-            epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.data['savePath'])
+            epi = Episode(self.logger, episode, self.sessdata, self.comicID, self.data['title'], self.data['savePath'])
             self.episodes.append(epi)
             if epi.isDownloaded():
                 self.numDownloaded += 1
-        return [(epi.title, epi.isAvailable(), epi.isDownloaded()) for epi in self.episodes]
+        return self.episodes
 
     def getNumDownloaded(self) -> int:
         return self.numDownloaded
 
-    def fetch(self) -> None:
-        """
-        使用多线程获取和下载漫画数据
-        Fetch and download comic data using multiple threads.
-        """
-        # 初始化储存文件夹
-        if not os.path.exists(self.rootPath):
-            os.mkdir(self.rootPath)
-        if os.path.exists(self.savePath) and os.path.isdir(self.savePath):
-            pass
-        else:
-            os.mkdir(self.savePath)
-
-        from concurrent.futures import ThreadPoolExecutor, as_completed
-
-        # 创建线程池爬取漫画
-        with ThreadPoolExecutor(max_workers=8) as executor, Progress() as progress:
-            epiTask = progress.add_task(f'正在下载 <{self.title}>', total=len(self.episodes))
-            self.logger.info(f'开始下载 <{self.title} - 下载章节数:{len(self.episodes)}>')
-            # 将下载任务提交到线程池中执行
-            future_to_epi = {executor.submit(epi.download): epi for epi in self.episodes}
-            # 等待所有任务完成
-            for future in as_completed(future_to_epi):
-                if future.done():
-                    progress.update(epiTask, advance=1)

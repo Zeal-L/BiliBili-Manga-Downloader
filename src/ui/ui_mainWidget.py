@@ -301,8 +301,14 @@ class Ui_MainWidget(object):
         self.progressBar_total_progress.setObjectName(u"progressBar_total_progress")
         self.progressBar_total_progress.setEnabled(True)
         self.progressBar_total_progress.setValue(100)
+        self.progressBar_total_progress.setTextVisible(True)
 
         self.h_Layout_total_progress.addWidget(self.progressBar_total_progress)
+
+        self.label_total_progress_timer = QLabel(self.tab_download)
+        self.label_total_progress_timer.setObjectName(u"label_total_progress_timer")
+
+        self.h_Layout_total_progress.addWidget(self.label_total_progress_timer)
 
 
         self.verticalLayout_2.addLayout(self.h_Layout_total_progress)
@@ -346,12 +352,12 @@ class Ui_MainWidget(object):
         self.scrollArea_processing = QScrollArea(self.tab_processing)
         self.scrollArea_processing.setObjectName(u"scrollArea_processing")
         self.scrollArea_processing.setWidgetResizable(True)
-        self.scrollAreaWidgetContents_finished_2 = QWidget()
-        self.scrollAreaWidgetContents_finished_2.setObjectName(u"scrollAreaWidgetContents_finished_2")
-        self.scrollAreaWidgetContents_finished_2.setGeometry(QRect(0, 0, 1115, 526))
-        self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_finished_2)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_finished_2)
+        self.scrollAreaWidgetContents_processing = QWidget()
+        self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1115, 526))
+        self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
+        self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
+        self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
 
         self.v_Layout_processing.addWidget(self.scrollArea_processing)
 
@@ -371,8 +377,8 @@ class Ui_MainWidget(object):
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
         self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 1115, 526))
-        self.verticalLayout_8 = QVBoxLayout(self.scrollAreaWidgetContents_finished)
-        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
+        self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
 
         self.v_Layout_finished.addWidget(self.scrollArea_finished)
@@ -522,7 +528,7 @@ class Ui_MainWidget(object):
         self.retranslateUi(MainWidget)
 
         self.tabWidget.setCurrentIndex(1)
-        self.tabWidget_my_manga.setCurrentIndex(0)
+        self.tabWidget_my_manga.setCurrentIndex(1)
         self.tabWidget_download_list.setCurrentIndex(1)
 
 
@@ -555,6 +561,7 @@ class Ui_MainWidget(object):
         self.pushButton_chp_detail_download_all.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u5168\u90e8\u7ae0\u8282", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWidget", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWidget", u"\u603b\u8fdb\u5ea6", None))
+        self.label_total_progress_timer.setText(QCoreApplication.translate("MainWidget", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4\uff1a", None))
         self.pushButton_processing_start.setText(QCoreApplication.translate("MainWidget", u"\u5f00\u59cb\u9009\u4e2d\u4efb\u52a1", None))
         self.pushButton_processing_pause.setText(QCoreApplication.translate("MainWidget", u"\u6682\u505c\u9009\u4e2d\u4efb\u52a1", None))
         self.pushButton_processing_delete.setText(QCoreApplication.translate("MainWidget", u"\u5220\u9664\u9009\u4e2d\u4efb\u52a1", None))

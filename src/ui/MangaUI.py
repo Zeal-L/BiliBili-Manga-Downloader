@@ -148,26 +148,26 @@ class MangaUI():
         self.numSelected = 0
         num_unlocked = 0
         if comic:
-            epiList = comic.getEpisodeInfo()
-        for (title, isAvailable, isDownloaded) in epiList:
-            temp = QListWidgetItem(title)
+            self.epiList = comic.getEpisodeInfo()
+        for epi in self.epiList:
+            temp = QListWidgetItem(epi.title)
             temp.setCheckState(Qt.Unchecked)
-            if isDownloaded:
+            if epi.isDownloaded():
                 temp.setFlags(Qt.NoItemFlags)
                 temp.setCheckState(Qt.Checked)
                 temp.setBackground(QColor(0, 255, 0, 50))
-            if not isAvailable:
+            if not epi.isAvailable():
                 temp.setFlags(Qt.NoItemFlags)
             else:
                 num_unlocked += 1
             temp.setSizeHint(QSize(160, 20))
             temp.setTextAlignment(Qt.AlignLeft)
-            temp.setToolTip(title)
+            temp.setToolTip(epi.title)
             mainGUI.listWidget_chp_detail.addItem(temp)
             
         #?###########################################################
         #? 绑定总章节数和已下载章节数等等的显示
-        mainGUI.label_chp_detail_total_chp.setText(f"总章数：{len(epiList)}")
+        mainGUI.label_chp_detail_total_chp.setText(f"总章数：{len(self.epiList)}")
         mainGUI.label_chp_detail_num_unlocked.setText(f"已解锁：{num_unlocked}")
         mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{comic.getNumDownloaded()}")
         mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.numSelected}")
@@ -235,3 +235,17 @@ class MangaUI():
 
         mainGUI.listWidget_chp_detail.setContextMenuPolicy(Qt.CustomContextMenu)
         mainGUI.listWidget_chp_detail.customContextMenuRequested.connect(myMenu)
+        
+        
+        def _():
+            self.numSelected = 0
+            for i in range(mainGUI.listWidget_chp_detail.count()):
+                if mainGUI.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags and mainGUI.listWidget_chp_detail.item(i).checkState() == Qt.Checked:
+                    mainGUI.DownloadUI.addTask(self.epiList[i])
+            # 跳转到下载界面的tab
+            mainGUI.tabWidget.setCurrentIndex(1)
+            mainGUI.tabWidget_download_list.setCurrentIndex(0)
+            
+            
+        
+        mainGUI.pushButton_chp_detail_download_selected.clicked.connect(_)
