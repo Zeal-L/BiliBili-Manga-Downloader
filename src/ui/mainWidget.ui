@@ -24,7 +24,7 @@
       <bool>false</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_my_manga">
       <attribute name="title">
@@ -145,8 +145,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>534</width>
-                  <height>191</height>
+                  <width>98</width>
+                  <height>28</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -528,8 +528,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>1101</width>
-                  <height>526</height>
+                  <width>98</width>
+                  <height>28</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_finished"/>
@@ -684,7 +684,7 @@
             <number>1</number>
            </property>
            <property name="maximum">
-            <number>32</number>
+            <number>64</number>
            </property>
            <property name="singleStep">
             <number>2</number>
@@ -693,7 +693,7 @@
             <number>2</number>
            </property>
            <property name="value">
-            <number>16</number>
+            <number>32</number>
            </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -703,7 +703,7 @@
          <item>
           <widget class="QLabel" name="label_num_thread">
            <property name="text">
-            <string>线程数并不是越多越好，请根据自己的网络情况合理配置（推荐：16）</string>
+            <string>线程数并不是越多越好，请根据自己的网络情况和平均任务大小合理配置（推荐：32）</string>
            </property>
           </widget>
          </item>

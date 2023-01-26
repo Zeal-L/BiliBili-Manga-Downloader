@@ -1,7 +1,7 @@
-import datetime
 import os
 import time
 import ctypes
+
 
 def openFolderAndSelectItems(path):
     """ 读取一个文件的父目录, 如果可能的话，选择该文件。
@@ -49,12 +49,10 @@ def openFolderAndSelectItems(path):
     ILFree(pidl)
     CoUninitialize()
 
-from rich.progress import Progress
-import io
-
 class DownloadInfo:
     def __init__(self):
         self.info = {}
+        self.averageSpeedInLastSecond = {}
 
     def update_task(self, id, rate, size=None):
         rate = rate / 100
@@ -86,12 +84,27 @@ class DownloadInfo:
         task['lastUpdateTime'] = currTime
     
     def calcuSmoothSpeed(self, task) -> None:
-        SMOOTHING_FACTOR = 0.125
-        # Using Exponential moving average 
+        SMOOTHING_FACTOR = 0.005
+        # 使用 Exponential moving average 来均衡历史平均速度和当前速度，以防波动过大
         task['averageSpeed'] = SMOOTHING_FACTOR * task['currSpeed'] + (1-SMOOTHING_FACTOR) * (task['averageSpeed'] or task['currSpeed'])
-        
+
+    def removeTask(self, taskID):
+        self.info.pop(taskID)
+
     def getTotalSmoothSpeedStr(self):
-        return self.formatSize(sum(task['averageSpeed'] for task in self.info.values() if task['rate'] != 1.0))
+        self.averageSpeedInLastSecond[time.perf_counter()] = sum(task['averageSpeed'] for task in self.info.values() if task['rate'] != 1.0)
+
+        # 取5秒内的平均速度，以防止速度突然变化
+        # 比如下载完一个文件 速度突然变为0
+        # 或者开始一组新的下载，速度突然变为很大
+        for key in list(self.averageSpeedInLastSecond.keys()):
+            if key < time.perf_counter() - 5:
+                self.averageSpeedInLastSecond.pop(key)
+
+        return self.formatSize(
+            sum(self.averageSpeedInLastSecond.values())
+            / len(self.averageSpeedInLastSecond) or 1
+        )
 
     def formatSize(self, size) -> str:
         if size < 0:

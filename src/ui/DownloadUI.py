@@ -53,8 +53,7 @@ class DownloadUI(QObject):
             
             
             mainGUI.label_total_progress_timer.setText(f"总下载速度：{self.downloadInfo.getTotalSmoothSpeedStr()}")
-            
-            
+
             
             if result['rate'] == 100:
 
@@ -69,6 +68,7 @@ class DownloadUI(QObject):
                         self.addFinished(mainGUI, label_title, result['path'])
                 # 删除字典中的条目
                 del currTask
+                self.downloadInfo.removeTask(result['taskID'])
                 
                 
         self.rate_progress.connect(lambda result: _(result))
