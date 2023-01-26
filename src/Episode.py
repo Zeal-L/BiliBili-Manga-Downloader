@@ -18,6 +18,7 @@ class Episode:
         self.ord = episode['ord']
         self.comicName = comicName
         self.contentSize = 0
+        self.imgsToken = None
         
         # 修复标题中的特殊字符
         episode['short_title'] = re.sub(r'[\\/:*?"<>|]', ' ', episode['short_title'])
@@ -49,30 +50,8 @@ class Episode:
             'cookie': f'SESSDATA={sessData}'
         }
         self.savePath = savePath
-    
-    def isAvailable(self) -> bool:
-        """
-        判断章节是否可用
-        True: 已解锁章节
-        False: 需付费章节
-        """
-        return self.available
-    
-    def isDownloaded(self) -> bool:
-        """
-        判断章节是否已下载
-        True: 已下载
-        False: 未下载
-        """
-        return os.path.exists(f'{self.savePath}/{self.title}.pdf')
-    
-    def download(self, rate_progress: SignalInstance, taskID: str) -> None:
-        """
-        下载章节内所有图片 并合并为PDF
-        """
         
-        self.taskID = taskID
-        
+    def init_imgsList(self):
         # 获取图片列表
         GetImageIndexURL = 'https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web'
         @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
@@ -99,48 +78,72 @@ class Episode:
             if res.status_code != 200:
                 self.logger.warning(f'{self.title} 获取图片token失败! {res.status_code} {res.reason} 重试中...')
                 raise requests.HTTPError()
-            return res
+            return res.json()
         try:
-            data = _()
+            self.imgsToken = _()['data']
         except Exception as e:
             self.logger.error(f'{self.title} 重复获取图片token多次后失败! {e}')
             raise requests.HTTPError(f'{self.title} 重复获取图片token多次后失败!, 请查看日志文件或者联系作者')
         
         # 获取图片大小
-        for index, img in enumerate(data.json()['data'], start=1):
+        for index, img in enumerate(self.imgsToken, start=1):
             try:
                 self.calculateEpiSize(index, img['url'], img['token'])
             except Exception as e:
                 self.logger.error(f"{self.title} - {index, img['url'], img['token']} - 重复获取图片大小多次后失败! - {e}")
                 raise requests.HTTPError(f'{self.title} 重复获取图片大小多次后失败!, 请查看日志文件或者联系作者')
+
+    def isAvailable(self) -> bool:
+        """
+        判断章节是否可用
+        True: 已解锁章节
+        False: 需付费章节
+        """
+        return self.available
+    
+    def isDownloaded(self) -> bool:
+        """
+        判断章节是否已下载
+        True: 已下载
+        False: 未下载
+        """
+        return os.path.exists(f'{self.savePath}/{self.title}.pdf')
+    
+    def download(self, rate_progress: SignalInstance, taskID: str, downloadInfo: DownloadInfo) -> None:
+        """
+        下载章节内所有图片 并合并为PDF
+        """
+        self.init_imgsList()
+        
+        downloadInfo.update_task(taskID, 0, size=self.contentSize)
         
         # 下载所有图片
         imgs = []
-        for index, img in enumerate(data.json()['data'], start=1):
+        for index, img in enumerate(self.imgsToken, start=1):
             try:
                 imgs.append(self.downloadImg(index, img['url'], img['token']))
                 rate_progress.emit({
-                    "taskID": self.taskID,
-                    "rate": int((index / len(data.json()['data'])) * 100),
+                    "taskID": taskID,
+                    "rate": int((index / len(self.imgsToken)) * 100),
                     "path": f"{self.savePath}/{self.title}.pdf"
                 })
             except Exception as e:
                 self.logger.error(f"{self.title} - {index, img['url'], img['token']} - 重复下载图片多次后失败! - {e}")
-                raise requests.HTTPError(f'{self.title} 重复下载图片多次后失败!, 请查看日志文件或者联系作者')
+                raise requests.HTTPError(f'{self.title} 重复下载图片多次后失败!, 请查看日志文件或者联系作者') from e
 
         # 统一转换为RGB模式
         tempImgs = [Image.open(x) for x in imgs]
         for i,img in enumerate(tempImgs):
             if img.mode != 'RGB':
                 tempImgs[i] = img.convert('RGB')
-
+        
         # 合并PDF
         try:
             tempImgs[0].save(os.path.join(self.savePath, f"{self.title}.pdf"), save_all=True, append_images=tempImgs[1:], quality=95)
             
         except Exception as e:
             self.logger.error(f'{self.title} 合并PDF失败! {e} - {imgs}')
-            raise ValueError(f'{self.title} 合并PDF失败!, 请查看日志文件或者联系作者')
+            raise ValueError(f'{self.title} 合并PDF失败!, 请查看日志文件或者联系作者') from e
 
         # 删除临时图片
         for img in imgs:
@@ -159,12 +162,6 @@ class Episode:
         
         self.contentSize += int(head.headers['Content-Length'])
 
-
-    def getEpiSize(self):
-        """
-        获取章节大小
-        """
-        return self.contentSize
     
     @retry(stop_max_delay=10000, wait_exponential_multiplier=200)
     def downloadImg(self, index: int, url: str, token: str) -> str:

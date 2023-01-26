@@ -36,7 +36,7 @@ class DownloadUI(QObject):
         self.allTasks = {}
         self.idCount = 0
         self.init_DownloadUI(mainGUI)
-        self.remainingTime = RemainingTime()
+        self.downloadInfo = DownloadInfo()
 
     def init_DownloadUI(self, mainGUI):
         self.mainGUI.verticalLayout_processing.setAlignment(Qt.AlignTop)
@@ -49,9 +49,11 @@ class DownloadUI(QObject):
                 sum(self.allTasks[i]['rate'] for i in self.allTasks.keys())
                 / len(self.allTasks)
             )
+            self.downloadInfo.update_task(result['taskID'], result['rate'])
             
             
-            # mainGUI.label_total_progress_timer.setText(f"预计剩余时间：{self.remainingTime.getTotalRmainingTime()}")
+            mainGUI.label_total_progress_timer.setText(f"总下载速度：{self.downloadInfo.getTotalSmoothSpeedStr()}")
+            
             
             
             if result['rate'] == 100:
@@ -93,8 +95,7 @@ class DownloadUI(QObject):
         widget = QWidget()
         widget.setLayout(h_Layout_donwlowdList)
         mainGUI.verticalLayout_finished.addWidget(widget)
-    
-    
+
     
     def addTask(self, epi):
         # 初始化储存文件夹
@@ -102,13 +103,11 @@ class DownloadUI(QObject):
             os.makedirs(epi.savePath)
             
         taskID = str(self.idCount)
-        
+
         self.allTasks[taskID] = {
             'rate': 0,
-            'size': epi.getEpiSize(),
-            'future': self.executor.submit(epi.download, self.rate_progress, taskID)
+            'future': self.executor.submit(epi.download, self.rate_progress, taskID, self.downloadInfo)
         }
-        
 
         # 添加任务组件到正在下载列表
         h_Layout_donwlowdList = QHBoxLayout()

@@ -52,26 +52,91 @@ def openFolderAndSelectItems(path):
 from rich.progress import Progress
 import io
 
-class RemainingTime:
+class DownloadInfo:
     def __init__(self):
-        self.remaining_time = {}
-        self.last_update_time = {}
-        self.progress = {}
-        self.totalProgress = {}
-        self.temp = io.StringIO()
-        self.p = Progress(disable=True, redirect_stdout=(True, self.temp))
+        self.info = {}
 
-    def update_task(self, id, rate):
-        if id not in self.progress:
-            self.progress[id] = self.p.add_task(f'正在下载 <{id}>', total=100)
-        
-        self.p.update(self.progress[id], completed=rate)
-        # self.remaining_time[id] = temp
-    def getRmainingTime(self, id) -> str:
-
-        
-        return self.remaining_time[id]
-
-    def getTotalRmainingTime(self):
-        print(self.temp.getvalue())
+    def update_task(self, id, rate, size=None):
+        rate = rate / 100
+        if id not in self.info:
+            self.info[id] = {
+                'size': size,           # 任务文件大小  单位: Byte
+                'rate': rate,           # 当前已下载百分比
+                'lastRate': 0,          # 上次已下载百分比
+                'currSpeed': None,      # 当前速度  单位: Byte/s
+                'averageSpeed': None,   # 平均速度  单位: Byte/s
+                'lastUpdateTime': None, # 上次更新时间 单位: 秒
+                # 'remainingTime': None   # 剩余时间  单位: 秒
+            }
+        else:
+            self.info[id]['rate'] = rate
+        self.calcuCurrSpeed(self.info[id])
+        self.calcuSmoothSpeed(self.info[id])
+        # self.calcuRemainingTime(self.info[id])
     
+    def calcuCurrSpeed(self, task) -> None:
+        if task['rate'] == 0 or task['lastUpdateTime'] is None:
+            task['currSpeed'] = 0
+            task['lastUpdateTime'] = time.perf_counter()
+            return
+        currTime = time.perf_counter()
+
+        task['currSpeed'] = (task['size'] * task['rate'] - task['size'] * task['lastRate']) / (currTime - task['lastUpdateTime'])
+        task['lastRate'] = task['rate']
+        task['lastUpdateTime'] = currTime
+    
+    def calcuSmoothSpeed(self, task) -> None:
+        SMOOTHING_FACTOR = 0.125
+        # Using Exponential moving average 
+        task['averageSpeed'] = SMOOTHING_FACTOR * task['currSpeed'] + (1-SMOOTHING_FACTOR) * (task['averageSpeed'] or task['currSpeed'])
+        
+    def getTotalSmoothSpeedStr(self):
+        return self.formatSize(sum(task['averageSpeed'] for task in self.info.values() if task['rate'] != 1.0))
+
+    def formatSize(self, size) -> str:
+        if size < 0:
+            return '0B/s'
+        elif size < 1024:
+            return '%dB/s' % size
+        elif size < 1024 * 1024:
+            return '%.2fKB/s' % (size / 1024)
+        elif size < 1024 * 1024 * 1024:
+            return '%.2fMB/s' % (size / 1024 / 1024)
+        elif size < 1024 * 1024 * 1024 * 1024:
+            return '%.2fGB/s' % (size / 1024 / 1024 / 1024)
+        else:
+            return '%.2fTB/s' % (size / 1024 / 1024 / 1024 / 1024)
+
+    # #? 由于需要提前访问所有章节的所有图片链接的header来统计总下载大小
+    # #? 轻易上千次的request产生的RTT会导致用户等待太长时间，所以放弃‘预计下载时间’功能
+    # #? 如果B站后续更新API可以一次就获取一章的大小，就可以复用以下功能
+
+    # def calcuRemainingTime(self, task) -> None:
+    #     if task['averageSpeed'] != 0:
+    #         task['remainingTime'] = (task['size'] * (1 - task['rate'])) / task['averageSpeed']
+
+    # def getSmoothSpeed(self, id) -> str:
+    #     if id in self.info:
+    #         task = self.info[id]
+    #         if task['averageSpeed'] != 0:
+    #             return self.formatSize(task['averageSpeed'])
+    #     return '0B/s'
+    
+    # def getTotalSmoothSpeed(self):
+    #     return sum(task['averageSpeed'] for task in self.info.values() if task['rate'] != 1.0)
+        
+    # def getRemainingTime(self, id) -> str:
+    #     if id in self.info:
+    #         return self.formatTime(self.info[id]['remainingTime'])
+    #     return '00:00:00'
+    
+    # def getTotalRemainingTime(self):
+    #     totalSizeLeft = sum(task['size'] * (1 - task['rate']) for task in self.info.values())
+    #     if self.getTotalSmoothSpeed() == 0:
+    #         return self.formatTime(0)
+    #     return self.formatTime(totalSizeLeft/self.getTotalSmoothSpeed())
+
+    # def formatTime(self, seconds) -> str:
+    #     m, s = divmod(seconds, 60)
+    #     h, m = divmod(m, 60)
+    #     return "%02d:%02d:%02d" % (h, m, s)

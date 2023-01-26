@@ -26,7 +26,7 @@ class Ui_MainWidget(object):
     def setupUi(self, MainWidget):
         if not MainWidget.objectName():
             MainWidget.setObjectName(u"MainWidget")
-        MainWidget.resize(1185, 704)
+        MainWidget.resize(1171, 704)
         icon = QIcon()
         icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWidget.setWindowIcon(icon)
@@ -112,7 +112,7 @@ class Ui_MainWidget(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 541, 191))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 534, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -256,12 +256,6 @@ class Ui_MainWidget(object):
 
         self.h_Layout_chp_detail.addWidget(self.pushButton_chp_detail_download_selected)
 
-        self.pushButton_chp_detail_download_all = QPushButton(self.groupBox_chp_detail)
-        self.pushButton_chp_detail_download_all.setObjectName(u"pushButton_chp_detail_download_all")
-        self.pushButton_chp_detail_download_all.setMaximumSize(QSize(200, 25))
-
-        self.h_Layout_chp_detail.addWidget(self.pushButton_chp_detail_download_all)
-
 
         self.verticalLayout_4.addLayout(self.h_Layout_chp_detail)
 
@@ -354,7 +348,7 @@ class Ui_MainWidget(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1115, 526))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1101, 526))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -376,7 +370,7 @@ class Ui_MainWidget(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 1115, 526))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 1101, 526))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -468,9 +462,10 @@ class Ui_MainWidget(object):
         self.h_Slider_num_thread.setMinimumSize(QSize(200, 0))
         self.h_Slider_num_thread.setMaximumSize(QSize(200, 16777215))
         self.h_Slider_num_thread.setMinimum(1)
-        self.h_Slider_num_thread.setMaximum(36)
+        self.h_Slider_num_thread.setMaximum(32)
         self.h_Slider_num_thread.setSingleStep(2)
         self.h_Slider_num_thread.setPageStep(2)
+        self.h_Slider_num_thread.setValue(16)
         self.h_Slider_num_thread.setOrientation(Qt.Horizontal)
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
@@ -527,9 +522,9 @@ class Ui_MainWidget(object):
 
         self.retranslateUi(MainWidget)
 
-        self.tabWidget.setCurrentIndex(1)
-        self.tabWidget_my_manga.setCurrentIndex(1)
-        self.tabWidget_download_list.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget_my_manga.setCurrentIndex(0)
+        self.tabWidget_download_list.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWidget)
@@ -558,7 +553,6 @@ class Ui_MainWidget(object):
         self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u4e0b\u8f7d\uff1a", None))
         self.label_chp_detail_num_selected.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u9009\u4e2d\uff1a", None))
         self.pushButton_chp_detail_download_selected.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u9009\u4e2d\u7ae0\u8282", None))
-        self.pushButton_chp_detail_download_all.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u5168\u90e8\u7ae0\u8282", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWidget", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWidget", u"\u603b\u8fdb\u5ea6", None))
         self.label_total_progress_timer.setText(QCoreApplication.translate("MainWidget", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4\uff1a", None))
@@ -574,7 +568,7 @@ class Ui_MainWidget(object):
         self.label_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\uff1a", None))
         self.pushButton_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6d4f\u89c8...", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWidget", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
-        self.label_num_thread.setText(QCoreApplication.translate("MainWidget", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a8\uff09", None))
+        self.label_num_thread.setText(QCoreApplication.translate("MainWidget", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))
         self.pushButton_open_log.setText(QCoreApplication.translate("MainWidget", u"\u6253\u5f00\u65e5\u5fd7", None))
         self.pushButton_clear_data.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7a7a\u7528\u6237\u6570\u636e", None))
         self.pushButton_about.setText(QCoreApplication.translate("MainWidget", u"\u5173\u4e8e", None))
