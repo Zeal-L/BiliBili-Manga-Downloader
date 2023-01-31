@@ -24,7 +24,7 @@
       <bool>false</bool>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_my_manga">
       <attribute name="title">
@@ -145,8 +145,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>534</width>
+                  <height>191</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -164,7 +164,7 @@
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,1">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout">
+             <layout class="QVBoxLayout" name="v_Layout_manga_image">
               <item>
                <widget class="QLabel" name="label_manga_image">
                 <property name="enabled">
@@ -528,8 +528,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>1101</width>
+                  <height>526</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_finished"/>

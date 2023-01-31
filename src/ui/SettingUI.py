@@ -1,14 +1,22 @@
+from __future__ import annotations
+
 import os
+import typing
+from functools import partial
 
 from MyAbout import MyAbout
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
-from src.utils import *
+from src.utils import log_path
+
+if typing.TYPE_CHECKING:
+    from MainGUI import MainGUI
 
 
-class SettingUI(): 
-    
-    def __init__(self, mainGUI): 
+class SettingUI():
+    """设置窗口类，用于管理设置UI
+    """
+    def __init__(self, mainGUI: MainGUI):
         self.clearUserData = False
         self.init_cookie(mainGUI)
         self.init_savePath(mainGUI)
@@ -16,11 +24,14 @@ class SettingUI():
         self.init_openLog(mainGUI)
         self.init_about(mainGUI)
         self.init_clearUserData(mainGUI)
-    
+
     ############################################################
-    # 绑定Cookie值
-    ############################################################
-    def init_cookie(self, mainGUI):
+    def init_cookie(self, mainGUI: MainGUI):
+        """绑定Cookie值
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
         if mainGUI.getConfig("cookie"):
             mainGUI.lineEdit_my_cookie.setText(mainGUI.getConfig("cookie"))
         def _():
@@ -28,21 +39,20 @@ class SettingUI():
             mainGUI.lineEdit_my_cookie.clearFocus()
         mainGUI.lineEdit_my_cookie.returnPressed.connect(_)
         mainGUI.pushButton_my_cookie.clicked.connect(_)
-        
+
     ############################################################
-    # 绑定漫画保存路径设置
-    ############################################################
-    def init_savePath(self, mainGUI):
-        if mainGUI.getConfig("save_path"):
-            mainGUI.lineEdit_save_path.setText(mainGUI.getConfig("save_path"))
-        else:
-            mainGUI.lineEdit_save_path.setText(os.getcwd())
-            mainGUI.updateConfig("save_path", os.getcwd())
+    def init_savePath(self, mainGUI: MainGUI):
+        """绑定漫画保存路径设置
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+
         def _():
-            savePath = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
-            if savePath:
-                mainGUI.lineEdit_save_path.setText(savePath)
-                mainGUI.updateConfig("save_path", savePath)
+            save_path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
+            if save_path:
+                mainGUI.lineEdit_save_path.setText(save_path)
+                mainGUI.updateConfig("save_path", save_path)
         mainGUI.pushButton_save_path.clicked.connect(_)
         def _():
             path = mainGUI.lineEdit_save_path.text()
@@ -52,43 +62,56 @@ class SettingUI():
                 mainGUI.lineEdit_save_path.setText(os.getcwd())
             mainGUI.lineEdit_save_path.clearFocus()
         mainGUI.lineEdit_save_path.returnPressed.connect(_)
-        
+
     ############################################################
-    # 绑定线程数设置
-    ############################################################
-    def init_num_thread(self, mainGUI):
+    def init_num_thread(self, mainGUI: MainGUI):
+        """绑定线程数设置
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+
         if mainGUI.getConfig("num_thread"):
             mainGUI.h_Slider_num_thread.setValue(mainGUI.getConfig("num_thread"))
         else:
             mainGUI.h_Slider_num_thread.setValue(8)
             mainGUI.updateConfig("num_thread", 8)
-        
+
         mainGUI.label_num_thread_count.setText(f"同时下载线程数：{mainGUI.getConfig('num_thread')}")
         def _(value):
             mainGUI.label_num_thread_count.setText(f"同时下载线程数：{value}")
             mainGUI.updateConfig("num_thread", value)
         mainGUI.h_Slider_num_thread.valueChanged.connect(_)
-    
-    ############################################################
-    # 绑定打开日志文件
-    ############################################################
-    def init_openLog(self, mainGUI):
-        mainGUI.pushButton_open_log.clicked.connect(lambda: os.startfile(os.path.join(mainGUI.logPath, "ERROR.log")))
 
     ############################################################
-    # 绑定关于按钮
-    ############################################################
-    def init_about(self, mainGUI):
-        aboutWindow = MyAbout()
-        mainGUI.pushButton_about.clicked.connect(lambda: aboutWindow.show())
+    def init_openLog(self, mainGUI: MainGUI):
+        """绑定打开日志文件
 
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        mainGUI.pushButton_open_log.clicked.connect(lambda: os.startfile(os.path.join(log_path, "ERROR.log")))
 
     ############################################################
-    # 绑定清理用户数据设置
+    def init_about(self, mainGUI: MainGUI):
+        """绑定关于按钮
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        about_window = MyAbout()
+        mainGUI.pushButton_about.clicked.connect(partial(about_window.show))
+
     ############################################################
-    def init_clearUserData(self, mainGUI):
+    def init_clearUserData(self, mainGUI: MainGUI):
+        """绑定清理用户数据设置
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
         def _():
             res = QMessageBox.information(mainGUI, "提示", "清除所有用户数据，不包括已下载漫画\n只包括Cookie和其他程序缓存文件\n\n注意：清除后将无法恢复\n当前会话不再产生新的配置文件，所有新配置只在当前会话有效", QMessageBox.Yes | QMessageBox.No)
             if res == QMessageBox.Yes:
                 self.clearUserData = True
+
         mainGUI.pushButton_clear_data.clicked.connect(_)

@@ -1,69 +1,47 @@
 import json
 import logging
 import os
-import re
-import sys
-from functools import partial
-from logging import handlers
+from typing import Any
 
-import requests
-
-from PySide6.QtCore import (Q_ARG, QEvent, QMetaObject, QSize, Qt, QThread,
-                            QTimer, QUrl, Slot)
-from PySide6.QtGui import (QColor, QDesktopServices, QFont, QImage, QPixmap,
-                           QStandardItem, QStandardItemModel, QTextCharFormat,
-                           QTextCursor)
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
-                               QFileDialog, QGroupBox, QHBoxLayout, QLabel,
-                               QLayout, QListView, QListWidget,
-                               QListWidgetItem, QMenu, QMessageBox,
-                               QPushButton, QRadioButton, QSizePolicy,
-                               QVBoxLayout, QWidget)
+from DownloadUI import DownloadUI
+from MangaUI import MangaUI
+from PySide6.QtGui import QCloseEvent, QFont
+from PySide6.QtWidgets import QWidget
+from SettingUI import SettingUI
 from ui_mainWidget import Ui_MainWidget
 
-from src.Comic import Comic
-from src.searchComic import SearchComic
-from src.utils import *
-from MangaUI import MangaUI 
-from SettingUI import SettingUI
-from DownloadUI import DownloadUI
+from src.utils import logger
 
 
-class MainGUI(QWidget, Ui_MainWidget): 
-    
-    def __init__(self): 
+class MainGUI(QWidget, Ui_MainWidget):
+    """主窗口类，用于管理所有UI
+    """
+
+    def __init__(self):
         super().__init__()
+
         self.setupUi(self)
-        self.setWindowTitle("哔哩哔哩漫画下载器 v0.0.1") 
+        self.setWindowTitle("哔哩哔哩漫画下载器 v1.0.0")
         self.setFont(QFont("Microsoft YaHei", 10))
-        
+        logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
+
         #?###########################################################
         #? 获取应用程序数据目录
         appdata_path = os.getenv("APPDATA")
         self.app_folder = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
         if not os.path.exists(self.app_folder):
             os.mkdir(self.app_folder)
-        
-        #?###########################################################
-        #? 配置日志记录器
-        self.logPath = os.path.join(appdata_path, "BiliBili-Manga-Downloader", "logs")
-        if not os.path.exists(self.logPath):
-            os.mkdir(self.logPath)
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.INFO)
-        logHandler = handlers.TimedRotatingFileHandler(os.path.join(self.logPath, "ERROR.log"), when='D', interval=1, backupCount=5, encoding="utf-8")
-        
-        logHandler.setFormatter(logging.Formatter(
-            '%(asctime)s | %(levelname)s | 模块:%(module)s | 函数:%(funcName)s %(lineno) d行 | %(message)s', 
-            datefmt='%Y-%m-%d %H:%M:%S'))
-        
-        logger.addHandler(logHandler)
-        self.logger = logger
 
         #?###########################################################
-        #? 读取配置文件
+        #? 读取配置文件，以及初始化 save_path
         self.configPath = os.path.join(self.app_folder, "config.json")
         self.config = None
+
+        if self.getConfig("save_path"):
+            self.lineEdit_save_path.setText(self.getConfig("save_path"))
+        else:
+            self.lineEdit_save_path.setText(os.getcwd())
+            self.updateConfig("save_path", os.getcwd())
 
         #?###########################################################
         #? 初始化UI绑定事件
@@ -73,10 +51,13 @@ class MainGUI(QWidget, Ui_MainWidget):
 
 
     ############################################################
-    # 重写关闭事件，清除用户数据
-    ############################################################
-    def closeEvent(self, event):
-        def _(path):
+    def closeEvent(self, event: QCloseEvent) -> None:
+        """重写关闭事件，清除用户数据
+
+        Args:
+            event (QCloseEvent): 关闭事件
+        """
+        def _(path: str) -> None:
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
                 if os.path.isdir(file_path):
@@ -84,33 +65,65 @@ class MainGUI(QWidget, Ui_MainWidget):
                 else:
                     os.remove(file_path)
             os.rmdir(path)
+
+        if self.SettingUI.clearUserData:
+            try:
+                _(self.app_folder)
+            except OSError as e:
+                logger.error(f"清除用户数据失败 - 目录:{self.app_folder}\n{e}")
+
+        logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
         logging.shutdown()
-        if self.SettingUI.clearUserData and os.path.exists(self.app_folder):
-            _(self.app_folder)
         event.accept()
-    
+
     ############################################################
-    # 读取配置文件
-    ############################################################
-    def getConfig(self, key: str):
+    def getConfig(self, key: str) -> Any:
+        """读取用户配置文件
+
+        Args:
+            key (str): 配置项
+
+        Returns:
+            Any: 配置项的值
+        """
         if self.config:
             return self.config.get(key)
 
-        # 检测配置文件是否存在， 不存在则创建
+        #?###########################################################
+        #? 检测配置文件是否存在， 不存在则创建
         if not os.path.exists(self.configPath):
-            with open(self.configPath, 'w', encoding='utf-8') as f:
-                json.dump({}, f)
+            try:
+                with open(self.configPath, 'w', encoding='utf-8') as f:
+                    json.dump({}, f)
+                    return None
+            except OSError as e:
+                logger.error(f"创建配置文件失败: 目录:{self.configPath}\n{e}")
                 return None
-        with open(self.configPath, 'r', encoding='utf-8') as f:
-            self.config = json.load(f)
+
+        #?###########################################################
+        #? 读取配置文件
+        try:
+            with open(self.configPath, 'r', encoding='utf-8') as f:
+                self.config = json.load(f)
+        except OSError as e:
+            logger.error(f"读取配置文件失败 - 目录:{self.configPath}\n{e}")
+            return None
+
         return self.config.get(key)
 
     ############################################################
-    # 更新配置文件
-    ############################################################
-    def updateConfig(self, key: str, value):
+    def updateConfig(self, key: str, value: Any) -> None:
+        """更新用户配置文件
+
+        Args:
+            key (str): 配置项
+            value (Any): 配置项的值
+        """
         self.config[key] = value
-        with open(self.configPath, 'w+', encoding='utf-8') as f:
-            # ensure_ascii=False 保证中文不被转义
-            json.dump(self.config, f, indent=4, ensure_ascii=False)
-        
+
+        try:
+            with open(self.configPath, 'w+', encoding='utf-8') as f:
+                # ensure_ascii=False 保证中文不被转义
+                json.dump(self.config, f, indent=4, ensure_ascii=False)
+        except OSError as e:
+            logger.error(f"更新配置文件失败 - 目录:{self.configPath} - key: {key} - value: {value}\n{e}")

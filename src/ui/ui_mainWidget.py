@@ -112,7 +112,7 @@ class Ui_MainWidget(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 534, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -127,8 +127,8 @@ class Ui_MainWidget(object):
         self.groupBox_my_manga.setObjectName(u"groupBox_my_manga")
         self.horizontalLayout_8 = QHBoxLayout(self.groupBox_my_manga)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.v_Layout_manga_image = QVBoxLayout()
+        self.v_Layout_manga_image.setObjectName(u"v_Layout_manga_image")
         self.label_manga_image = QLabel(self.groupBox_my_manga)
         self.label_manga_image.setObjectName(u"label_manga_image")
         self.label_manga_image.setEnabled(True)
@@ -142,10 +142,10 @@ class Ui_MainWidget(object):
         self.label_manga_image.setScaledContents(False)
         self.label_manga_image.setWordWrap(False)
 
-        self.verticalLayout.addWidget(self.label_manga_image)
+        self.v_Layout_manga_image.addWidget(self.label_manga_image)
 
 
-        self.horizontalLayout_8.addLayout(self.verticalLayout)
+        self.horizontalLayout_8.addLayout(self.v_Layout_manga_image)
 
         self.v_Layout_manga_detail = QVBoxLayout()
         self.v_Layout_manga_detail.setSpacing(6)
@@ -370,7 +370,7 @@ class Ui_MainWidget(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 1101, 526))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -522,7 +522,7 @@ class Ui_MainWidget(object):
 
         self.retranslateUi(MainWidget)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.tabWidget_my_manga.setCurrentIndex(0)
         self.tabWidget_download_list.setCurrentIndex(0)
 
