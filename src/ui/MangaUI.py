@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QHBoxLayout, QLabel, QListWidgetItem,
 
 from src.Comic import Comic
 from src.searchComic import SearchComic
-from src.utils import logger
+from src.utils import (logger, MAX_RETRY_SMALL, TIMEOUT_SMALL, RETRY_WAIT_EX)
 
 import typing
 if typing.TYPE_CHECKING:
@@ -169,10 +169,10 @@ class MangaUI():
 
         #?###########################################################
         #? 加载图片，以及绑定双击和悬停事件
-        @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> bytes:
             try:
-                res = requests.get(data['vertical_cover'], timeout=2)
+                res = requests.get(data['vertical_cover'], timeout=TIMEOUT_SMALL)
             except requests.RequestException() as e:
                 logger.warning(f"获取封面图片失败! 重试中...\n{e}")
                 raise e
@@ -325,6 +325,15 @@ class MangaUI():
                     mainGUI.DownloadUI.addTask(mainGUI, self.epi_list[i])
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
+
+            #?###########################################################
+            #? 更新我的库存界面信息 也就是v_Layout_myLibrary里的章节数量信息
+            for i in range(mainGUI.v_Layout_myLibrary.count()):
+                temp = mainGUI.v_Layout_myLibrary.itemAt(i).widget().layout()
+                if self.epi_list[0].comic_name in temp.itemAt(0).widget().text():
+                    temp.itemAt(2).widget().setText(f"{num_num_downloaded}/{len(self.epi_list)}")
+                    break
+
 
             #?###########################################################
             #？ 跳转到下载界面的tab

@@ -8,7 +8,7 @@ from retrying import retry, RetryError
 from PySide6.QtWidgets import QMessageBox
 
 from src.Episode import Episode
-from src.utils import logger
+from src.utils import (logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL)
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -17,10 +17,10 @@ if typing.TYPE_CHECKING:
 class Comic:
     """单本漫画 综合信息类
     """
-    def __init__(self, comic_id: int, sessdata: str, root_path: str, num_thread: int) -> None:
+    def __init__(self, comic_id: int, sessdata: str, save_path: str, num_thread: int) -> None:
         self.comic_id = comic_id
         self.sessdata = sessdata
-        self.root_path = root_path
+        self.save_path = save_path
         self.num_thread = num_thread
         self.num_downloaded = 0
         self.episodes = []
@@ -42,23 +42,22 @@ class Comic:
             dict: 漫画信息
         """
 
-        @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> dict:
             try:
-                res = requests.post(self.detail_url, headers=self.headers, data=self.payload, timeout=2)
+                res = requests.post(self.detail_url, headers=self.headers, data=self.payload, timeout=TIMEOUT_SMALL)
             except requests.RequestException() as e:
-                logger.warning(f"获取漫画信息失败! 重试中...\n{e}")
+                logger.warning(f"漫画id:{self.comic_id} 获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f'{self.comic_id} 爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...')
+                logger.warning(f'漫画id:{self.comic_id} 爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...')
                 raise requests.HTTPError()
             return res.json()['data']
 
-        logger.info(f"获取漫画id:{self.comic_id} 的详细信息中...")
         try:
             self.data = _()
         except RetryError as e:
-            logger.error(f'重复获取漫画信息多次后失败!\n{e}')
+            logger.error(f'漫画id:{self.comic_id} 重复获取漫画信息多次后失败!\n{e}')
             QMessageBox.warning(mainGUI, "警告", "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
             return {}
 
@@ -66,7 +65,7 @@ class Comic:
         #? 解析漫画信息
         self.data['author_name'] = '，'.join(self.data['author_name'])
         self.data['styles'] = '，'.join(self.data['styles'])
-        self.data['save_path'] = f"{self.root_path}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comic_id}"
+        self.data['save_path'] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comic_id}"
         self.data['ID'] = self.comic_id
         return self.data
 

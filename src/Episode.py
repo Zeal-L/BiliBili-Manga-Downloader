@@ -145,7 +145,6 @@ class Episode:
             taskID (str): 任务ID
             downloadInfo (DownloadInfo): 下载任务的详细信息类实例
         """
-        # TODO: 尝试把这一步放在漫画初始化的时候完成，使用多线程
         self.init_imgsList(mainGUI)
 
         downloadInfo.updateTask(taskID, 0, size=self.content_size)

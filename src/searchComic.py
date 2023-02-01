@@ -1,12 +1,13 @@
 from __future__ import annotations
-from src.utils import logger
-
-from PySide6.QtWidgets import QMessageBox
-
-import requests
-from retrying import retry, RetryError
 
 import typing
+
+import requests
+from PySide6.QtWidgets import QMessageBox
+from retrying import RetryError, retry
+
+from src.utils import (logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL)
+
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
@@ -36,10 +37,10 @@ class SearchComic:
         Returns:
             list: 搜索结果列表
         """
-        @retry(stop_max_delay=5000, wait_exponential_multiplier=200)
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> list:
             try:
-                res = requests.post(self.detailUrl, data=self.payload, headers=self.headers, timeout=2)
+                res = requests.post(self.detailUrl, data=self.payload, headers=self.headers, timeout=TIMEOUT_SMALL)
             except requests.RequestException() as e:
                 logger.warning(f"获取搜索结果失败! 重试中...\n{e}")
                 raise e

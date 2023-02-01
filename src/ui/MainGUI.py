@@ -34,7 +34,7 @@ class MainGUI(QWidget, Ui_MainWidget):
 
         #?###########################################################
         #? 读取配置文件，以及初始化 save_path
-        self.configPath = os.path.join(self.app_folder, "config.json")
+        self.config_path = os.path.join(self.app_folder, "config.json")
         self.config = None
 
         if self.getConfig("save_path"):
@@ -91,22 +91,22 @@ class MainGUI(QWidget, Ui_MainWidget):
 
         #?###########################################################
         #? 检测配置文件是否存在， 不存在则创建
-        if not os.path.exists(self.configPath):
+        if not os.path.exists(self.config_path):
             try:
-                with open(self.configPath, 'w', encoding='utf-8') as f:
+                with open(self.config_path, 'w', encoding='utf-8') as f:
                     json.dump({}, f)
                     return None
             except OSError as e:
-                logger.error(f"创建配置文件失败: 目录:{self.configPath}\n{e}")
+                logger.error(f"创建配置文件失败: 目录:{self.config_path}\n{e}")
                 return None
 
         #?###########################################################
         #? 读取配置文件
         try:
-            with open(self.configPath, 'r', encoding='utf-8') as f:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
                 self.config = json.load(f)
         except OSError as e:
-            logger.error(f"读取配置文件失败 - 目录:{self.configPath}\n{e}")
+            logger.error(f"读取配置文件失败 - 目录:{self.config_path}\n{e}")
             return None
 
         return self.config.get(key)
@@ -122,8 +122,8 @@ class MainGUI(QWidget, Ui_MainWidget):
         self.config[key] = value
 
         try:
-            with open(self.configPath, 'w+', encoding='utf-8') as f:
+            with open(self.config_path, 'w+', encoding='utf-8') as f:
                 # ensure_ascii=False 保证中文不被转义
                 json.dump(self.config, f, indent=4, ensure_ascii=False)
         except OSError as e:
-            logger.error(f"更新配置文件失败 - 目录:{self.configPath} - key: {key} - value: {value}\n{e}")
+            logger.error(f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}")
