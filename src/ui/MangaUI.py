@@ -1,21 +1,23 @@
 from __future__ import annotations
-import os
-import re
-from functools import partial
 
 import hashlib
+import os
+import re
+import typing
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
 import requests
-from retrying import retry, RetryError
-from PySide6.QtCore import QSize, Qt, QUrl, QEvent, QPoint
+from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap
-from PySide6.QtWidgets import (QHBoxLayout, QLabel, QListWidgetItem,
-                               QMessageBox, QWidget, QMenu)
+from PySide6.QtWidgets import (QHBoxLayout, QLabel, QListWidgetItem, QMenu,
+                               QMessageBox, QWidget)
+from retrying import RetryError, retry
 
 from src.Comic import Comic
 from src.searchComic import SearchComic
-from src.utils import (logger, MAX_RETRY_SMALL, TIMEOUT_SMALL, RETRY_WAIT_EX)
+from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
-import typing
 if typing.TYPE_CHECKING:
     from MainGUI import MainGUI
 
@@ -82,17 +84,22 @@ class MangaUI():
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
-
-        self.UpdateMyLibrary(mainGUI)
+        mainGUI.my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
+        self.updateMyLibrary(mainGUI)
         def _() -> None:
-            self.UpdateMyLibrary(mainGUI)
+            self.updateMyLibrary(mainGUI)
             QMessageBox.information(mainGUI, "通知",  "更新完成！")
 
         mainGUI.pushButton_myLibrary_update.clicked.connect(_)
 
 
     ############################################################
-    def UpdateMyLibrary(self, mainGUI: MainGUI) -> None:
+    # 以下三个函数是为了更新我的库存，是一个整体
+    # 拆开的原因主要是为了绕开多线程访问 mainGUI 报错的情况 ↓↓↓
+    # QObject::setParent: Cannot set parent, new parent is in a different thread
+    ############################################################
+
+    def updateMyLibrary(self, mainGUI: MainGUI) -> None:
         """扫描本地并且更新我的库存
 
         Args:
@@ -109,54 +116,92 @@ class MangaUI():
         #?###########################################################
         #? 读取本地库存
         path = mainGUI.getConfig("save_path")
-        my_library = []
 
-        for item in os.listdir(path):
-            if re.search(r'ID-\d+', item):
-                my_library.append((int(re.search(r'ID-(\d+)', item)[1]), os.path.join(path, item)))
+        my_library = [
+            (int(re.search(r'ID-(\d+)', item)[1]), os.path.join(path, item))
+            for item in os.listdir(path)
+            if re.search(r'ID-\d+', item)
+        ]
         mainGUI.label_myLibrary_count.setText(f"我的库存：{len(my_library)}部")
 
         #?###########################################################
-        #? 添加漫画
-        for (comic_id, comic_path) in my_library:
-            comic = Comic(comic_id, mainGUI.getConfig("cookie"), mainGUI.getConfig("save_path"), mainGUI.getConfig("num_thread"))
-            data = comic.getComicInfo(mainGUI)
-            #? 获取漫画信息失败直接跳过
-            if not data:
-                return
-            epi_list = comic.getEpisodesInfo()
-            h_layout_my_library = QHBoxLayout()
-            h_layout_my_library.addWidget(QLabel(f"<span style='color:blue;font-weight:bold'>{data['title']}</span> by {data['author_name']}"))
-            h_layout_my_library.addStretch(1)
-            h_layout_my_library.addWidget(QLabel(f"{comic.getNumDownloaded()}/{len(epi_list)}"))
+        #? 用多线程添加漫画，避免卡顿
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            for (comic_id, comic_path) in my_library:
+                executor.submit(self.updateMyLibrarySingle, mainGUI, comic_id, comic_path)
 
-            widget = QWidget()
-            widget.setStyleSheet("font-size: 10pt;")
 
-            #?###########################################################
-            #? 绑定漫画被点击事件
-            def _(_event: QEvent, widget: QWidget) -> None:
-                for i in range(mainGUI.v_Layout_myLibrary.count()):
-                    temp = mainGUI.v_Layout_myLibrary.itemAt(i).widget()
-                    temp.setStyleSheet("font-size: 10pt;")
-                widget.setStyleSheet("background-color:rgb(200, 200, 255); font-size: 10pt;")
+    ############################################################
+    def updateMyLibrarySingle(self, mainGUI: MainGUI, comic_id: int, comic_path: str) -> None:
+        """添加单个漫画到我的库存
 
-            widget.mousePressEvent = partial(_, widget=widget)
-            widget.mouseDoubleClickEvent = partial(self.updateComicInfo, mainGUI, comic)
-            widget.setLayout(h_layout_my_library)
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            comic_id (int): 漫画ID
+            comic_path (str): 漫画保存路径
+        """
+        comic = Comic(comic_id, mainGUI.getConfig("cookie"), mainGUI.getConfig("save_path"), mainGUI.getConfig("num_thread"))
+        data = comic.getComicInfo(mainGUI)
+        #? 获取漫画信息失败直接跳过
+        if not data:
+            return
+        epi_list = comic.getEpisodesInfo()
 
-            #?###########################################################
-            #? 绑定右键漫画打开文件夹事件
-            def myMenu_openFolder(widget: QWidget, comic_path: str, pos: QPoint) -> None:
-                menu = QMenu()
-                menu.addAction("打开文件夹", lambda: os.startfile(comic_path))
-                menu.exec_(widget.mapToGlobal(pos))
+        info = {
+            "mainGUI": mainGUI,
+            "data": data,
+            "comic": comic,
+            "epi_list": epi_list,
+            "comic_path": comic_path
+        }
 
-            widget.setContextMenuPolicy(Qt.CustomContextMenu)
-            widget.customContextMenuRequested.connect(partial(myMenu_openFolder, widget, comic_path))
+        mainGUI.my_library_add_widget.emit(info)
 
-            mainGUI.v_Layout_myLibrary.addWidget(widget)
+    ############################################################
+    def updateMyLibrarySingleAdd(self, info: dict) -> None:
+        """绑定我的库存中单个漫画的点击事件
 
+        Args:
+            info (dict): 漫画信息
+        """
+        mainGUI: MainGUI = info['mainGUI']
+        data: dict = info['data']
+        comic: Comic = info['comic']
+        epi_list: list = info['epi_list']
+        comic_path: str = info['comic_path']
+
+        h_layout_my_library = QHBoxLayout()
+        h_layout_my_library.addWidget(QLabel(f"<span style='color:blue;font-weight:bold'>{data['title']}</span> by {data['author_name']}"))
+        h_layout_my_library.addStretch(1)
+        h_layout_my_library.addWidget(QLabel(f"{comic.getNumDownloaded()}/{len(epi_list)}"))
+
+        widget = QWidget()
+        widget.setStyleSheet("font-size: 10pt;")
+
+        #?###########################################################
+        #? 绑定漫画被点击事件
+        def _(_event: QEvent, widget: QWidget) -> None:
+            for i in range(mainGUI.v_Layout_myLibrary.count()):
+                temp = mainGUI.v_Layout_myLibrary.itemAt(i).widget()
+                temp.setStyleSheet("font-size: 10pt;")
+            widget.setStyleSheet("background-color:rgb(200, 200, 255); font-size: 10pt;")
+
+        widget.mousePressEvent = partial(_, widget=widget)
+        widget.mouseDoubleClickEvent = partial(self.updateComicInfo, mainGUI, comic)
+        widget.setLayout(h_layout_my_library)
+
+        #?###########################################################
+        #? 绑定右键漫画打开文件夹事件
+        def myMenu_openFolder(widget: QWidget, comic_path: str, pos: QPoint) -> None:
+            menu = QMenu()
+            menu.addAction("打开文件夹", lambda: os.startfile(comic_path))
+            menu.exec_(widget.mapToGlobal(pos))
+
+        widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        widget.customContextMenuRequested.connect(partial(myMenu_openFolder, widget, comic_path))
+        mainGUI.v_Layout_myLibrary.addWidget(widget)
+
+    ############################################################
     ############################################################
     def updateComicInfo(self, mainGUI: MainGUI, comic: Comic, _event: QEvent = None) -> None:
         """更新漫画信息详情界面

@@ -7,7 +7,7 @@ from DownloadUI import DownloadUI
 from MangaUI import MangaUI
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QCloseEvent, QFont
-from PySide6.QtWidgets import QWidget, QMessageBox
+from PySide6.QtWidgets import QMessageBox, QWidget
 from SettingUI import SettingUI
 from ui_mainWidget import Ui_MainWidget
 
@@ -21,6 +21,8 @@ class MainGUI(QWidget, Ui_MainWidget):
     #? 主要是为了 Episode 类里面的提示框准备的，
     #? 因为 Episode 类是在另一个线程里面运行的，而只有主线程才能修改 GUI
     message_box = Signal(str)
+    #? 用于多线程更新我的库存
+    my_library_add_widget = Signal(dict)
 
     def __init__(self):
         super().__init__()
@@ -29,6 +31,7 @@ class MainGUI(QWidget, Ui_MainWidget):
         self.setWindowTitle("哔哩哔哩漫画下载器 v1.0.0")
         self.setFont(QFont("Microsoft YaHei", 10))
         self.message_box.connect(lambda msg: QMessageBox.warning(None, "警告",  msg))
+
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
         #?###########################################################
