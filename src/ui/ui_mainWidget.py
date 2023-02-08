@@ -299,10 +299,29 @@ class Ui_MainWidget(object):
 
         self.h_Layout_total_progress.addWidget(self.progressBar_total_progress)
 
-        self.label_total_progress_timer = QLabel(self.tab_download)
-        self.label_total_progress_timer.setObjectName(u"label_total_progress_timer")
+        self.line_7 = QFrame(self.tab_download)
+        self.line_7.setObjectName(u"line_7")
+        self.line_7.setFrameShape(QFrame.VLine)
+        self.line_7.setFrameShadow(QFrame.Sunken)
 
-        self.h_Layout_total_progress.addWidget(self.label_total_progress_timer)
+        self.h_Layout_total_progress.addWidget(self.line_7)
+
+        self.label_total_progress_speed = QLabel(self.tab_download)
+        self.label_total_progress_speed.setObjectName(u"label_total_progress_speed")
+
+        self.h_Layout_total_progress.addWidget(self.label_total_progress_speed)
+
+        self.line_6 = QFrame(self.tab_download)
+        self.line_6.setObjectName(u"line_6")
+        self.line_6.setFrameShape(QFrame.VLine)
+        self.line_6.setFrameShadow(QFrame.Sunken)
+
+        self.h_Layout_total_progress.addWidget(self.line_6)
+
+        self.label_total_progress_time = QLabel(self.tab_download)
+        self.label_total_progress_time.setObjectName(u"label_total_progress_time")
+
+        self.h_Layout_total_progress.addWidget(self.label_total_progress_time)
 
 
         self.verticalLayout_2.addLayout(self.h_Layout_total_progress)
@@ -315,40 +334,12 @@ class Ui_MainWidget(object):
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.v_Layout_processing = QVBoxLayout()
         self.v_Layout_processing.setObjectName(u"v_Layout_processing")
-        self.h_Layout_processing = QHBoxLayout()
-        self.h_Layout_processing.setSpacing(10)
-        self.h_Layout_processing.setObjectName(u"h_Layout_processing")
-        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.h_Layout_processing.addItem(self.horizontalSpacer_8)
-
-        self.pushButton_processing_start = QPushButton(self.tab_processing)
-        self.pushButton_processing_start.setObjectName(u"pushButton_processing_start")
-        self.pushButton_processing_start.setMinimumSize(QSize(100, 25))
-
-        self.h_Layout_processing.addWidget(self.pushButton_processing_start)
-
-        self.pushButton_processing_pause = QPushButton(self.tab_processing)
-        self.pushButton_processing_pause.setObjectName(u"pushButton_processing_pause")
-        self.pushButton_processing_pause.setMinimumSize(QSize(100, 25))
-
-        self.h_Layout_processing.addWidget(self.pushButton_processing_pause)
-
-        self.pushButton_processing_delete = QPushButton(self.tab_processing)
-        self.pushButton_processing_delete.setObjectName(u"pushButton_processing_delete")
-        self.pushButton_processing_delete.setMinimumSize(QSize(100, 25))
-
-        self.h_Layout_processing.addWidget(self.pushButton_processing_delete)
-
-
-        self.v_Layout_processing.addLayout(self.h_Layout_processing)
-
         self.scrollArea_processing = QScrollArea(self.tab_processing)
         self.scrollArea_processing.setObjectName(u"scrollArea_processing")
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1101, 526))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1101, 559))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -533,7 +524,7 @@ class Ui_MainWidget(object):
     def retranslateUi(self, MainWidget):
         MainWidget.setWindowTitle(QCoreApplication.translate("MainWidget", u"Form", None))
         self.label_8.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u540d", None))
-        self.lineEdit_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u975e\u4eba", None))
+        self.lineEdit_manga_search_name.setText("")
         self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u641c\u7d22", None))
         self.label_manga_search.setText("")
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWidget", u"\u641c\u7d22\u6f2b\u753b", None))
@@ -555,10 +546,8 @@ class Ui_MainWidget(object):
         self.pushButton_chp_detail_download_selected.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u9009\u4e2d\u7ae0\u8282", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWidget", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWidget", u"\u603b\u8fdb\u5ea6", None))
-        self.label_total_progress_timer.setText(QCoreApplication.translate("MainWidget", u"\u9884\u8ba1\u5269\u4f59\u65f6\u95f4\uff1a", None))
-        self.pushButton_processing_start.setText(QCoreApplication.translate("MainWidget", u"\u5f00\u59cb\u9009\u4e2d\u4efb\u52a1", None))
-        self.pushButton_processing_pause.setText(QCoreApplication.translate("MainWidget", u"\u6682\u505c\u9009\u4e2d\u4efb\u52a1", None))
-        self.pushButton_processing_delete.setText(QCoreApplication.translate("MainWidget", u"\u5220\u9664\u9009\u4e2d\u4efb\u52a1", None))
+        self.label_total_progress_speed.setText(QCoreApplication.translate("MainWidget", u"\u603b\u4e0b\u8f7d\u901f\u5ea6:", None))
+        self.label_total_progress_time.setText(QCoreApplication.translate("MainWidget", u"\u5269\u4f59\u65f6\u95f4\uff1a", None))
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_processing), QCoreApplication.translate("MainWidget", u"\u8fdb\u884c\u4e2d", None))
         self.pushButton_clear_tasks.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7406\u5df2\u5b8c\u6210\u4efb\u52a1", None))
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_finished), QCoreApplication.translate("MainWidget", u"\u5df2\u5b8c\u6210", None))

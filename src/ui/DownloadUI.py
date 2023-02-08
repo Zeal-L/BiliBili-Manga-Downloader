@@ -41,7 +41,9 @@ class DownloadUI(QObject):
         mainGUI.verticalLayout_processing.setAlignment(Qt.AlignTop)
         mainGUI.verticalLayout_finished.setAlignment(Qt.AlignTop)
 
-        def _(result):
+        #?###########################################################
+        #? 任务进度更新的信号槽绑定
+        def _(result: dict):
             curr_task = self.all_tasks[result['taskID']]
             curr_task['rate'] = result['rate']
             curr_task['bar'].setValue(result['rate'])
@@ -51,19 +53,21 @@ class DownloadUI(QObject):
             )
             self.download_info.updateTask(result['taskID'], result['rate'])
 
+            #? 更新总进度条的速度和剩余时间
+            mainGUI.label_total_progress_speed.setText(f"{self.download_info.getTotalSmoothSpeedStr()}")
+            mainGUI.label_total_progress_time.setText(f"{self.download_info.getTotalRemainingTimeStr()}")
 
-            mainGUI.label_total_progress_timer.setText(f"总下载速度：{self.download_info.getTotalSmoothSpeedStr()}")
-
-            #?###########################################################
             #? 在下载列表UI里删除下载完成的任务
-            if result['rate'] == 100:
+            #? 如果result['rate'] 等于1 意味着下载出错跳过，删除任务相关信息
+            if result['rate'] in (100, -1):
                 for i in reversed(range(mainGUI.verticalLayout_processing.count())):
                     to_delete = mainGUI.verticalLayout_processing.itemAt(i).widget()
                     #? 如果widget的ObjectName和当前任务的id一致
                     if to_delete.objectName() == result['taskID']:
-                        #? 取出标题组件用于添加到已完成列表
-                        label_title = to_delete.layout().itemAt(0).widget()
-                        self.addFinished(mainGUI, label_title, result['path'])
+                        if result['rate'] == 100:
+                            #? 取出标题组件用于添加到已完成列表
+                            label_title = to_delete.layout().itemAt(0).widget()
+                            self.addFinished(mainGUI, label_title, result['path'])
                         #? deleteLater 会有延迟，为了显示效果，先将父控件设为None
                         to_delete.setParent(None)
                         to_delete.deleteLater()
@@ -71,6 +75,7 @@ class DownloadUI(QObject):
                 #? 删除字典中的条目
                 del curr_task
                 self.download_info.removeTask(result['taskID'])
+                self.all_tasks.pop(result['taskID'])
 
         self.rate_progress.connect(_)
 
@@ -122,11 +127,13 @@ class DownloadUI(QObject):
         if not os.path.exists(epi.save_path):
             os.makedirs(epi.save_path)
 
+        #?###########################################################
+        #? 创建任务
         task_id = str(self.id_count)
-
+        self.download_info.createTask(task_id, epi.size)
         self.all_tasks[task_id] = {
             'rate': 0,
-            'future': self.executor.submit(epi.download, mainGUI, self.rate_progress, task_id, self.download_info)
+            'future': self.executor.submit(epi.download, mainGUI, self.rate_progress, task_id)
         }
 
         #?###########################################################

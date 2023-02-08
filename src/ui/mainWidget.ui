@@ -61,7 +61,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>非人</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -410,9 +410,30 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_total_progress_timer">
+          <widget class="Line" name="line_7">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_total_progress_speed">
            <property name="text">
-            <string>预计剩余时间：</string>
+            <string>总下载速度:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_6">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_total_progress_time">
+           <property name="text">
+            <string>剩余时间：</string>
            </property>
           </widget>
          </item>
@@ -429,66 +450,7 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <layout class="QVBoxLayout" name="v_Layout_processing" stretch="0,0">
-             <item>
-              <layout class="QHBoxLayout" name="h_Layout_processing">
-               <property name="spacing">
-                <number>10</number>
-               </property>
-               <item>
-                <spacer name="horizontalSpacer_8">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_processing_start">
-                 <property name="minimumSize">
-                  <size>
-                   <width>100</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>开始选中任务</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_processing_pause">
-                 <property name="minimumSize">
-                  <size>
-                   <width>100</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>暂停选中任务</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_processing_delete">
-                 <property name="minimumSize">
-                  <size>
-                   <width>100</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>删除选中任务</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
+            <layout class="QVBoxLayout" name="v_Layout_processing" stretch="0">
              <item>
               <widget class="QScrollArea" name="scrollArea_processing">
                <property name="widgetResizable">
@@ -500,7 +462,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>1101</width>
-                  <height>526</height>
+                  <height>559</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_processing"/>

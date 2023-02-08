@@ -40,6 +40,10 @@ class MangaUI():
             if not mainGUI.getConfig("cookie"):
                 QMessageBox.critical(mainGUI, "Critical",  "请先在设置界面填写自己的Cookie！")
                 return
+            #? 如果输入框为空，只有空格，提示用户输入
+            if not mainGUI.lineEdit_manga_search_name.text().strip():
+                QMessageBox.critical(mainGUI, "Critical",  "请输入漫画名！")
+                return
 
             self.search_info = SearchComic(mainGUI.lineEdit_manga_search_name.text(), mainGUI.getConfig("cookie")).getResults(mainGUI)
             mainGUI.listWidget_manga_search.clear()
@@ -117,6 +121,9 @@ class MangaUI():
         for (comic_id, comic_path) in my_library:
             comic = Comic(comic_id, mainGUI.getConfig("cookie"), mainGUI.getConfig("save_path"), mainGUI.getConfig("num_thread"))
             data = comic.getComicInfo(mainGUI)
+            #? 获取漫画信息失败直接跳过
+            if not data:
+                return
             epi_list = comic.getEpisodesInfo()
             h_layout_my_library = QHBoxLayout()
             h_layout_my_library.addWidget(QLabel(f"<span style='color:blue;font-weight:bold'>{data['title']}</span> by {data['author_name']}"))

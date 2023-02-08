@@ -9,11 +9,10 @@ import typing
 import requests
 from PIL import Image
 from PySide6.QtCore import SignalInstance
-from PySide6.QtWidgets import QMessageBox
-from retrying import RetryError, retry
+from retrying import retry
 
 from src.utils import (MAX_RETRY_LARGE, MAX_RETRY_SMALL, RETRY_WAIT_EX,
-                       TIMEOUT_LARGE, TIMEOUT_SMALL, DownloadInfo, logger)
+                       TIMEOUT_LARGE, TIMEOUT_SMALL, logger)
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -26,7 +25,7 @@ class Episode:
         self.available = not episode['is_locked']
         self.ord = episode['ord']
         self.comic_name = comic_name
-        self.content_size = 0
+        self.size = episode['size']
         self.imgs_token = None
 
         #?###########################################################
@@ -65,8 +64,11 @@ class Episode:
         self.pdf_path = os.path.join(self.save_path, f"{self.title}.pdf")
 
     ############################################################
-    def init_imgsList(self, mainGUI: MainGUI) -> None:
-        """初始化章节内所有图片的列表和图片的token，以及统计章节的大小
+    def init_imgsList(self, mainGUI: MainGUI) -> bool:
+        """初始化章节内所有图片的列表和图片的token
+
+        Returns
+            bool: 是否初始化成功
         """
         #?###########################################################
         #? 获取图片列表
@@ -75,7 +77,7 @@ class Episode:
         def _() -> list:
             try:
                 res = requests.post(GetImageIndexURL, data={'ep_id': self.id}, headers=self.headers, timeout=TIMEOUT_SMALL)
-            except requests.RequestException() as e:
+            except requests.RequestException as e:
                 logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
@@ -85,10 +87,11 @@ class Episode:
 
         try:
             imgs_urls = [img['path'] for img in _()]
-        except RetryError as e:
-            logger.error(f'《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n {e}')
-            QMessageBox.warning(mainGUI, "警告",  f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
-            return
+        except requests.RequestException as e:
+            logger.error(f'《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}')
+            logger.exception(e)
+            mainGUI.message_box.emit(f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            return False
 
         #?###########################################################
         #? 获取图片token
@@ -97,7 +100,7 @@ class Episode:
         def _() -> list:
             try:
                 res = requests.post(ImageTokenURL, data={"urls": json.dumps(imgs_urls)}, headers=self.headers, timeout=TIMEOUT_SMALL)
-            except requests.RequestException() as e:
+            except requests.RequestException as e:
                 logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
@@ -107,59 +110,47 @@ class Episode:
 
         try:
             self.imgs_token = _()
-        except RetryError as e:
+        except requests.RequestException as e:
             logger.error(f'《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}')
-            QMessageBox.warning(mainGUI, "警告",  f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
-            return
+            logger.exception(e)
+            mainGUI.message_box.emit(f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            return False
 
-        #?###########################################################
-        #? 统计章节内所有图片大小
-        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _(index: int, url: str, token: str) -> None:
-            img_url = f"{url}?token={token}"
-            try:
-                res = requests.head(img_url, timeout=TIMEOUT_SMALL)
-            except requests.RequestException() as e:
-                logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! 重试中...\n{e}")
-                raise e
-            if res.status_code != 200:
-                logger.warning(f'《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...')
-                raise requests.HTTPError()
-            self.content_size += int(res.headers['Content-Length'])
-
-        for index, img in enumerate(self.imgs_token, start=1):
-            try:
-                _(index, img['url'], img['token'])
-            except RetryError as e:
-                logger.error(f"获取图片 header 多次后失败，跳过!\n{e}")
-                QMessageBox.warning(mainGUI, "警告",  f"《{self.comic_name}》章节：{self.title} 获取图片 header 多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
-                return
+        return True
 
     ############################################################
-    def download(self, mainGUI: MainGUI, rate_progress: SignalInstance, taskID: str, downloadInfo: DownloadInfo) -> None:
+    def download(self, mainGUI: MainGUI, rate_progress: SignalInstance, taskID: str) -> None:
         """下载章节内所有图片 并合并为PDF
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
             rate_progress (SignalInstance): 信号槽，用于更新下载进度条
             taskID (str): 任务ID
-            downloadInfo (DownloadInfo): 下载任务的详细信息类实例
         """
-        self.init_imgsList(mainGUI)
+        check_succeed = True
 
-        downloadInfo.updateTask(taskID, 0, size=self.content_size)
+        #?###########################################################
+        #? 初始化下载图片需要的参数
+        if not self.init_imgsList(mainGUI):
+            rate_progress.emit({
+                "taskID": taskID,
+                "rate": -1,
+            })
 
         #?###########################################################
         #? 下载所有图片
         imgs_path = []
         for index, img in enumerate(self.imgs_token, start=1):
             img_url = f"{img['url']}?token={img['token']}"
-            try:
-                img_path = self.downloadImg(index, img_url)
-            except RetryError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 重复下载图片多次后失败!\n{e}")
-                QMessageBox.warning(mainGUI, "警告", f"《{self.comic_name}》章节：{self.title} 重复下载图片多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
-                return
+
+            img_path = self.downloadImg(mainGUI, index, img_url)
+            if img_path is None:
+                check_succeed = False
+                rate_progress.emit({
+                    "taskID": taskID,
+                    "rate": -1,
+                })
+                break
 
             imgs_path.append(img_path)
             rate_progress.emit({
@@ -170,18 +161,29 @@ class Episode:
 
         #?###########################################################
         #? 统一转换为RGB模式
-        temp_imgs = [Image.open(x) for x in imgs_path]
-        for i,img in enumerate(temp_imgs):
-            if img.mode != 'RGB':
-                temp_imgs[i] = img.convert('RGB')
+        if check_succeed:
+            temp_imgs = [Image.open(x) for x in imgs_path]
+            for i,img in enumerate(temp_imgs):
+                if img.mode != 'RGB':
+                    temp_imgs[i] = img.convert('RGB')
 
         #?###########################################################
         #? 合并PDF
-        try:
-            temp_imgs[0].save(self.pdf_path, save_all=True, append_images=temp_imgs[1:], quality=95)
-        except ValueError as e:
-            logger.error(f'《{self.comic_name}》章节：{self.title} 合并PDF失败!\n{imgs_path}\n{e}')
-            QMessageBox.warning(mainGUI, "警告", f"《{self.comic_name}》章节：{self.title} 合并PDF失败!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
+        @retry(stop_max_attempt_number=5)
+        def _():
+            try:
+                temp_imgs[0].save(self.pdf_path, save_all=True, append_images=temp_imgs[1:], quality=95)
+            except OSError as e:
+                logger.error(f'《{self.comic_name}》章节：{self.title} 合并PDF失败! 重试中...\n{imgs_path}\n{e}')
+                raise e
+
+        if check_succeed:
+            try:
+                _()
+            except OSError as e:
+                logger.error(f'《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n{imgs_path}\n{e}')
+                logger.exception(e)
+                mainGUI.message_box.emit(f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
 
         #?###########################################################
         #? 删除临时图片, 偶尔会出现删除失败的情况，故给与重试5次
@@ -196,17 +198,17 @@ class Episode:
                     imgs_path.remove(img)
         try:
             _()
-        except RetryError as e:
-            logger.error(f'《{self.comic_name}》章节：{self.title} 删除临时图片失败!\n{imgs_path}\n{e}')
-            QMessageBox.warning(mainGUI, "警告", f"《{self.comic_name}》章节：{self.title} 删除临时图片失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！")
-
+        except OSError as e:
+            logger.error(f'《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}')
+            logger.exception(e)
+            mainGUI.message_box.emit(f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！")
 
     ############################################################
-    @retry(stop_max_delay=MAX_RETRY_LARGE, wait_exponential_multiplier=RETRY_WAIT_EX)
-    def downloadImg(self, index: int, img_url: str) -> str:
+    def downloadImg(self, mainGUI: MainGUI, index: int, img_url: str) -> str:
         """根据 url 和 token 下载图片
 
         Args:
+            mainGUI (MainGUI): 主窗口类实例
             index (int): 章节中图片的序号
             img_url (str): 图片的合法 url
 
@@ -214,21 +216,51 @@ class Episode:
             str: 图片的保存路径
         """
 
-        try:
-            res = requests.get(img_url, timeout=TIMEOUT_LARGE)
-        except requests.RequestException() as e:
-            logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 下载图片失败! 重试中...\n{e}")
-            raise e
-        if res.status_code != 200:
-            logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
-            raise requests.HTTPError()
-        if res.headers['Etag'] != hashlib.md5(res.content).hexdigest():
-            logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n\t{res.headers['Etag']} ≠ {hashlib.md5(res.content).hexdigest()}")
-            raise requests.HTTPError()
+        #?###########################################################
+        #? 下载图片
+        @retry(stop_max_delay=MAX_RETRY_LARGE, wait_exponential_multiplier=RETRY_WAIT_EX)
+        def _() -> bytes:
+            try:
+                res = requests.get(img_url, timeout=TIMEOUT_LARGE)
+            except requests.RequestException as e:
+                logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 下载图片失败! 重试中...\n{e}")
+                raise e
+            if res.status_code != 200:
+                logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                raise requests.HTTPError()
+            if res.headers['Etag'] != hashlib.md5(res.content).hexdigest():
+                logger.warning(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n\t{res.headers['Etag']} ≠ {hashlib.md5(res.content).hexdigest()}")
+                raise requests.HTTPError()
+            return res.content
 
+        try:
+            img = _()
+        except requests.RequestException as e:
+            logger.error(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 重复下载图片多次后失败!\n{e}")
+            logger.exception(e)
+            mainGUI.message_box.emit(f"《{self.comic_name}》章节：{self.title} 重复下载图片多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            return None
+
+        #?###########################################################
+        #? 保存图片
         path_to_save = os.path.join(self.save_path, f"{self.ord}_{index}.jpg")
-        with open(path_to_save, 'wb') as f:
-            f.write(res.content)
+        @retry(stop_max_attempt_number=5)
+        def _() -> None:
+            try:
+                with open(path_to_save, 'wb') as f:
+                    f.write(img)
+            except OSError as e:
+                logger.error(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 保存图片失败! 重试中...\n{e}")
+                raise e
+
+        try:
+            _()
+        except OSError as e:
+            logger.error(f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 保存图片多次后失败!\n{e}")
+            logger.exception(e)
+            mainGUI.message_box.emit(f"《{self.comic_name}》章节：{self.title} - {index} - 保存图片多次后失败!\n已暂时跳过此章节, 并删除所有缓存文件！\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            return None
+
         return path_to_save
 
     ############################################################

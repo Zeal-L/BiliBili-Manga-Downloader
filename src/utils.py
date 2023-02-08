@@ -117,32 +117,44 @@ class DownloadInfo:
         self.average_speed_in_last_second = {}
 
     ############################################################
-    def updateTask(self, taskID: int, rate: float, size: int = None) -> None:
+    def removeTask(self, taskID: int) -> None:
+        """清空任务信息, 释放内存
+
+        Args:
+            taskID (int): 任务ID
+        """
+        self.info.pop(taskID)
+
+    ############################################################
+    def createTask(self, taskID: int, size: int) -> None:
+        """创建任务信息
+
+        Args:
+            taskID (int): 任务ID
+            size (int): 任务文件大小  单位: Byte
+        """
+        self.info[taskID] = {
+            'size': size,               # 任务文件大小  单位: Byte
+            'rate': 0,                  # 当前已下载百分比
+            'last_rate': 0,             # 上次已下载百分比
+            'curr_speed': 0,            # 当前速度  单位: Byte/s
+            'average_speed': 0,         # 平均速度  单位: Byte/s
+            'last_update_time': None,   # 上次更新时间 单位: 秒
+        }
+
+    ############################################################
+    def updateTask(self, taskID: int, rate: float) -> None:
         """更新任务信息
 
         Args:
             taskID (int): 任务ID
             rate (float): 下载进度百分比
-            size (int, optional): 任务文件大小. Defaults to None.
         """
-        rate /= 100
 
-        if taskID not in self.info:
-            self.info[taskID] = {
-                'size': size,               # 任务文件大小  单位: Byte
-                'rate': rate,               # 当前已下载百分比
-                'last_rate': 0,             # 上次已下载百分比
-                'curr_speed': None,         # 当前速度  单位: Byte/s
-                'average_speed': None,      # 平均速度  单位: Byte/s
-                'last_update_time': None,   # 上次更新时间 单位: 秒
-                # 'remaining_time': None    # 剩余时间  单位: 秒
-            }
-        else:
-            self.info[taskID]['rate'] = rate
+        self.info[taskID]['rate'] = rate / 100
 
         self.calcuCurrSpeed(self.info[taskID])
         self.calcuSmoothSpeed(self.info[taskID])
-        # self.calcu_remaining_time(self.info[id])
 
     ############################################################
     def calcuCurrSpeed(self, task: dict) -> None:
@@ -173,13 +185,23 @@ class DownloadInfo:
         task['average_speed'] = SMOOTHING_FACTOR * task['curr_speed'] + (1-SMOOTHING_FACTOR) * (task['average_speed'] or task['curr_speed'])
 
     ############################################################
-    def removeTask(self, taskID: int) -> None:
-        """清空任务信息, 释放内存
+    def getSmoothSpeed(self, task_id) -> str:
+        if task_id in self.info:
+            task = self.info[task_id]
+            if task['average_speed']:
+                return self.formatSpeed(task['average_speed'])
+        return '0B/s'
 
-        Args:
-            taskID (int): 任务ID
-        """
-        self.info.pop(taskID)
+    ############################################################
+    def getTotalSmoothSpeed(self) -> int:
+        self.average_speed_in_last_second[time.perf_counter()] = sum(task['average_speed'] for task in self.info.values() if task['rate'] != 1.0)
+
+        for key in list(self.average_speed_in_last_second.keys()):
+            if key < time.perf_counter() - 5:
+                self.average_speed_in_last_second.pop(key)
+
+        return sum(self.average_speed_in_last_second.values()) / len(self.average_speed_in_last_second) or 1
+
 
     ############################################################
     def getTotalSmoothSpeedStr(self) -> str:
@@ -197,66 +219,72 @@ class DownloadInfo:
             if key < time.perf_counter() - 5:
                 self.average_speed_in_last_second.pop(key)
 
-        return self.formatSize(
+        return self.formatSpeed(
             sum(self.average_speed_in_last_second.values())
             / len(self.average_speed_in_last_second) or 1
         )
 
     ############################################################
-    def formatSize(self, size: int) -> str:
-        """格式化文件大小
+    def formatSpeed(self, speed: float) -> str:
+        """格式化每秒速度大小
 
         Args:
-            size (int): 文件大小
+            size (int): 每秒速度大小
 
         Returns:
-            str: 格式化后的文件大小, 例如: 1.23MB/s
+            str: 格式化后的每秒速度大小, 例如: 1.23MB/s
         """
-        if size < 0:
+        if speed < 0:
             return '0B/s'
-        elif size < 1024:
-            return '%dB/s' % size
-        elif size < 1024 * 1024:
-            return '%.2fKB/s' % (size / 1024)
-        elif size < 1024 * 1024 * 1024:
-            return '%.2fMB/s' % (size / 1024 / 1024)
-        elif size < 1024 * 1024 * 1024 * 1024:
-            return '%.2fGB/s' % (size / 1024 / 1024 / 1024)
+        elif speed < 1024:
+            return '%dB/s' % speed
+        elif speed < 1024 * 1024:
+            return '%.2fKB/s' % (speed / 1024)
+        elif speed < 1024 * 1024 * 1024:
+            return '%.2fMB/s' % (speed / 1024 / 1024)
         else:
-            return '%.2fTB/s' % (size / 1024 / 1024 / 1024 / 1024)
+            return '%.2fGB/s' % (speed / 1024 / 1024 / 1024)
+
 
     ############################################################
+    def getRemainingTimeStr(self, task_id: int) -> str or None:
+        """获取任务的剩余时间
 
-    # #? 由于需要提前访问所有章节的所有图片链接的header来统计总下载大小
-    # #? 轻易上千次的request产生的RTT会导致用户等待太长时间，所以放弃‘预计下载时间’功能
-    # #? 如果B站后续更新API可以一次就获取一章的大小，就可以复用以下功能
+        Args:
+            task_id (int): 任务ID
 
-    # def calcuRemainingTime(self, task) -> None:
-    #     if task['average_speed'] != 0:
-    #         task['remaining_time'] = (task['size'] * (1 - task['rate'])) / task['average_speed']
+        Returns:
+            str or None: 剩余时间字符串, 如果任务不存在则返回None
+        """
+        if task_id in self.info:
+            task = self.info[task_id]
+            return self.formatTime((task['size'] * (1 - task['rate'])) / task['average_speed'])
+        return None
 
-    # def getSmoothSpeed(self, task_id) -> str:
-    #     if task_id in self.info:
-    #         task = self.info[task_id]
-    #         if task['average_speed'] != 0:
-    #             return self.formatSize(task['average_speed'])
-    #     return '0B/s'
+    ############################################################
+    def getTotalRemainingTimeStr(self) -> str:
+        """获取所有任务的剩余时间
 
-    # def getTotalSmoothSpeed(self) -> int:
-    #     return sum(task['average_speed'] for task in self.info.values() if task['rate'] != 1.0)
+        Returns:
+            str: 剩余时间字符串
+        """
+        total_size_left = sum(task['size'] * (1 - task['rate']) for task in self.info.values())
+        if self.getTotalSmoothSpeed() == 0:
+            return self.formatTime(0)
+        return self.formatTime(total_size_left / self.getTotalSmoothSpeed())
 
-    # def get_remaining_time(self, task_id) -> str:
-    #     if task_id in self.info:
-    #         return self.formatTime(self.info[task_id]['remaining_time'])
-    #     return '00:00:00'
+    ############################################################
+    def formatTime(self, seconds: float) -> str:
+        """格式化剩余时间
 
-    # def getTotalRemainingTime(self):
-    #     total_size_left = sum(task['size'] * (1 - task['rate']) for task in self.info.values())
-    #     if self.getTotalSmoothSpeed() == 0:
-    #         return self.formatTime(0)
-    #     return self.formatTime(total_size_left/self.getTotalSmoothSpeed())
+        Args:
+            seconds (float): 剩余时间
 
-    # def formatTime(self, seconds) -> str:
-    #     m, s = divmod(seconds, 60)
-    #     h, m = divmod(m, 60)
-    #     return "%02d:%02d:%02d" % (h, m, s)
+        Returns:
+            str: 格式化后的剩余时间, 例如: 1天 23:59:59
+        """
+        m, s = divmod(seconds, 60)
+        h, m = divmod(m, 60)
+        if h > 24:
+            return "%d天 %02d:%02d:%02d" % (h // 24, h % 24, m, s)
+        return "%02d:%02d:%02d" % (h, m, s)

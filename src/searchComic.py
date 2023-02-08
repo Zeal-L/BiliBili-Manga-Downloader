@@ -4,7 +4,7 @@ import typing
 
 import requests
 from PySide6.QtWidgets import QMessageBox
-from retrying import RetryError, retry
+from retrying import retry
 
 from src.utils import (logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL)
 
@@ -41,7 +41,7 @@ class SearchComic:
         def _() -> list:
             try:
                 res = requests.post(self.detailUrl, data=self.payload, headers=self.headers, timeout=TIMEOUT_SMALL)
-            except requests.RequestException() as e:
+            except requests.RequestException as e:
                 logger.warning(f"获取搜索结果失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
@@ -53,8 +53,9 @@ class SearchComic:
 
         try:
             data = _()
-        except RetryError as e:
+        except requests.RequestException as e:
             logger.error(f'重复获取搜索结果多次后失败!\n{e}')
+            logger.exception(e)
             QMessageBox.warning(mainGUI, "警告",  "重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件")
             return []
 

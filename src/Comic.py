@@ -4,7 +4,7 @@ from __future__ import annotations
 import typing
 
 import requests
-from retrying import retry, RetryError
+from retrying import retry
 from PySide6.QtWidgets import QMessageBox
 
 from src.Episode import Episode
@@ -46,7 +46,7 @@ class Comic:
         def _() -> dict:
             try:
                 res = requests.post(self.detail_url, headers=self.headers, data=self.payload, timeout=TIMEOUT_SMALL)
-            except requests.RequestException() as e:
+            except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
@@ -56,8 +56,9 @@ class Comic:
 
         try:
             self.data = _()
-        except RetryError as e:
+        except requests.RequestException as e:
             logger.error(f'漫画id:{self.comic_id} 重复获取漫画信息多次后失败!\n{e}')
+            logger.exception(e)
             QMessageBox.warning(mainGUI, "警告", "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
             return {}
 
