@@ -5,7 +5,7 @@ import typing
 from functools import partial
 
 from MyAbout import MyAbout
-from PySide6.QtWidgets import QFileDialog, QMessageBox
+from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
 
 from src.utils import log_path
 
@@ -24,9 +24,10 @@ class SettingUI():
         self.init_openLog(mainGUI)
         self.init_about(mainGUI)
         self.init_clearUserData(mainGUI)
+        self.init_saveMethod(mainGUI)
 
     ############################################################
-    def init_cookie(self, mainGUI: MainGUI):
+    def init_cookie(self, mainGUI: MainGUI) -> None:
         """绑定Cookie值
 
         Args:
@@ -41,7 +42,7 @@ class SettingUI():
         mainGUI.pushButton_my_cookie.clicked.connect(_)
 
     ############################################################
-    def init_savePath(self, mainGUI: MainGUI):
+    def init_savePath(self, mainGUI: MainGUI) -> None:
         """绑定漫画保存路径设置
 
         Args:
@@ -64,7 +65,7 @@ class SettingUI():
         mainGUI.lineEdit_save_path.returnPressed.connect(_)
 
     ############################################################
-    def init_num_thread(self, mainGUI: MainGUI):
+    def init_num_thread(self, mainGUI: MainGUI) -> None:
         """绑定线程数设置
 
         Args:
@@ -84,7 +85,7 @@ class SettingUI():
         mainGUI.h_Slider_num_thread.valueChanged.connect(_)
 
     ############################################################
-    def init_openLog(self, mainGUI: MainGUI):
+    def init_openLog(self, mainGUI: MainGUI) -> None:
         """绑定打开日志文件
 
         Args:
@@ -93,7 +94,7 @@ class SettingUI():
         mainGUI.pushButton_open_log.clicked.connect(lambda: os.startfile(os.path.join(log_path, "ERROR.log")))
 
     ############################################################
-    def init_about(self, mainGUI: MainGUI):
+    def init_about(self, mainGUI: MainGUI) -> None:
         """绑定关于按钮
 
         Args:
@@ -103,7 +104,7 @@ class SettingUI():
         mainGUI.pushButton_about.clicked.connect(partial(about_window.show))
 
     ############################################################
-    def init_clearUserData(self, mainGUI: MainGUI):
+    def init_clearUserData(self, mainGUI: MainGUI) -> None:
         """绑定清理用户数据设置
 
         Args:
@@ -115,3 +116,24 @@ class SettingUI():
                 self.clearUserData = True
 
         mainGUI.pushButton_clear_data.clicked.connect(_)
+
+    ############################################################
+    def init_saveMethod(self, mainGUI: MainGUI) -> None:
+        """绑定保存方式设置
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        if mainGUI.getConfig("save_method"):
+            for i in range(mainGUI.h_Layout_groupBox_save_method.count()):
+                button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
+                if button.text() == mainGUI.getConfig("save_method"):
+                    button.setChecked(True)
+
+        def _(button: QRadioButton, checked: bool) -> None:
+            if checked:
+                mainGUI.updateConfig("save_method", button.text())
+
+        for i in range(mainGUI.h_Layout_groupBox_save_method.count()):
+            button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
+            button.toggled.connect(partial(_, button))

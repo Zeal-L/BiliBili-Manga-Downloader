@@ -18,8 +18,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGroupBox,
     QHBoxLayout, QLabel, QLineEdit, QListView,
     QListWidget, QListWidgetItem, QProgressBar, QPushButton,
-    QScrollArea, QSizePolicy, QSlider, QSpacerItem,
-    QTabWidget, QVBoxLayout, QWidget)
+    QRadioButton, QScrollArea, QSizePolicy, QSlider,
+    QSpacerItem, QTabWidget, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_MainWidget(object):
@@ -395,6 +395,10 @@ class Ui_MainWidget(object):
         self.tab_setting.setObjectName(u"tab_setting")
         self.verticalLayout_5 = QVBoxLayout(self.tab_setting)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalSpacer_4 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_4)
+
         self.h_Layout_my_cookie = QHBoxLayout()
         self.h_Layout_my_cookie.setObjectName(u"h_Layout_my_cookie")
         self.label_my_cookie = QLabel(self.tab_setting)
@@ -439,16 +443,36 @@ class Ui_MainWidget(object):
 
         self.verticalLayout_5.addLayout(self.h_Layout_save_path)
 
+        self.verticalSpacer_3 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_3)
+
+        self.line_8 = QFrame(self.tab_setting)
+        self.line_8.setObjectName(u"line_8")
+        self.line_8.setFrameShape(QFrame.HLine)
+        self.line_8.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_5.addWidget(self.line_8)
+
+        self.verticalSpacer_5 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_5)
+
+        self.groupBox = QGroupBox(self.tab_setting)
+        self.groupBox.setObjectName(u"groupBox")
+        self.groupBox.setMinimumSize(QSize(0, 50))
+        self.verticalLayout_3 = QVBoxLayout(self.groupBox)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.h_Layout_num_thread = QHBoxLayout()
         self.h_Layout_num_thread.setObjectName(u"h_Layout_num_thread")
-        self.label_num_thread_count = QLabel(self.tab_setting)
+        self.label_num_thread_count = QLabel(self.groupBox)
         self.label_num_thread_count.setObjectName(u"label_num_thread_count")
         self.label_num_thread_count.setMinimumSize(QSize(110, 0))
         self.label_num_thread_count.setMaximumSize(QSize(16777215, 16777215))
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread_count)
 
-        self.h_Slider_num_thread = QSlider(self.tab_setting)
+        self.h_Slider_num_thread = QSlider(self.groupBox)
         self.h_Slider_num_thread.setObjectName(u"h_Slider_num_thread")
         self.h_Slider_num_thread.setMinimumSize(QSize(200, 0))
         self.h_Slider_num_thread.setMaximumSize(QSize(200, 16777215))
@@ -461,17 +485,50 @@ class Ui_MainWidget(object):
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
 
-        self.label_num_thread = QLabel(self.tab_setting)
+        self.label_num_thread = QLabel(self.groupBox)
         self.label_num_thread.setObjectName(u"label_num_thread")
+        self.label_num_thread.setWordWrap(True)
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread)
+
+        self.groupBox_save_method = QGroupBox(self.groupBox)
+        self.groupBox_save_method.setObjectName(u"groupBox_save_method")
+        self.h_Layout_groupBox_save_method = QHBoxLayout(self.groupBox_save_method)
+        self.h_Layout_groupBox_save_method.setObjectName(u"h_Layout_groupBox_save_method")
+        self.radioButton_save_method_pdf = QRadioButton(self.groupBox_save_method)
+        self.radioButton_save_method_pdf.setObjectName(u"radioButton_save_method_pdf")
+        self.radioButton_save_method_pdf.setMinimumSize(QSize(60, 0))
+        self.radioButton_save_method_pdf.setChecked(True)
+
+        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_pdf)
+
+        self.radioButton_save_method_7z = QRadioButton(self.groupBox_save_method)
+        self.radioButton_save_method_7z.setObjectName(u"radioButton_save_method_7z")
+        self.radioButton_save_method_7z.setMinimumSize(QSize(60, 0))
+        self.radioButton_save_method_7z.setChecked(False)
+
+        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_7z)
+
+        self.radioButton_save_method_folder = QRadioButton(self.groupBox_save_method)
+        self.radioButton_save_method_folder.setObjectName(u"radioButton_save_method_folder")
+        self.radioButton_save_method_folder.setEnabled(True)
+        self.radioButton_save_method_folder.setMinimumSize(QSize(60, 0))
+        self.radioButton_save_method_folder.setChecked(False)
+
+        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_folder)
+
+
+        self.h_Layout_num_thread.addWidget(self.groupBox_save_method)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_2)
 
 
-        self.verticalLayout_5.addLayout(self.h_Layout_num_thread)
+        self.verticalLayout_3.addLayout(self.h_Layout_num_thread)
+
+
+        self.verticalLayout_5.addWidget(self.groupBox)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -505,7 +562,7 @@ class Ui_MainWidget(object):
 
         self.verticalLayout_5.addItem(self.verticalSpacer_2)
 
-        self.verticalLayout_5.setStretch(3, 1)
+        self.verticalLayout_5.setStretch(7, 1)
         self.tabWidget.addTab(self.tab_setting, "")
 
         self.horizontalLayout_23.addWidget(self.tabWidget)
@@ -513,7 +570,7 @@ class Ui_MainWidget(object):
 
         self.retranslateUi(MainWidget)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         self.tabWidget_my_manga.setCurrentIndex(0)
         self.tabWidget_download_list.setCurrentIndex(0)
 
@@ -556,8 +613,13 @@ class Ui_MainWidget(object):
         self.pushButton_my_cookie.setText(QCoreApplication.translate("MainWidget", u"\u786e\u8ba4", None))
         self.label_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\uff1a", None))
         self.pushButton_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6d4f\u89c8...", None))
+        self.groupBox.setTitle(QCoreApplication.translate("MainWidget", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWidget", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWidget", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a32\uff09", None))
+        self.groupBox_save_method.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fdd\u5b58\u683c\u5f0f\uff1a", None))
+        self.radioButton_save_method_pdf.setText(QCoreApplication.translate("MainWidget", u"PDF", None))
+        self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWidget", u"7z\u538b\u7f29\u5305", None))
+        self.radioButton_save_method_folder.setText(QCoreApplication.translate("MainWidget", u"\u6587\u4ef6\u5939-\u56fe\u7247", None))
         self.pushButton_open_log.setText(QCoreApplication.translate("MainWidget", u"\u6253\u5f00\u65e5\u5fd7", None))
         self.pushButton_clear_data.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7a7a\u7528\u6237\u6570\u636e", None))
         self.pushButton_about.setText(QCoreApplication.translate("MainWidget", u"\u5173\u4e8e", None))

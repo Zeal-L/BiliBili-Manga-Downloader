@@ -40,11 +40,11 @@ class MangaUI():
         """
         def _() -> None:
             if not mainGUI.getConfig("cookie"):
-                QMessageBox.critical(mainGUI, "Critical",  "请先在设置界面填写自己的Cookie！")
+                QMessageBox.critical(mainGUI, "警告",  "请先在设置界面填写自己的Cookie！")
                 return
             #? 如果输入框为空，只有空格，提示用户输入
             if not mainGUI.lineEdit_manga_search_name.text().strip():
-                QMessageBox.critical(mainGUI, "Critical",  "请输入漫画名！")
+                QMessageBox.critical(mainGUI, "警告",  "请输入漫画名！")
                 return
 
             self.search_info = SearchComic(mainGUI.lineEdit_manga_search_name.text(), mainGUI.getConfig("cookie")).getResults(mainGUI)
@@ -72,7 +72,7 @@ class MangaUI():
         """
         def _(item: QListWidgetItem) -> None:
             index = mainGUI.listWidget_manga_search.indexFromItem(item).row()
-            comic = Comic(self.search_info[index]['id'], mainGUI.getConfig("cookie"), mainGUI.getConfig("save_path"), mainGUI.getConfig("num_thread"))
+            comic = Comic(self.search_info[index]['id'], mainGUI)
             self.updateComicInfo(mainGUI, comic)
 
         mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
@@ -140,7 +140,7 @@ class MangaUI():
             comic_id (int): 漫画ID
             comic_path (str): 漫画保存路径
         """
-        comic = Comic(comic_id, mainGUI.getConfig("cookie"), mainGUI.getConfig("save_path"), mainGUI.getConfig("num_thread"))
+        comic = Comic(comic_id, mainGUI)
         data = comic.getComicInfo(mainGUI)
         #? 获取漫画信息失败直接跳过
         if not data:

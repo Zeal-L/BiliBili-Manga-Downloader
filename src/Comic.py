@@ -17,11 +17,12 @@ if typing.TYPE_CHECKING:
 class Comic:
     """单本漫画 综合信息类
     """
-    def __init__(self, comic_id: int, sessdata: str, save_path: str, num_thread: int) -> None:
+    def __init__(self, comic_id: int, mainGUI: MainGUI) -> None:
+        self.mainGUI = mainGUI
         self.comic_id = comic_id
-        self.sessdata = sessdata
-        self.save_path = save_path
-        self.num_thread = num_thread
+        self.sessdata =  mainGUI.getConfig("cookie")
+        self.save_path = mainGUI.getConfig("save_path")
+        self.num_thread = mainGUI.getConfig("num_thread")
         self.num_downloaded = 0
         self.episodes = []
         self.data = None
@@ -30,7 +31,7 @@ class Comic:
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
             'referer': f'https://manga.bilibili.com/detail/mc{comic_id}?from=manga_homepage',
-            'cookie': f'SESSDATA={sessdata}'
+            'cookie': f'SESSDATA={self.sessdata}'
         }
         self.payload = {"comic_id": self.comic_id}
 
@@ -71,7 +72,7 @@ class Comic:
         return self.data
 
     ############################################################
-    def getEpisodesInfo(self) -> list:
+    def getEpisodesInfo(self) -> list[Episode]:
         """获取章节信息
 
         Returns:
@@ -86,7 +87,7 @@ class Comic:
         #? 解析章节
         ep_list = self.data['ep_list']
         for episode in reversed(ep_list):
-            epi = Episode(episode, self.sessdata, self.comic_id, self.data['title'], self.data['save_path'])
+            epi = Episode(episode, self.sessdata, self.comic_id, self.data, self.mainGUI)
             self.episodes.append(epi)
             if epi.isDownloaded():
                 self.num_downloaded += 1

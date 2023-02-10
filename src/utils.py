@@ -5,6 +5,11 @@ import re
 import time
 from logging.handlers import TimedRotatingFileHandler
 
+__app_name__ = "BiliBili-Manga-Downloader"
+__version__ = "1.0.0"
+__author__ = "Zeal L"
+__copyright__ = "© 2023 Zeal L"
+
 ############################################################
 # 配置全局网络请求的 timeout 以及 max retry
 ############################################################

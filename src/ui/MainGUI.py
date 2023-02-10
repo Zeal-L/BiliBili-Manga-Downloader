@@ -44,7 +44,7 @@ class MainGUI(QWidget, Ui_MainWidget):
         #?###########################################################
         #? 读取配置文件，以及初始化 save_path
         self.config_path = os.path.join(self.app_folder, "config.json")
-        self.config = None
+        self.config = {}
 
         if self.getConfig("save_path"):
             self.lineEdit_save_path.setText(self.getConfig("save_path"))
