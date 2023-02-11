@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWidget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.1
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGroupBo
     QListWidget, QListWidgetItem, QProgressBar, QPushButton,
     QRadioButton, QScrollArea, QSizePolicy, QSlider,
     QSpacerItem, QTabWidget, QVBoxLayout, QWidget)
-import resource_rc
+import src.ui.resource_rc
 
 class Ui_MainWidget(object):
     def setupUi(self, MainWidget):
@@ -112,7 +112,7 @@ class Ui_MainWidget(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 534, 191))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -361,7 +361,7 @@ class Ui_MainWidget(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 1101, 526))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 98, 28))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -570,7 +570,7 @@ class Ui_MainWidget(object):
 
         self.retranslateUi(MainWidget)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.tabWidget_my_manga.setCurrentIndex(0)
         self.tabWidget_download_list.setCurrentIndex(0)
 

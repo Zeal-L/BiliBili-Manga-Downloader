@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import hashlib
 import os
-import re
-import typing
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+from hashlib import md5
+from re import search, sub
+from typing import TYPE_CHECKING
 
 import requests
 from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QUrl
@@ -18,8 +18,8 @@ from src.Comic import Comic
 from src.searchComic import SearchComic
 from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
-if typing.TYPE_CHECKING:
-    from MainGUI import MainGUI
+if TYPE_CHECKING:
+    from src.ui.MainGUI import MainGUI
 
 class MangaUI():
     def __init__(self, mainGUI: MainGUI):
@@ -53,8 +53,8 @@ class MangaUI():
             for item in self.search_info:
                 #?###########################################################
                 #? 替换爬取信息里的html标签
-                item['title'] = re.sub(r'</[^>]+>', '</span>', item['title'])
-                item['title'] = re.sub(r'<[^/>]+>', '<span style="color:red;font-weight:bold">', item['title'])
+                item['title'] = sub(r'</[^>]+>', '</span>', item['title'])
+                item['title'] = sub(r'<[^/>]+>', '<span style="color:red;font-weight:bold">', item['title'])
                 #?###########################################################
                 temp = QListWidgetItem()
                 mainGUI.listWidget_manga_search.addItem(temp)
@@ -118,9 +118,9 @@ class MangaUI():
         path = mainGUI.getConfig("save_path")
 
         my_library = [
-            (int(re.search(r'ID-(\d+)', item)[1]), os.path.join(path, item))
+            (int(search(r'ID-(\d+)', item)[1]), os.path.join(path, item))
             for item in os.listdir(path)
-            if re.search(r'ID-\d+', item)
+            if search(r'ID-\d+', item)
         ]
         mainGUI.label_myLibrary_count.setText(f"我的库存：{len(my_library)}部")
 
@@ -231,8 +231,8 @@ class MangaUI():
             if res.status_code != 200:
                 logger.warning(f"获取封面图片失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
                 raise requests.HTTPError()
-            if res.headers['Etag'] != hashlib.md5(res.content).hexdigest():
-                logger.warning(f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {hashlib.md5(res.content).hexdigest()}")
+            if res.headers['Etag'] != md5(res.content).hexdigest():
+                logger.warning(f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5(res.content).hexdigest()}")
                 raise requests.HTTPError()
             return res.content
 

@@ -1,25 +1,27 @@
-
 import os
 import sys
+from ctypes import windll
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'ui'))
 
-from PySide6.QtWidgets import QApplication
-from rich.console import Console
+from PySide6.QtWidgets import QApplication, QMessageBox
+
 from src.ui.MainGUI import MainGUI
 
 
-console = Console()
-
 if __name__ == '__main__':
-    app = QApplication.instance() or QApplication(sys.argv)
+    app = QApplication(sys.argv)
+
+    if windll.user32.FindWindowW(None, "哔哩哔哩漫画下载器 v1.0.0") != 0:
+        box = QMessageBox.information(None, "提示", "有一个我已经不满足不了你吗？\n\t...(｡•ˇ‸ˇ•｡) ...")
+        sys.exit(0)
+
     window = MainGUI()
     window.show()
     app.exec()
 
 # 妹子太多只好飞升了
 
-# TODO: 更改window任务栏右键显示信息 <-- 暂时先不管，可能是需要打包后才能解决
 # TODO: 检查Cookie过期
 # TODO: 缓存更多资源，减少网络请求
 # TODO: 添加二维码登入功能

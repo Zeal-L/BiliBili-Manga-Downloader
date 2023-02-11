@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import os
-import typing
 from functools import partial
+from typing import TYPE_CHECKING
 
-from MyAbout import MyAbout
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
 
+from src.ui.MyAbout import MyAbout
 from src.utils import log_path
 
-if typing.TYPE_CHECKING:
-    from MainGUI import MainGUI
+if TYPE_CHECKING:
+    from src.ui.MainGUI import MainGUI
 
 
 class SettingUI():

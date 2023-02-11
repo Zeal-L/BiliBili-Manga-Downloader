@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'myAbout.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.1
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -17,7 +17,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QSizePolicy,
     QVBoxLayout, QWidget)
-import resource_rc
+import src.ui.resource_rc
 
 class Ui_My_about(object):
     def setupUi(self, My_about):

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
-import typing
 from concurrent.futures import ThreadPoolExecutor
+from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QWidget
@@ -10,8 +10,8 @@ from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QWidget
 from src.Episode import Episode
 from src.utils import DownloadInfo, openFolderAndSelectItems
 
-if typing.TYPE_CHECKING:
-    from MainGUI import MainGUI
+if TYPE_CHECKING:
+    from src.ui.MainGUI import MainGUI
 
 
 class DownloadUI(QObject):

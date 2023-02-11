@@ -1,0 +1,50 @@
+
+# UTF-8
+#
+# For more details about fixed file info 'ffi' see:
+# http://msdn.microsoft.com/en-us/library/ms646997.aspx
+VSVersionInfo(
+    ffi=FixedFileInfo(
+        # filevers 和 prodvers 应该总是一个包含四项的元组：(1, 2, 3, 4)
+        # 将不需要的项目设置为零。
+        # 文件版本号
+        filevers=(1, 0, 0, 0),
+        prodvers=(1, 0, 0, 0),
+        # 包含指定有效位“flags”的位掩码
+        mask=0x3f,
+        # 包含指定文件布尔属性的位掩码。
+        flags=0x0,
+        # 设计此文件的操作系统。
+        # 0x4 -NT，无需更改。
+        OS=0x4,
+        # 文件的一般类型。
+        # 0x1 -该文件是一个应用程序。
+        fileType=0x1,
+        #  文件的功能。
+        # 0x0 -没有为此文件类型定义函数
+        subtype=0x0,
+        # 创建日期和时间戳。
+        date=(0, 0)
+        ),
+        kids=[
+            StringFileInfo(
+                [
+                StringTable(
+                u'040904B0',
+            # 文件说明
+                [StringStruct(u'FileDescription', u'哔哩哔哩漫画下载器'),
+                StringStruct(u'FileVersion', u'1, 0, 0'),
+            # 内部名称
+                StringStruct(u'InternalName', u'哔哩哔哩漫画下载器 v1.0.0'),
+            # 版权
+                StringStruct(u'LegalCopyright', u'Copyright (C) 2023 Zeal L'),
+            # 原始文件名
+                StringStruct(u'OriginalFilename', u'哔哩哔哩漫画下载器.exe'),
+            # 产品名称
+                StringStruct(u'ProductName', u'BiliBili-Manga-Downloader'),
+            # 产品版本号
+                StringStruct(u'ProductVersion', u'1.0.0')])
+                ]),
+            VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+        ]
+)

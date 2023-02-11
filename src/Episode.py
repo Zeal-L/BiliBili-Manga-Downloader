@@ -72,13 +72,21 @@ class Episode:
         self.epi_path_pdf = os.path.join(self.save_path, f"{self.title}.pdf")
         self.epi_path_folder = os.path.join(self.save_path, f"{self.title}")
         self.epi_path_7z = os.path.join(self.save_path, f"{self.title}.7z")
-        match self.save_method:
-            case 'PDF':
-                self.epi_path = self.epi_path_pdf
-            case '文件夹-图片':
-                self.epi_path = self.epi_path_folder
-            case '7z压缩包':
-                self.epi_path = self.epi_path_7z
+
+        # match self.save_method:
+        #     case 'PDF':
+        #         self.epi_path = self.epi_path_pdf
+        #     case '文件夹-图片':
+        #         self.epi_path = self.epi_path_folder
+        #     case '7z压缩包':
+        #         self.epi_path = self.epi_path_7z
+
+        if self.save_method == 'PDF':
+            self.epi_path = self.epi_path_pdf
+        elif self.save_method == '文件夹-图片':
+            self.epi_path = self.epi_path_folder
+        elif self.save_method == '7z压缩包':
+            self.epi_path = self.epi_path_7z
 
 
 
@@ -186,13 +194,19 @@ class Episode:
 
         #?###########################################################
         #? 保存图片
-        match self.save_method:
-            case 'PDF':
-                self.saveToPDF(mainGUI, temp_imgs)
-            case '文件夹-图片':
-                self.saveToFolder(mainGUI, temp_imgs)
-            case '7z压缩包':
-                self.saveTo7z(mainGUI, temp_imgs)
+        # match self.save_method:
+        #     case 'PDF':
+        #         self.saveToPDF(mainGUI, temp_imgs)
+        #     case '文件夹-图片':
+        #         self.saveToFolder(mainGUI, temp_imgs)
+        #     case '7z压缩包':
+        #         self.saveTo7z(mainGUI, temp_imgs)
+        if self.save_method == 'PDF':
+            self.saveToPDF(mainGUI, temp_imgs)
+        elif self.save_method == '文件夹-图片':
+            self.saveToFolder(mainGUI, temp_imgs)
+        elif self.save_method == '7z压缩包':
+            self.saveTo7z(mainGUI, temp_imgs)
 
         self.clearAfterSave(mainGUI, imgs_path)
 
