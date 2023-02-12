@@ -85,8 +85,12 @@ class MangaUI():
             mainGUI (MainGUI): 主窗口类实例
         """
         mainGUI.my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
-        self.updateMyLibrary(mainGUI)
+        if mainGUI.getConfig("cookie"):
+            self.updateMyLibrary(mainGUI)
         def _() -> None:
+            if not mainGUI.getConfig("cookie"):
+                QMessageBox.critical(mainGUI, "警告",  "请先在设置界面填写自己的Cookie！")
+                return
             self.updateMyLibrary(mainGUI)
             QMessageBox.information(mainGUI, "通知",  "更新完成！")
 
@@ -303,7 +307,25 @@ class MangaUI():
 
         #?###########################################################
         #? 绑定鼠标点击选择信号
+        def checkbox_change(item: QListWidgetItem) -> None:
+            # 暂停itemChanged 信号，防止死循环
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
+            if item.flags() == Qt.NoItemFlags:
+                return
+            if item.checkState() == Qt.Checked:
+
+                self.num_selected += 1
+            elif item.checkState() == Qt.Unchecked:
+
+                self.num_selected -= 1
+            mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+
+        mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+
+
         def _(item: QListWidgetItem) -> None:
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             if item.flags() == Qt.NoItemFlags:
                 return
             if item.checkState() == Qt.Checked:
@@ -313,38 +335,49 @@ class MangaUI():
                 item.setCheckState(Qt.Checked)
                 self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-        mainGUI.listWidget_chp_detail.itemClicked.connect(_)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+
+        mainGUI.listWidget_chp_detail.itemPressed.connect(_)
+
 
         #?###########################################################
         #? 绑定右键菜单，让用户可以勾选或者全选等
         def checkSelected() -> None:
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for item in mainGUI.listWidget_chp_detail.selectedItems():
                 if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Unchecked:
                     item.setCheckState(Qt.Checked)
                     self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
 
         def uncheckSelected() -> None:
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for item in mainGUI.listWidget_chp_detail.selectedItems():
                 if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Checked:
                     item.setCheckState(Qt.Unchecked)
                     self.num_selected -= 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
 
         def checkAll() -> None:
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             self.num_selected = 0
             for i in range(mainGUI.listWidget_chp_detail.count()):
                 if mainGUI.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags:
                     mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.Checked)
                     self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
 
         def uncheckAll() -> None:
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             self.num_selected = 0
             for i in range(mainGUI.listWidget_chp_detail.count()):
                 if mainGUI.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags:
                     mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.Unchecked)
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
 
         def myMenu(pos: QPoint) -> None:
             menu = QMenu()
@@ -371,12 +404,14 @@ class MangaUI():
             mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{num_num_downloaded}")
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
 
+            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for i in range(mainGUI.listWidget_chp_detail.count()):
                 item = mainGUI.listWidget_chp_detail.item(i)
                 if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Checked:
                     mainGUI.DownloadUI.addTask(mainGUI, self.epi_list[i])
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
+            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
 
             #?###########################################################
             #? 更新我的库存界面信息 也就是v_Layout_myLibrary里的章节数量信息

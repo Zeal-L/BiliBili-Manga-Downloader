@@ -75,8 +75,7 @@ class SettingUI():
         if mainGUI.getConfig("num_thread"):
             mainGUI.h_Slider_num_thread.setValue(mainGUI.getConfig("num_thread"))
         else:
-            mainGUI.h_Slider_num_thread.setValue(8)
-            mainGUI.updateConfig("num_thread", 8)
+            mainGUI.updateConfig("num_thread", mainGUI.h_Slider_num_thread.value())
 
         mainGUI.label_num_thread_count.setText(f"同时下载线程数：{mainGUI.getConfig('num_thread')}")
         def _(value):
@@ -129,6 +128,12 @@ class SettingUI():
                 button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
                 if button.text() == mainGUI.getConfig("save_method"):
                     button.setChecked(True)
+        else:
+            for i in range(mainGUI.h_Layout_groupBox_save_method.count()):
+                button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
+                if button.isChecked():
+                    mainGUI.updateConfig("save_method", button.text())
+                    break
 
         def _(button: QRadioButton, checked: bool) -> None:
             if checked:

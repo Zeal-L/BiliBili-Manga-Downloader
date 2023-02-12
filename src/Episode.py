@@ -194,6 +194,8 @@ class Episode:
 
         #?###########################################################
         #? 保存图片
+
+        # 现版本的 pyinstaller 不支持switch语句，等待后续更新
         # match self.save_method:
         #     case 'PDF':
         #         self.saveToPDF(mainGUI, temp_imgs)
@@ -201,6 +203,7 @@ class Episode:
         #         self.saveToFolder(mainGUI, temp_imgs)
         #     case '7z压缩包':
         #         self.saveTo7z(mainGUI, temp_imgs)
+
         if self.save_method == 'PDF':
             self.saveToPDF(mainGUI, temp_imgs)
         elif self.save_method == '文件夹-图片':

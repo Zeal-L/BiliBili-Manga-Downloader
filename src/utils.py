@@ -25,8 +25,13 @@ RETRY_WAIT_EX = 200
 ############################################################
 # 配置日志记录器
 ############################################################
+
 appdata_path = os.getenv("APPDATA")
-log_path = os.path.join(appdata_path, "BiliBili-Manga-Downloader", "logs")
+data_path = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
+if not os.path.exists(data_path):
+    os.mkdir(data_path)
+
+log_path = os.path.join(data_path, "logs")
 if not os.path.exists(log_path):
     os.mkdir(log_path)
 
