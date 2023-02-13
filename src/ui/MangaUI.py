@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from hashlib import md5
 from re import search, sub
@@ -84,6 +84,8 @@ class MangaUI():
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
+        # 布局对齐
+        mainGUI.v_Layout_myLibrary.setAlignment(Qt.AlignTop)
         mainGUI.my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
         if mainGUI.getConfig("cookie"):
             self.updateMyLibrary(mainGUI)
@@ -91,8 +93,8 @@ class MangaUI():
             if not mainGUI.getConfig("cookie"):
                 QMessageBox.critical(mainGUI, "警告",  "请先在设置界面填写自己的Cookie！")
                 return
-            self.updateMyLibrary(mainGUI)
-            QMessageBox.information(mainGUI, "通知",  "更新完成！")
+            if self.updateMyLibrary(mainGUI):
+                QMessageBox.information(mainGUI, "通知",  "更新完成！")
 
         mainGUI.pushButton_myLibrary_update.clicked.connect(_)
 
@@ -103,7 +105,7 @@ class MangaUI():
     # QObject::setParent: Cannot set parent, new parent is in a different thread
     ############################################################
 
-    def updateMyLibrary(self, mainGUI: MainGUI) -> None:
+    def updateMyLibrary(self, mainGUI: MainGUI) -> bool:
         """扫描本地并且更新我的库存
 
         Args:
@@ -119,24 +121,40 @@ class MangaUI():
 
         #?###########################################################
         #? 读取本地库存
+        my_library = {}
         path = mainGUI.getConfig("save_path")
+        for item in os.listdir(path):
+            if search(r'ID-\d+', item):
+                my_library[int(search(r'ID-(\d+)', item)[1])] = {
+                    'comic_name' : search(r'(《.*》)', item)[1],
+                    'comic_path': os.path.join(path, item)
+                }
 
-        my_library = [
-            (int(search(r'ID-(\d+)', item)[1]), os.path.join(path, item))
-            for item in os.listdir(path)
-            if search(r'ID-\d+', item)
-        ]
         mainGUI.label_myLibrary_count.setText(f"我的库存：{len(my_library)}部")
 
         #?###########################################################
         #? 用多线程添加漫画，避免卡顿
+        futures = []
         with ThreadPoolExecutor(max_workers=16) as executor:
-            for (comic_id, comic_path) in my_library:
-                executor.submit(self.updateMyLibrarySingle, mainGUI, comic_id, comic_path)
+            futures.extend(
+                executor.submit(
+                    self.updateMyLibrarySingle, mainGUI, comic_id, my_library[comic_id]['comic_path']
+                )
+                for comic_id in my_library
+            )
 
+        if fail_comic := [
+            future.result()
+            for future in as_completed(futures)
+            if future.result()
+        ]:
+            temp = ''.join(my_library[i]['comic_name'] + '\n' for i in fail_comic)
+            mainGUI.message_box.emit(f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！")
+            return False
+        return True
 
     ############################################################
-    def updateMyLibrarySingle(self, mainGUI: MainGUI, comic_id: int, comic_path: str) -> None:
+    def updateMyLibrarySingle(self, mainGUI: MainGUI, comic_id: int, comic_path: str) -> None or int:
         """添加单个漫画到我的库存
 
         Args:
@@ -145,10 +163,10 @@ class MangaUI():
             comic_path (str): 漫画保存路径
         """
         comic = Comic(comic_id, mainGUI)
-        data = comic.getComicInfo(mainGUI)
+        data = comic.getComicInfo()
         #? 获取漫画信息失败直接跳过
         if not data:
-            return
+            return comic_id
         epi_list = comic.getEpisodesInfo()
 
         info = {
@@ -160,6 +178,7 @@ class MangaUI():
         }
 
         mainGUI.my_library_add_widget.emit(info)
+        return None
 
     ############################################################
     def updateMyLibrarySingleAdd(self, info: dict) -> None:
@@ -216,7 +235,11 @@ class MangaUI():
         """
         #?###########################################################
         #? 更新漫画信息
-        data = comic.getComicInfo(mainGUI)
+        data = comic.getComicInfo()
+        #? 获取漫画信息失败直接跳过
+        if not data:
+            mainGUI.message_box.emit("重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            return
         mainGUI.label_manga_title.setText("<span style='color:blue;font-weight:bold'>标题：</span>" + data['title'])
         mainGUI.label_manga_author.setText("<span style='color:blue;font-weight:bold'>作者：</span>" + data['author_name'])
         mainGUI.label_manga_style.setText(f"<span style='color:blue;font-weight:bold'>标签：</span>{data['styles'] or '无'}")

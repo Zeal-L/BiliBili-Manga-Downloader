@@ -5,7 +5,6 @@ import typing
 
 import requests
 from retrying import retry
-from PySide6.QtWidgets import QMessageBox
 
 from src.Episode import Episode
 from src.utils import (logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL)
@@ -36,7 +35,7 @@ class Comic:
         self.payload = {"comic_id": self.comic_id}
 
     ############################################################
-    def getComicInfo(self, mainGUI: MainGUI) -> dict:
+    def getComicInfo(self) -> dict:
         """使用哔哩哔哩漫画 API 分析漫画数据
 
         Returns:
@@ -60,7 +59,6 @@ class Comic:
         except requests.RequestException as e:
             logger.error(f'漫画id:{self.comic_id} 重复获取漫画信息多次后失败!\n{e}')
             logger.exception(e)
-            QMessageBox.warning(mainGUI, "警告", "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！")
             return {}
 
         #?###########################################################
