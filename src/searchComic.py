@@ -14,10 +14,10 @@ if typing.TYPE_CHECKING:
 class SearchComic:
     """根据名字搜索漫画类
     """
-    def __init__(self, comicName: str, sessdata: str) -> None:
-        self.comicName = comicName
+    def __init__(self, comic_name: str, sessdata: str) -> None:
+        self.comic_name = comic_name
         self.sessdata = sessdata
-        self.detailUrl = 'https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web'
+        self.detail_url = 'https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web'
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             'origin': 'https://manga.bilibili.com',
@@ -25,7 +25,7 @@ class SearchComic:
             'cookie': f'SESSDATA={sessdata}'
         }
         self.payload = {
-            "key_word": comicName,
+            "key_word": comic_name,
             "page_num": 1,
             "page_size": 99
         }
@@ -40,7 +40,7 @@ class SearchComic:
         @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> list:
             try:
-                res = requests.post(self.detailUrl, data=self.payload, headers=self.headers, timeout=TIMEOUT_SMALL)
+                res = requests.post(self.detail_url, data=self.payload, headers=self.headers, timeout=TIMEOUT_SMALL)
             except requests.RequestException as e:
                 logger.warning(f"获取搜索结果失败! 重试中...\n{e}")
                 raise e
@@ -49,7 +49,7 @@ class SearchComic:
                 raise requests.HTTPError()
             return res.json()['data']['list']
 
-        logger.info(f"正在搜索漫画:《{self.comicName}》中...")
+        logger.info(f"正在搜索漫画:《{self.comic_name}》中...")
 
         try:
             data = _()

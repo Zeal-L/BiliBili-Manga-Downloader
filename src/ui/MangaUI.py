@@ -31,6 +31,7 @@ class MangaUI():
         self.init_myLibrary(mainGUI)
         self.init_episodesDetails(mainGUI)
 
+
     ############################################################
     def init_mangaSearch(self, mainGUI: MainGUI) -> None:
         """链接搜索漫画功能
@@ -76,6 +77,8 @@ class MangaUI():
             self.updateComicInfo(mainGUI, comic)
 
         mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
+        # 鼠标移动到图片上的时候更改鼠标样式, 提示用户可以用鼠标点击
+        mainGUI.label_manga_image.setCursor(Qt.PointingHandCursor)
 
     ############################################################
     def init_myLibrary(self, mainGUI: MainGUI) -> None:
@@ -284,6 +287,8 @@ class MangaUI():
             img = label_img.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             mainGUI.label_manga_image.setPixmap(img)
             mainGUI.label_manga_image.setAlignment(Qt.AlignTop)
+
+
         mainGUI.label_manga_image.resizeEvent = _
         _()
 

@@ -114,6 +114,13 @@
                 </widget>
                </item>
                <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>(右键打开文件夹)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <spacer name="horizontalSpacer_3">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -145,8 +152,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>534</width>
+                  <height>191</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -254,7 +261,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_chp_detail">
          <property name="title">
-          <string>章节详情</string>
+          <string>章节详情 (右键确认鼠标框选内容)</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0">
           <item>
@@ -461,8 +468,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>1101</width>
-                  <height>559</height>
+                  <width>98</width>
+                  <height>28</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_processing"/>

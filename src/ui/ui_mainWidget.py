@@ -95,6 +95,11 @@ class Ui_MainWidget(object):
 
         self.horizontalLayout.addWidget(self.label_myLibrary_count)
 
+        self.label = QLabel(self.tab_myLibrary)
+        self.label.setObjectName(u"label")
+
+        self.horizontalLayout.addWidget(self.label)
+
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_3)
@@ -112,7 +117,7 @@ class Ui_MainWidget(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 534, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -339,7 +344,7 @@ class Ui_MainWidget(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1101, 559))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 98, 28))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -586,6 +591,7 @@ class Ui_MainWidget(object):
         self.label_manga_search.setText("")
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWidget", u"\u641c\u7d22\u6f2b\u753b", None))
         self.label_myLibrary_count.setText(QCoreApplication.translate("MainWidget", u"\u5e93\u5b58\uff1a", None))
+        self.label.setText(QCoreApplication.translate("MainWidget", u"(\u53f3\u952e\u6253\u5f00\u6587\u4ef6\u5939)", None))
         self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWidget", u"\u68c0\u67e5\u66f4\u65b0", None))
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myLibrary), QCoreApplication.translate("MainWidget", u"\u672c\u5730\u5e93\u5b58", None))
         self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fe1\u606f", None))
@@ -595,7 +601,7 @@ class Ui_MainWidget(object):
         self.label_manga_style.setText("")
         self.label_manga_isFinish.setText("")
         self.label_manga_outline.setText("")
-        self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWidget", u"\u7ae0\u8282\u8be6\u60c5", None))
+        self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWidget", u"\u7ae0\u8282\u8be6\u60c5 (\u53f3\u952e\u786e\u8ba4\u9f20\u6807\u6846\u9009\u5185\u5bb9)", None))
         self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWidget", u"\u603b\u7ae0\u6570\uff1a", None))
         self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u89e3\u9501\uff1a", None))
         self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u4e0b\u8f7d\uff1a", None))
