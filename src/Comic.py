@@ -5,6 +5,7 @@ import typing
 
 import requests
 from retrying import retry
+import re
 
 from src.Episode import Episode
 from src.utils import (logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL)
@@ -64,6 +65,8 @@ class Comic:
         #?###########################################################
         #? 解析漫画信息
         self.data['author_name'] = '，'.join(self.data['author_name'])
+        self.data['author_name'] = self.data['author_name'].replace('作者:', '').replace('出品:', '')
+        self.data['author_name'] = re.sub(r'[\\/:*?"<>|]', ' ', self.data['author_name'])
         self.data['styles'] = '，'.join(self.data['styles'])
         self.data['save_path'] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comic_id}"
         self.data['ID'] = self.comic_id

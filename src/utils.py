@@ -40,7 +40,8 @@ logger.setLevel(logging.INFO)
 
 #? 配置一个按天切割的日志记录器
 log_handler = TimedRotatingFileHandler(os.path.join(log_path, "ERROR.log"),
-                                        when='D', interval=1, backupCount=7, encoding="utf-8")
+                                        when='D', interval=1, backupCount=7,
+                                        encoding="utf-8")
 log_handler.suffix = "%Y-%m-%d.log"
 log_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}(\.\w+)?$", re.ASCII)
 log_handler.setFormatter(

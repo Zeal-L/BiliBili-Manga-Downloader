@@ -20,10 +20,6 @@ if __name__ == '__main__':
     window.show()
     app.exec()
 
-
-# 妹子太多只好飞升了
-
-# TODO: 添加检测cookie无效或者过期功能，并且弹窗
 # TODO: 缓存更多资源，减少网络请求
 # TODO: 添加二维码登入功能
 # TODO: 添加不同的主题
