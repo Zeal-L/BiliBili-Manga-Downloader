@@ -16,6 +16,7 @@ pillow = ">=9.4.0"
 [dev-packages]
 rich = "*"
 pylint = "*"
+auto-py-to-exe = "*"
 
 [requires]
 python_version = "3.11"

@@ -157,7 +157,7 @@ class MangaUI():
         return True
 
     ############################################################
-    def updateMyLibrarySingle(self, mainGUI: MainGUI, comic_id: int, comic_path: str) -> None or int:
+    def updateMyLibrarySingle(self, mainGUI: MainGUI, comic_id: int, comic_path: str) -> int | None:
         """添加单个漫画到我的库存
 
         Args:

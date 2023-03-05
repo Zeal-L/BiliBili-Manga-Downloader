@@ -258,7 +258,7 @@ class DownloadInfo:
 
 
     ############################################################
-    def getRemainingTimeStr(self, task_id: int) -> str:
+    def getRemainingTimeStr(self, task_id: int) -> str | None:
         """获取任务的剩余时间
 
         Args:
