@@ -72,8 +72,7 @@ class DownloadUI(QObject):
             #? 更新总进度条的进度，速度和剩余时间
             if len(self.all_tasks) != 0:
                 mainGUI.progressBar_total_progress.setValue(
-                    sum(self.all_tasks[i]['rate'] for i in self.all_tasks.keys())
-                    / len(self.all_tasks)
+                    sum(task[1]['rate'] for task in self.all_tasks.items()) / len(self.all_tasks)
                 )
                 mainGUI.label_total_progress_speed.setText(f"{self.download_info.getTotalSmoothSpeedStr()}")
                 mainGUI.label_total_progress_time.setText(f"{self.download_info.getTotalRemainingTimeStr()}")
