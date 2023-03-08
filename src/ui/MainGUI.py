@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QMessageBox, QWidget
 from src.ui.SettingUI import SettingUI
 from src.ui.ui_mainWidget import Ui_MainWidget
 
-from src.utils import logger
+from src.utils import (logger, __version__)
 
 
 class MainGUI(QWidget, Ui_MainWidget):
@@ -28,7 +28,7 @@ class MainGUI(QWidget, Ui_MainWidget):
         super().__init__()
 
         self.setupUi(self)
-        self.setWindowTitle("哔哩哔哩漫画下载器 v1.0.0")
+        self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
         self.message_box.connect(lambda msg: QMessageBox.warning(None, "警告",  msg))
 
