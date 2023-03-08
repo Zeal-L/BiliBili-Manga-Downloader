@@ -47,15 +47,7 @@ class DownloadUI(QObject):
             curr_task = self.all_tasks[result['taskID']]
             curr_task['rate'] = result['rate']
             curr_task['bar'].setValue(result['rate'])
-            mainGUI.progressBar_total_progress.setValue(
-                sum(self.all_tasks[i]['rate'] for i in self.all_tasks.keys())
-                / len(self.all_tasks)
-            )
             self.download_info.updateTask(result['taskID'], result['rate'])
-
-            #? 更新总进度条的速度和剩余时间
-            mainGUI.label_total_progress_speed.setText(f"{self.download_info.getTotalSmoothSpeedStr()}")
-            mainGUI.label_total_progress_time.setText(f"{self.download_info.getTotalRemainingTimeStr()}")
 
             #? 在下载列表UI里删除下载完成的任务
             #? 如果result['rate'] 等于1 意味着下载出错跳过，删除任务相关信息
@@ -76,6 +68,19 @@ class DownloadUI(QObject):
                 del curr_task
                 self.download_info.removeTask(result['taskID'])
                 self.all_tasks.pop(result['taskID'])
+
+            #? 更新总进度条的进度，速度和剩余时间
+            if len(self.all_tasks) != 0:
+                mainGUI.progressBar_total_progress.setValue(
+                    sum(task[1]['rate'] for task in self.all_tasks.items()) / len(self.all_tasks)
+                )
+                mainGUI.label_total_progress_speed.setText(f"{self.download_info.getTotalSmoothSpeedStr()}")
+                mainGUI.label_total_progress_time.setText(f"{self.download_info.getTotalRemainingTimeStr()}")
+            else:
+                mainGUI.progressBar_total_progress.setValue(100)
+                mainGUI.label_total_progress_speed.setText("总下载速度:")
+                mainGUI.label_total_progress_time.setText("剩余时间：")
+
 
         self.rate_progress.connect(_)
 
