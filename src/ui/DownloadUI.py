@@ -63,21 +63,21 @@ class DownloadUI(QObject):
                         #? deleteLater 会有延迟，为了显示效果，先将父控件设为None
                         to_delete.setParent(None)
                         to_delete.deleteLater()
-
-                #? 删除字典中的条目
-                del curr_task
-                self.download_info.removeTask(result['taskID'])
-                self.all_tasks.pop(result['taskID'])
+                #? 更新跳过章节任务相关信息
+                if result['rate'] == -1:
+                    self.download_info.updateTask(result['taskID'], 100)
+                    curr_task['rate'] = 100
 
             #? 更新总进度条的进度，速度和剩余时间
-            if len(self.all_tasks) != 0:
-                mainGUI.progressBar_total_progress.setValue(
-                    sum(task[1]['rate'] for task in self.all_tasks.items()) / len(self.all_tasks)
-                )
+            total_progress = sum(task[1]['rate'] for task in self.all_tasks.items()) / len(self.all_tasks)
+            mainGUI.progressBar_total_progress.setValue(total_progress)
+            if total_progress != 100:
                 mainGUI.label_total_progress_speed.setText(f"{self.download_info.getTotalSmoothSpeedStr()}")
                 mainGUI.label_total_progress_time.setText(f"{self.download_info.getTotalRemainingTimeStr()}")
             else:
-                mainGUI.progressBar_total_progress.setValue(100)
+                #? 100% 后删除所有任务字典中的条目
+                self.download_info.removeAllTasks()
+                self.all_tasks.clear()
                 mainGUI.label_total_progress_speed.setText("总下载速度:")
                 mainGUI.label_total_progress_time.setText("剩余时间：")
 
