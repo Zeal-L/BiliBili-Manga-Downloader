@@ -39,8 +39,11 @@ class Episode:
         #? 修复标题中的特殊字符
         episode['short_title'] = re.sub(r'[\\/:*?"<>|]', ' ', episode['short_title'])
         episode['short_title'] = re.sub(r'\s+$', '', episode['short_title'])
+        episode['short_title'] = re.sub(r'\.', '·', episode['short_title'])
         episode['title'] =  re.sub(r'[\\/:*?"<>|]', ' ', episode['title'])
         episode['title'] =  re.sub(r'\s+$', '', episode['title'])
+        episode['title'] =  re.sub(r'\.', '·', episode['title'])
+
 
         #?###########################################################
         #? 修复重复标题
