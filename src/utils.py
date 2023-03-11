@@ -6,7 +6,7 @@ import time
 from logging.handlers import TimedRotatingFileHandler
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -137,6 +137,12 @@ class DownloadInfo:
         self.info.pop(taskID)
 
     ############################################################
+    def removeAllTasks(self) -> None:
+        """清空所有任务信息, 释放内存
+        """
+        self.info.clear()
+
+    ############################################################
     def createTask(self, taskID: int, size: int) -> None:
         """创建任务信息
 
@@ -207,6 +213,9 @@ class DownloadInfo:
     def getTotalSmoothSpeed(self) -> int:
         self.average_speed_in_last_second[time.perf_counter()] = sum(task['average_speed'] for task in self.info.values() if task['rate'] != 1.0)
 
+        # 取5秒内的平均速度，以防止速度突然变化
+        # 比如下载完一个文件 速度突然变为0
+        # 或者开始一组新的下载，速度突然变为很大
         for key in list(self.average_speed_in_last_second.keys()):
             if key < time.perf_counter() - 5:
                 self.average_speed_in_last_second.pop(key)
@@ -221,19 +230,7 @@ class DownloadInfo:
         Returns:
             str: 平均速度字符串
         """
-        self.average_speed_in_last_second[time.perf_counter()] = sum(task['average_speed'] for task in self.info.values() if task['rate'] != 1.0)
-
-        # 取5秒内的平均速度，以防止速度突然变化
-        # 比如下载完一个文件 速度突然变为0
-        # 或者开始一组新的下载，速度突然变为很大
-        for key in list(self.average_speed_in_last_second.keys()):
-            if key < time.perf_counter() - 5:
-                self.average_speed_in_last_second.pop(key)
-
-        return self.formatSpeed(
-            sum(self.average_speed_in_last_second.values())
-            / len(self.average_speed_in_last_second) or 1
-        )
+        return self.formatSpeed(self.getTotalSmoothSpeed())
 
     ############################################################
     def formatSpeed(self, speed: float) -> str:

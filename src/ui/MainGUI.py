@@ -55,8 +55,8 @@ class MainGUI(QWidget, Ui_MainWidget):
         #?###########################################################
         #? 初始化UI绑定事件
         self.mangaUI = MangaUI(self)
-        self.SettingUI = SettingUI(self)
-        self.DownloadUI = DownloadUI(self)
+        self.settingUI = SettingUI(self)
+        self.downloadUI = DownloadUI(self)
 
 
     ############################################################
@@ -75,7 +75,7 @@ class MainGUI(QWidget, Ui_MainWidget):
                     os.remove(file_path)
             os.rmdir(path)
 
-        if self.SettingUI.clearUserData:
+        if self.settingUI.clearUserData:
             try:
                 _(self.app_folder)
             except OSError as e:

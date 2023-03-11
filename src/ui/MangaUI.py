@@ -436,7 +436,7 @@ class MangaUI():
             for i in range(mainGUI.listWidget_chp_detail.count()):
                 item = mainGUI.listWidget_chp_detail.item(i)
                 if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Checked:
-                    mainGUI.DownloadUI.addTask(mainGUI, self.epi_list[i])
+                    mainGUI.downloadUI.addTask(mainGUI, self.epi_list[i])
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
             mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
