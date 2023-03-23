@@ -870,11 +870,11 @@
         },
         "auto-py-to-exe": {
             "hashes": [
-                "sha256:1f15947bfc7cfc83e936ae7ca1e7517453f15199ce2dc3028e5a9a853e42eac2",
-                "sha256:76b7b4f1437d16254dbc0ccdbacb1a411496516fcb364c1ac4a6191b89a02a67"
+                "sha256:28c577f7a3c5dcbf1955745a5b95ad40b6ed8304a1e0362e13d9d882f1f9c003",
+                "sha256:98c1fca8a7fcbde2b1102e69c7d7f6815bfad8b1fd45fd84f12f78533fc5aad7"
             ],
             "index": "pypi",
-            "version": "==2.32.0"
+            "version": "==2.33.0"
         },
         "bottle": {
             "hashes": [
@@ -899,10 +899,10 @@
         },
         "eel": {
             "hashes": [
-                "sha256:b21f88c21e050eb2b5f6296f1eeeaf57ad9a2dfbffdf1bf88b90ef05a6ffcdb9"
+                "sha256:ac1ce574a90a2c908408b5fc94d7a88a7cbde49cd36af84135d7cfcffcdddb03"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==0.14.0"
+            "markers": "python_version >= '3.7'",
+            "version": "==0.16.0"
         },
         "future": {
             "hashes": [
