@@ -1,9 +1,20 @@
+from __future__ import annotations
+
+import typing
+import requests
 import ctypes
 import logging
 import os
 import re
+from retrying import retry
+from PySide6.QtWidgets import QMessageBox
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt
 import time
 from logging.handlers import TimedRotatingFileHandler
+
+if typing.TYPE_CHECKING:
+    from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
 __version__ = "1.0.4"
@@ -312,3 +323,48 @@ class DownloadInfo:
         if h > 24:
             return "%d天 %02d:%02d:%02d" % (h // 24, h % 24, m, s)
         return "%02d:%02d:%02d" % (h, m, s)
+
+
+def check_new_version(mainGUI: MainGUI):
+    """检查新版本, 如果有新版本则弹出提示
+
+    Args:
+        mainGUI (MainGUI): 主窗口类实例
+
+    """
+    url = (
+        "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
+    )
+
+    @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
+    def _() -> list:
+        try:
+            res = requests.get(url, timeout=TIMEOUT_SMALL)
+        except requests.RequestException as e:
+            logger.warning(f"获取更新信息失败! 重试中...\n{e}")
+            raise e
+        if res.status_code != 200:
+            logger.warning(f"获取更新信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+            raise requests.HTTPError()
+        return res.json()
+
+    try:
+        data = _()
+    except requests.RequestException as e:
+        logger.error(f"重复更新信息多次后失败!\n{e}")
+        logger.exception(e)
+        QMessageBox.warning(
+            mainGUI, "警告", "重复获取更新信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
+        )
+        return
+
+    if data["tag_name"][1:] != __version__:
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle("更新小助手")
+        msgBox.setText(
+            f"您当前使用的版本为 v{__version__}，最新版本为 {data['tag_name']} <br> <a href='{data['html_url']}'>请前往 Github 下载最新版本</a>"
+        )
+        msgBox.setTextFormat(Qt.RichText)
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
+        msgBox.exec()

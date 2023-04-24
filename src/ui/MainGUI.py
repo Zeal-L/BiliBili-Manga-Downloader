@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QMessageBox, QWidget
 from src.ui.SettingUI import SettingUI
 from src.ui.PySide_src.mainWidget_ui import Ui_MainWidget
 
-from src.utils import logger, __version__
+from src.utils import logger, __version__, check_new_version
 
 
 class MainGUI(QWidget, Ui_MainWidget):
@@ -56,6 +56,9 @@ class MainGUI(QWidget, Ui_MainWidget):
         self.mangaUI = MangaUI(self)
         self.settingUI = SettingUI(self)
         self.downloadUI = DownloadUI(self)
+
+        # ? 检查新版本
+        check_new_version(self)
 
     ############################################################
     def closeEvent(self, event: QCloseEvent) -> None:
