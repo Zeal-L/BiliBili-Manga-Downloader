@@ -2,14 +2,14 @@ import os
 import sys
 from ctypes import windll
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'ui'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "src", "ui"))
 
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from src.ui.MainGUI import MainGUI
-from src.utils import (__version__)
+from src.utils import __version__
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
 
     if windll.user32.FindWindowW(None, f"哔哩哔哩漫画下载器 v{__version__}") != 0:

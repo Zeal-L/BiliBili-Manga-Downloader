@@ -6,22 +6,22 @@ echo -e "\033[34m\n 安装pipenv（如果还没有安装）... \n\033[0m"
 pip3 install pipenv
 
 echo -e "\033[34m\n 安装所有依赖项 ... \n\033[0m"
-pipenv install --dev
+pipenv run pipenv install --dev
 
 echo -e "\033[34m\n 重新编译UI文件 ... \n\033[0m"
-pyside6-rcc src/ui/resource.qrc -o src/ui/resource_rc.py
-pyside6-uic src/ui/mainWidget.ui -o src/ui/ui_mainWidget.py
-pyside6-uic src/ui/myAbout.ui -o src/ui/ui_myAbout.py
+pipenv run pyside6-rcc src/ui/PySide_src/resource.qrc -o src/ui/PySide_src/resource_rc.py
+pipenv run pyside6-uic src/ui/PySide_src/mainWidget.ui -o src/ui/PySide_src/mainWidget_ui.py
+pipenv run pyside6-uic src/ui/PySide_src/myAbout.ui -o src/ui/PySide_src/myAbout_ui.py
 
 echo -e "\033[34m\n 修复UI文件中的导入问题 ... \n\033[0m"
-sed -i 's/resource_rc/src.ui.resource_rc/' src/ui/ui_mainWidget.py
-sed -i 's/resource_rc/src.ui.resource_rc/' src/ui/ui_myAbout.py
+sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/mainWidget_ui.py
+sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/myAbout_ui.py
 
 echo -e "\033[34m\n 显示项目目录 ... \n\033[0m"
-pipenv --where
+pipenv run pipenv --where
 
 echo -e "\033[34m\n 显示虚拟环境目录 ... \n\033[0m"
-pipenv --venv
+pipenv run pipenv --venv
 
 echo -e "\033[32m\n 项目部署完成！(输入 pipenv shell 进入虚拟环境) \n\033[0m"
 

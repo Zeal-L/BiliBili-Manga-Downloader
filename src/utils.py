@@ -6,7 +6,7 @@ import time
 from logging.handlers import TimedRotatingFileHandler
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -38,26 +38,31 @@ if not os.path.exists(log_path):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-#? 配置一个按天切割的日志记录器
-log_handler = TimedRotatingFileHandler(os.path.join(log_path, "ERROR.log"),
-                                        when='D', interval=1, backupCount=7,
-                                        encoding="utf-8")
+# ? 配置一个按天切割的日志记录器
+log_handler = TimedRotatingFileHandler(
+    os.path.join(log_path, "ERROR.log"),
+    when="D",
+    interval=1,
+    backupCount=7,
+    encoding="utf-8",
+)
 log_handler.suffix = "%Y-%m-%d.log"
 log_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}(\.\w+)?$", re.ASCII)
 log_handler.setFormatter(
     logging.Formatter(
-        '%(asctime)s | %(levelname)s | %(module)s: %(funcName)s - %(lineno)d | %(message)s',
-        datefmt='%H:%M:%S'
+        "%(asctime)s | %(levelname)s | %(module)s: %(funcName)s - %(lineno)d | %(message)s",
+        datefmt="%H:%M:%S",
     )
 )
 log_handler.setLevel(logging.INFO)
 logger.addHandler(log_handler)
 
+
 ############################################################
 # Helper Functions
 ############################################################
-def openFolderAndSelectItems(path : str) -> None:
-    """ 读取一个文件的父目录, 如果可能的话，选择该文件。
+def openFolderAndSelectItems(path: str) -> None:
+    """读取一个文件的父目录, 如果可能的话，选择该文件。
 
         我们可以运行`explorer /select,filename`，
         但这并不支持在选择一个已经打开的目录中的文件时重复使用现有的资源管理器窗口。
@@ -138,8 +143,7 @@ class DownloadInfo:
 
     ############################################################
     def removeAllTasks(self) -> None:
-        """清空所有任务信息, 释放内存
-        """
+        """清空所有任务信息, 释放内存"""
         self.info.clear()
 
     ############################################################
@@ -151,12 +155,12 @@ class DownloadInfo:
             size (int): 任务文件大小  单位: Byte
         """
         self.info[taskID] = {
-            'size': size,               # 任务文件大小  单位: Byte
-            'rate': 0,                  # 当前已下载百分比
-            'last_rate': 0,             # 上次已下载百分比
-            'curr_speed': 0,            # 当前速度  单位: Byte/s
-            'average_speed': 0,         # 平均速度  单位: Byte/s
-            'last_update_time': None,   # 上次更新时间 单位: 秒
+            "size": size,  # 任务文件大小  单位: Byte
+            "rate": 0,  # 当前已下载百分比
+            "last_rate": 0,  # 上次已下载百分比
+            "curr_speed": 0,  # 当前速度  单位: Byte/s
+            "average_speed": 0,  # 平均速度  单位: Byte/s
+            "last_update_time": None,  # 上次更新时间 单位: 秒
         }
 
     ############################################################
@@ -168,7 +172,7 @@ class DownloadInfo:
             rate (float): 下载进度百分比
         """
 
-        self.info[taskID]['rate'] = rate / 100
+        self.info[taskID]["rate"] = rate / 100
 
         self.calcuCurrSpeed(self.info[taskID])
         self.calcuSmoothSpeed(self.info[taskID])
@@ -180,15 +184,17 @@ class DownloadInfo:
         Args:
             task (dict): 任务信息
         """
-        if task['rate'] == 0 or task['last_update_time'] is None:
-            task['curr_speed'] = 0
-            task['last_update_time'] = time.perf_counter()
+        if task["rate"] == 0 or task["last_update_time"] is None:
+            task["curr_speed"] = 0
+            task["last_update_time"] = time.perf_counter()
             return
         curr_time = time.perf_counter()
 
-        task['curr_speed'] = (task['size'] * task['rate'] - task['size'] * task['last_rate']) / (curr_time - task['last_update_time'])
-        task['last_rate'] = task['rate']
-        task['last_update_time'] = curr_time
+        task["curr_speed"] = (
+            task["size"] * task["rate"] - task["size"] * task["last_rate"]
+        ) / (curr_time - task["last_update_time"])
+        task["last_rate"] = task["rate"]
+        task["last_update_time"] = curr_time
 
     ############################################################
     def calcuSmoothSpeed(self, task: dict) -> None:
@@ -199,19 +205,23 @@ class DownloadInfo:
         """
         SMOOTHING_FACTOR = 0.005
         # 使用 Exponential moving average 来均衡历史平均速度和当前速度，以防波动过大
-        task['average_speed'] = SMOOTHING_FACTOR * task['curr_speed'] + (1-SMOOTHING_FACTOR) * (task['average_speed'] or task['curr_speed'])
+        task["average_speed"] = SMOOTHING_FACTOR * task["curr_speed"] + (
+            1 - SMOOTHING_FACTOR
+        ) * (task["average_speed"] or task["curr_speed"])
 
     ############################################################
     def getSmoothSpeed(self, task_id) -> str:
         if task_id in self.info:
             task = self.info[task_id]
-            if task['average_speed']:
-                return self.formatSpeed(task['average_speed'])
-        return '0B/s'
+            if task["average_speed"]:
+                return self.formatSpeed(task["average_speed"])
+        return "0B/s"
 
     ############################################################
     def getTotalSmoothSpeed(self) -> int:
-        self.average_speed_in_last_second[time.perf_counter()] = sum(task['average_speed'] for task in self.info.values() if task['rate'] != 1.0)
+        self.average_speed_in_last_second[time.perf_counter()] = sum(
+            task["average_speed"] for task in self.info.values() if task["rate"] != 1.0
+        )
 
         # 取5秒内的平均速度，以防止速度突然变化
         # 比如下载完一个文件 速度突然变为0
@@ -220,8 +230,11 @@ class DownloadInfo:
             if key < time.perf_counter() - 5:
                 self.average_speed_in_last_second.pop(key)
 
-        return sum(self.average_speed_in_last_second.values()) / len(self.average_speed_in_last_second) or 1
-
+        return (
+            sum(self.average_speed_in_last_second.values())
+            / len(self.average_speed_in_last_second)
+            or 1
+        )
 
     ############################################################
     def getTotalSmoothSpeedStr(self) -> str:
@@ -243,16 +256,15 @@ class DownloadInfo:
             str: 格式化后的每秒速度大小, 例如: 1.23MB/s
         """
         if speed < 0:
-            return '0B/s'
+            return "0B/s"
         elif speed < 1024:
-            return '%dB/s' % speed
+            return "%dB/s" % speed
         elif speed < 1024 * 1024:
-            return '%.2fKB/s' % (speed / 1024)
+            return "%.2fKB/s" % (speed / 1024)
         elif speed < 1024 * 1024 * 1024:
-            return '%.2fMB/s' % (speed / 1024 / 1024)
+            return "%.2fMB/s" % (speed / 1024 / 1024)
         else:
-            return '%.2fGB/s' % (speed / 1024 / 1024 / 1024)
-
+            return "%.2fGB/s" % (speed / 1024 / 1024 / 1024)
 
     ############################################################
     def getRemainingTimeStr(self, task_id: int) -> str | None:
@@ -266,7 +278,9 @@ class DownloadInfo:
         """
         if task_id in self.info:
             task = self.info[task_id]
-            return self.formatTime((task['size'] * (1 - task['rate'])) / task['average_speed'])
+            return self.formatTime(
+                (task["size"] * (1 - task["rate"])) / task["average_speed"]
+            )
         return None
 
     ############################################################
@@ -276,7 +290,9 @@ class DownloadInfo:
         Returns:
             str: 剩余时间字符串
         """
-        total_size_left = sum(task['size'] * (1 - task['rate']) for task in self.info.values())
+        total_size_left = sum(
+            task["size"] * (1 - task["rate"]) for task in self.info.values()
+        )
         if self.getTotalSmoothSpeed() == 0:
             return self.formatTime(0)
         return self.formatTime(total_size_left / self.getTotalSmoothSpeed())

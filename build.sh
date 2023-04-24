@@ -26,6 +26,7 @@ pipenv run pyinstaller app.spec
 echo -e "\033[34m\n pyinstaller 移动可执行文件到根目录 ... \n\033[0m"
 cp -r dist/* ./
 rm -rf dist
+rm -rf build
 
 echo -e "\033[32m\n 项目构建完成 ... \n\033[0m"
 
