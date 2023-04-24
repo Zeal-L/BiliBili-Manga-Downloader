@@ -10,13 +10,13 @@ pypdf2 = ">=3.0.1"
 pyside6 = ">=6.4.2"
 requests = ">=2.28.1"
 retrying = ">=1.3.4"
-pyinstaller = ">=5.8.0"
 pillow = ">=9.4.0"
+pypinyin = ">=0.48.0"
 
 [dev-packages]
 rich = "*"
 pylint = "*"
-auto-py-to-exe = "*"
+pyinstaller = "*"
 
 [requires]
 python_version = "3.11"

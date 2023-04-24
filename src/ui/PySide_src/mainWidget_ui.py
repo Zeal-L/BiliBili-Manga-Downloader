@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWidget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.2
+## Created by: Qt User Interface Compiler version 6.5.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGroupBo
     QListWidget, QListWidgetItem, QProgressBar, QPushButton,
     QRadioButton, QScrollArea, QSizePolicy, QSlider,
     QSpacerItem, QTabWidget, QVBoxLayout, QWidget)
-import src.ui.resource_rc
+import src.ui.PySide_src.resource_rc
 
 class Ui_MainWidget(object):
     def setupUi(self, MainWidget):

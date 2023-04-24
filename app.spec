@@ -42,5 +42,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     version='.\\version.txt',
-    icon=['.\\src\\ui\\imgs\\BiliBili_favicon.ico'],
+    icon=['.\\src\\ui\\PySide_src\\imgs\\BiliBili_favicon.ico'],
 )

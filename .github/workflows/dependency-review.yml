@@ -23,7 +23,7 @@ jobs:
           # ([String]). Block pull requests that introduce vulnerabilities in the scopes that match this list (optional)
           # Possible values: "development", "runtime", "unknown"
           fail-on-scopes: development, runtime
-          deny-licenses: LGPL-2.0, BSD-2-Clause
+          deny-licenses: BSD-2-Clause
 
 
    
