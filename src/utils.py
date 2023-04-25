@@ -337,7 +337,7 @@ def check_new_version(mainGUI: MainGUI):
     )
 
     @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
-    def _() -> list:
+    def _() -> dict:
         try:
             res = requests.get(url, timeout=TIMEOUT_SMALL)
         except requests.RequestException as e:

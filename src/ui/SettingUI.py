@@ -109,10 +109,13 @@ class SettingUI:
         """
 
         def _():
-            save_path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
-            if save_path:
-                mainGUI.lineEdit_save_path.setText(save_path)
-                mainGUI.updateConfig("save_path", save_path)
+            path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
+            if os.path.exists(path):
+                mainGUI.lineEdit_save_path.setText(path)
+                mainGUI.updateConfig("save_path", path)
+            else:
+                mainGUI.lineEdit_save_path.setText(os.getcwd())
+                mainGUI.updateConfig("save_path", os.getcwd())
 
         mainGUI.pushButton_save_path.clicked.connect(_)
 
@@ -122,6 +125,7 @@ class SettingUI:
                 mainGUI.updateConfig("save_path", path)
             else:
                 mainGUI.lineEdit_save_path.setText(os.getcwd())
+                mainGUI.updateConfig("save_path", os.getcwd())
             mainGUI.lineEdit_save_path.clearFocus()
 
         mainGUI.lineEdit_save_path.returnPressed.connect(_)

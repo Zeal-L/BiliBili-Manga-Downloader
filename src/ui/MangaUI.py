@@ -147,12 +147,18 @@ class MangaUI:
         # ? 读取本地库存
         my_library = {}
         path = mainGUI.getConfig("save_path")
-        for item in os.listdir(path):
-            if search(r"ID-\d+", item):
-                my_library[int(search(r"ID-(\d+)", item)[1])] = {
-                    "comic_name": search(r"(《.*》)", item)[1],
-                    "comic_path": os.path.join(path, item),
-                }
+
+        if os.path.exists(path):
+            for item in os.listdir(path):
+                if search(r"ID-\d+", item):
+                    my_library[int(search(r"ID-(\d+)", item)[1])] = {
+                        "comic_name": search(r"(《.*》)", item)[1],
+                        "comic_path": os.path.join(path, item),
+                    }
+        else:
+            mainGUI.lineEdit_save_path.setText(os.getcwd())
+            mainGUI.updateConfig("save_path", os.getcwd())
+
 
         mainGUI.label_myLibrary_count.setText(f"我的库存：{len(my_library)}部")
 
@@ -282,7 +288,6 @@ class MangaUI:
                     mainGUI.v_Layout_myLibrary.insertWidget(i, widget)
                     break
 
-    ############################################################
     ############################################################
 
     def updateComicInfo(
