@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.0.4"
+__version__ = "1.1.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -354,7 +354,7 @@ def check_new_version(mainGUI: MainGUI):
         logger.error(f"重复更新信息多次后失败!\n{e}")
         logger.exception(e)
         QMessageBox.warning(
-            mainGUI, "警告", "重复获取更新信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
+            mainGUI, "警告", "重复获取软件版本更新信息多次后失败!\n请检查网络连接或者重启软件!\n因需要访问github，所以请确认拥有外网访问权限（VPN）\n\n更多详细信息请查看日志文件"
         )
         return
 
