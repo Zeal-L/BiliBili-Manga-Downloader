@@ -1,0 +1,62 @@
+name: 反馈 Bug
+description: 反馈遇到的问题
+labels: [bug]
+title: "[Bug] 修改我！"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        为了使我更好地帮助你，请提供以下信息。以及上方的标题
+  - type: textarea
+    id: desc
+    attributes:
+      label: 问题描述
+      description: 发生了什么情况？有什么现状？复现条件是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为
+      description: 正常情况下应该发生什么
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为
+      description: 实际上发生了什么
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: 截图或录屏
+      description: 问题复现时候的截图或录屏
+      placeholder: 点击文本框下面小长条可以上传文件
+  - type: input
+    id: version
+    attributes:
+      label: 哔哩哔哩漫画下载器版本号
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 系统环境
+      options:
+        - Windows10
+        - Windows11
+        - 其他 - 请在问题描述里附加
+      description: 目前主要适配Windows10
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: 最新日志文件路径：`C:\Users\你的用户名\AppData\Roaming\BiliBili-Manga-Downloader\logs\ERROR.log`
+      placeholder: 点击文本框下面小长条可以上传文件
+    validations:
+      required: true
