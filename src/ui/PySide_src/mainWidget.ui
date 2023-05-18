@@ -842,7 +842,7 @@
             </size>
            </property>
            <property name="text">
-            <string>打开日志</string>
+            <string>打开最新日志</string>
            </property>
           </widget>
          </item>
@@ -856,6 +856,19 @@
            </property>
            <property name="text">
             <string>清空用户数据</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_check_update">
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>检查更新</string>
            </property>
           </widget>
          </item>

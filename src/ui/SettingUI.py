@@ -10,7 +10,14 @@ from retrying import retry
 
 
 from src.ui.MyAbout import MyAbout
-from src.utils import log_path, logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.utils import (
+    log_path,
+    logger,
+    MAX_RETRY_SMALL,
+    RETRY_WAIT_EX,
+    TIMEOUT_SMALL,
+    check_new_version,
+)
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -28,6 +35,7 @@ class SettingUI:
         self.init_about(mainGUI)
         self.init_clearUserData(mainGUI)
         self.init_saveMethod(mainGUI)
+        self.init_checkUpdate(mainGUI)
 
     ############################################################
     def init_cookie(self, mainGUI: MainGUI) -> None:
@@ -226,3 +234,13 @@ class SettingUI:
                 i
             ).widget()
             button.toggled.connect(partial(_, button))
+
+    def init_checkUpdate(self, mainGUI: MainGUI) -> None:
+        """绑定检查更新按钮
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        mainGUI.pushButton_check_update.clicked.connect(
+            partial(check_new_version, mainGUI)
+        )

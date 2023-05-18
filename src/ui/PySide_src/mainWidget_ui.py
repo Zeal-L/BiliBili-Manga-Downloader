@@ -554,6 +554,12 @@ class Ui_MainWidget(object):
 
         self.h_Layout_buttons.addWidget(self.pushButton_clear_data)
 
+        self.pushButton_check_update = QPushButton(self.tab_setting)
+        self.pushButton_check_update.setObjectName(u"pushButton_check_update")
+        self.pushButton_check_update.setMaximumSize(QSize(200, 16777215))
+
+        self.h_Layout_buttons.addWidget(self.pushButton_check_update)
+
         self.pushButton_about = QPushButton(self.tab_setting)
         self.pushButton_about.setObjectName(u"pushButton_about")
         self.pushButton_about.setMaximumSize(QSize(200, 16777215))
@@ -626,8 +632,9 @@ class Ui_MainWidget(object):
         self.radioButton_save_method_pdf.setText(QCoreApplication.translate("MainWidget", u"PDF", None))
         self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWidget", u"7z\u538b\u7f29\u5305", None))
         self.radioButton_save_method_folder.setText(QCoreApplication.translate("MainWidget", u"\u6587\u4ef6\u5939-\u56fe\u7247", None))
-        self.pushButton_open_log.setText(QCoreApplication.translate("MainWidget", u"\u6253\u5f00\u65e5\u5fd7", None))
+        self.pushButton_open_log.setText(QCoreApplication.translate("MainWidget", u"\u6253\u5f00\u6700\u65b0\u65e5\u5fd7", None))
         self.pushButton_clear_data.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7a7a\u7528\u6237\u6570\u636e", None))
+        self.pushButton_check_update.setText(QCoreApplication.translate("MainWidget", u"\u68c0\u67e5\u66f4\u65b0", None))
         self.pushButton_about.setText(QCoreApplication.translate("MainWidget", u"\u5173\u4e8e", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_setting), QCoreApplication.translate("MainWidget", u"\u8bbe\u7f6e", None))
     # retranslateUi

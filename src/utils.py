@@ -368,3 +368,8 @@ def check_new_version(mainGUI: MainGUI):
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
         msgBox.exec()
+
+    else:
+        QMessageBox.information(
+            mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了"
+        )
