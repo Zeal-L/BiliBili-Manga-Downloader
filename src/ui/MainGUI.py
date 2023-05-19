@@ -7,14 +7,14 @@ from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QCloseEvent, QFont
-from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtWidgets import QMessageBox, QMainWindow
 from src.ui.SettingUI import SettingUI
-from src.ui.PySide_src.mainWidget_ui import Ui_MainWidget
-
+from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
+from qt_material import QtStyleTools
 from src.utils import logger, __version__
 
 
-class MainGUI(QWidget, Ui_MainWidget):
+class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
     """主窗口类，用于管理所有UI"""
 
     # ? 主要是为了 Episode 类里面的提示框准备的，
@@ -23,9 +23,9 @@ class MainGUI(QWidget, Ui_MainWidget):
     # ? 用于多线程更新我的库存
     my_library_add_widget = Signal(dict)
 
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
-
+        self.app = app
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
@@ -86,7 +86,7 @@ class MainGUI(QWidget, Ui_MainWidget):
 
     ############################################################
     def getConfig(self, key: str) -> Any:
-        """读取用户配置文件
+        """读取用户配置文件, 如果key不存在则创建空值
 
         Args:
             key (str): 配置项

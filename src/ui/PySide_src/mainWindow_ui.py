@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainWidget.ui'
+## Form generated from reading UI file 'mainWindow.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.5.0
 ##
@@ -11,28 +11,34 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGroupBox,
-    QHBoxLayout, QLabel, QLineEdit, QListView,
-    QListWidget, QListWidgetItem, QProgressBar, QPushButton,
-    QRadioButton, QScrollArea, QSizePolicy, QSlider,
-    QSpacerItem, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
+    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+    QListView, QListWidget, QListWidgetItem, QMainWindow,
+    QProgressBar, QPushButton, QRadioButton, QScrollArea,
+    QSizePolicy, QSlider, QSpacerItem, QTabWidget,
+    QVBoxLayout, QWidget)
 import src.ui.PySide_src.resource_rc
 
-class Ui_MainWidget(object):
-    def setupUi(self, MainWidget):
-        if not MainWidget.objectName():
-            MainWidget.setObjectName(u"MainWidget")
-        MainWidget.resize(1171, 704)
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        if not MainWindow.objectName():
+            MainWindow.setObjectName(u"MainWindow")
+        MainWindow.resize(1138, 699)
         icon = QIcon()
         icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
-        MainWidget.setWindowIcon(icon)
-        self.horizontalLayout_23 = QHBoxLayout(MainWidget)
-        self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
-        self.tabWidget = QTabWidget(MainWidget)
+        MainWindow.setWindowIcon(icon)
+        self.actiondd = QAction(MainWindow)
+        self.actiondd.setObjectName(u"actiondd")
+        self.centralwidget = QWidget(MainWindow)
+        self.centralwidget.setObjectName(u"centralwidget")
+        self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
         self.tabWidget.setAutoFillBackground(False)
         self.tab_my_manga = QWidget()
@@ -117,7 +123,7 @@ class Ui_MainWidget(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 506, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -344,7 +350,7 @@ class Ui_MainWidget(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1046, 554))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -535,6 +541,59 @@ class Ui_MainWidget(object):
 
         self.verticalLayout_5.addWidget(self.groupBox)
 
+        self.verticalSpacer_6 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_6)
+
+        self.line_9 = QFrame(self.tab_setting)
+        self.line_9.setObjectName(u"line_9")
+        self.line_9.setFrameShape(QFrame.HLine)
+        self.line_9.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_5.addWidget(self.line_9)
+
+        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_5.addItem(self.verticalSpacer_7)
+
+        self.groupBox_2 = QGroupBox(self.tab_setting)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.groupBox_2.setMinimumSize(QSize(0, 50))
+        self.horizontalLayout_4 = QHBoxLayout(self.groupBox_2)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.label_2 = QLabel(self.groupBox_2)
+        self.label_2.setObjectName(u"label_2")
+
+        self.horizontalLayout_4.addWidget(self.label_2)
+
+        self.comboBox_theme_style = QComboBox(self.groupBox_2)
+        self.comboBox_theme_style.setObjectName(u"comboBox_theme_style")
+        self.comboBox_theme_style.setMinimumSize(QSize(100, 0))
+
+        self.horizontalLayout_4.addWidget(self.comboBox_theme_style)
+
+        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
+
+        self.label_3 = QLabel(self.groupBox_2)
+        self.label_3.setObjectName(u"label_3")
+
+        self.horizontalLayout_4.addWidget(self.label_3)
+
+        self.comboBox_theme_density = QComboBox(self.groupBox_2)
+        self.comboBox_theme_density.setObjectName(u"comboBox_theme_density")
+        self.comboBox_theme_density.setMinimumSize(QSize(100, 0))
+
+        self.horizontalLayout_4.addWidget(self.comboBox_theme_density)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
+
+
+        self.verticalLayout_5.addWidget(self.groupBox_2)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer)
@@ -573,69 +632,74 @@ class Ui_MainWidget(object):
 
         self.verticalLayout_5.addItem(self.verticalSpacer_2)
 
-        self.verticalLayout_5.setStretch(7, 1)
+        self.verticalLayout_5.setStretch(11, 1)
         self.tabWidget.addTab(self.tab_setting, "")
 
-        self.horizontalLayout_23.addWidget(self.tabWidget)
+        self.horizontalLayout_2.addWidget(self.tabWidget)
 
+        MainWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(MainWidget)
+        self.retranslateUi(MainWindow)
 
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget_my_manga.setCurrentIndex(0)
         self.tabWidget_download_list.setCurrentIndex(0)
 
 
-        QMetaObject.connectSlotsByName(MainWidget)
+        QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
-    def retranslateUi(self, MainWidget):
-        MainWidget.setWindowTitle(QCoreApplication.translate("MainWidget", u"Form", None))
-        self.label_8.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u540d", None))
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.actiondd.setText(QCoreApplication.translate("MainWindow", u"dd", None))
+        self.label_8.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u540d", None))
         self.lineEdit_manga_search_name.setText("")
-        self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWidget", u"\u641c\u7d22", None))
+        self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22", None))
         self.label_manga_search.setText("")
-        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWidget", u"\u641c\u7d22\u6f2b\u753b", None))
-        self.label_myLibrary_count.setText(QCoreApplication.translate("MainWidget", u"\u5e93\u5b58\uff1a", None))
-        self.label.setText(QCoreApplication.translate("MainWidget", u"(\u53f3\u952e\u6253\u5f00\u6587\u4ef6\u5939)", None))
-        self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWidget", u"\u68c0\u67e5\u66f4\u65b0", None))
-        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myLibrary), QCoreApplication.translate("MainWidget", u"\u672c\u5730\u5e93\u5b58", None))
-        self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fe1\u606f", None))
+        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWindow", u"\u641c\u7d22\u6f2b\u753b", None))
+        self.label_myLibrary_count.setText(QCoreApplication.translate("MainWindow", u"\u5e93\u5b58\uff1a", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"(\u53f3\u952e\u6253\u5f00\u6587\u4ef6\u5939)", None))
+        self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWindow", u"\u68c0\u67e5\u66f4\u65b0", None))
+        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myLibrary), QCoreApplication.translate("MainWindow", u"\u672c\u5730\u5e93\u5b58", None))
+        self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fe1\u606f", None))
         self.label_manga_image.setText("")
         self.label_manga_title.setText("")
         self.label_manga_author.setText("")
         self.label_manga_style.setText("")
         self.label_manga_isFinish.setText("")
         self.label_manga_outline.setText("")
-        self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWidget", u"\u7ae0\u8282\u8be6\u60c5 (\u53f3\u952e\u786e\u8ba4\u9f20\u6807\u6846\u9009\u5185\u5bb9)", None))
-        self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWidget", u"\u603b\u7ae0\u6570\uff1a", None))
-        self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u89e3\u9501\uff1a", None))
-        self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u4e0b\u8f7d\uff1a", None))
-        self.label_chp_detail_num_selected.setText(QCoreApplication.translate("MainWidget", u"\u5df2\u9009\u4e2d\uff1a", None))
-        self.pushButton_chp_detail_download_selected.setText(QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u9009\u4e2d\u7ae0\u8282", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWidget", u"\u6211\u7684\u6f2b\u753b", None))
-        self.label_total_progress.setText(QCoreApplication.translate("MainWidget", u"\u603b\u8fdb\u5ea6", None))
-        self.label_total_progress_speed.setText(QCoreApplication.translate("MainWidget", u"\u603b\u4e0b\u8f7d\u901f\u5ea6:", None))
-        self.label_total_progress_time.setText(QCoreApplication.translate("MainWidget", u"\u5269\u4f59\u65f6\u95f4\uff1a", None))
-        self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_processing), QCoreApplication.translate("MainWidget", u"\u8fdb\u884c\u4e2d", None))
-        self.pushButton_clear_tasks.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7406\u5df2\u5b8c\u6210\u4efb\u52a1", None))
-        self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_finished), QCoreApplication.translate("MainWidget", u"\u5df2\u5b8c\u6210", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_download), QCoreApplication.translate("MainWidget", u"\u4e0b\u8f7d\u5217\u8868", None))
-        self.label_my_cookie.setText(QCoreApplication.translate("MainWidget", u"\u6211\u7684Cookie\uff1a", None))
-        self.pushButton_my_cookie.setText(QCoreApplication.translate("MainWidget", u"\u786e\u8ba4", None))
-        self.label_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\uff1a", None))
-        self.pushButton_save_path.setText(QCoreApplication.translate("MainWidget", u"\u6d4f\u89c8...", None))
-        self.groupBox.setTitle(QCoreApplication.translate("MainWidget", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
-        self.label_num_thread_count.setText(QCoreApplication.translate("MainWidget", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
-        self.label_num_thread.setText(QCoreApplication.translate("MainWidget", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))
-        self.groupBox_save_method.setTitle(QCoreApplication.translate("MainWidget", u"\u6f2b\u753b\u4fdd\u5b58\u683c\u5f0f\uff1a", None))
-        self.radioButton_save_method_pdf.setText(QCoreApplication.translate("MainWidget", u"PDF", None))
-        self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWidget", u"7z\u538b\u7f29\u5305", None))
-        self.radioButton_save_method_folder.setText(QCoreApplication.translate("MainWidget", u"\u6587\u4ef6\u5939-\u56fe\u7247", None))
-        self.pushButton_open_log.setText(QCoreApplication.translate("MainWidget", u"\u6253\u5f00\u6700\u65b0\u65e5\u5fd7", None))
-        self.pushButton_clear_data.setText(QCoreApplication.translate("MainWidget", u"\u6e05\u7a7a\u7528\u6237\u6570\u636e", None))
-        self.pushButton_check_update.setText(QCoreApplication.translate("MainWidget", u"\u68c0\u67e5\u66f4\u65b0", None))
-        self.pushButton_about.setText(QCoreApplication.translate("MainWidget", u"\u5173\u4e8e", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_setting), QCoreApplication.translate("MainWidget", u"\u8bbe\u7f6e", None))
+        self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u8be6\u60c5 (\u53f3\u952e\u786e\u8ba4\u9f20\u6807\u6846\u9009\u5185\u5bb9)", None))
+        self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWindow", u"\u603b\u7ae0\u6570\uff1a", None))
+        self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u89e3\u9501\uff1a", None))
+        self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u4e0b\u8f7d\uff1a", None))
+        self.label_chp_detail_num_selected.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9009\u4e2d\uff1a", None))
+        self.pushButton_chp_detail_download_selected.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u9009\u4e2d\u7ae0\u8282", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
+        self.label_total_progress.setText(QCoreApplication.translate("MainWindow", u"\u603b\u8fdb\u5ea6", None))
+        self.label_total_progress_speed.setText(QCoreApplication.translate("MainWindow", u"\u603b\u4e0b\u8f7d\u901f\u5ea6:", None))
+        self.label_total_progress_time.setText(QCoreApplication.translate("MainWindow", u"\u5269\u4f59\u65f6\u95f4\uff1a", None))
+        self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_processing), QCoreApplication.translate("MainWindow", u"\u8fdb\u884c\u4e2d", None))
+        self.pushButton_clear_tasks.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u7406\u5df2\u5b8c\u6210\u4efb\u52a1", None))
+        self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_finished), QCoreApplication.translate("MainWindow", u"\u5df2\u5b8c\u6210", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_download), QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u5217\u8868", None))
+        self.label_my_cookie.setText(QCoreApplication.translate("MainWindow", u"\u6211\u7684Cookie\uff1a", None))
+        self.pushButton_my_cookie.setText(QCoreApplication.translate("MainWindow", u"\u786e\u8ba4", None))
+        self.label_save_path.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\uff1a", None))
+        self.pushButton_save_path.setText(QCoreApplication.translate("MainWindow", u"\u6d4f\u89c8...", None))
+        self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
+        self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
+        self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))
+        self.groupBox_save_method.setTitle(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fdd\u5b58\u683c\u5f0f\uff1a", None))
+        self.radioButton_save_method_pdf.setText(QCoreApplication.translate("MainWindow", u"PDF", None))
+        self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWindow", u"7z\u538b\u7f29\u5305", None))
+        self.radioButton_save_method_folder.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u5939-\u56fe\u7247", None))
+        self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898\u8bbe\u7f6e", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898\u6837\u5f0f\uff1a ", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898\u5bc6\u5ea6\uff1a ", None))
+        self.pushButton_open_log.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u6700\u65b0\u65e5\u5fd7", None))
+        self.pushButton_clear_data.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u7a7a\u7528\u6237\u6570\u636e", None))
+        self.pushButton_check_update.setText(QCoreApplication.translate("MainWindow", u"\u68c0\u67e5\u66f4\u65b0", None))
+        self.pushButton_about.setText(QCoreApplication.translate("MainWindow", u"\u5173\u4e8e", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_setting), QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
     # retranslateUi
 
