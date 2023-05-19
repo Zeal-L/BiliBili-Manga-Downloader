@@ -10,7 +10,14 @@ from retrying import retry
 
 
 from src.ui.MyAbout import MyAbout
-from src.utils import log_path, logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.utils import (
+    log_path,
+    logger,
+    MAX_RETRY_SMALL,
+    RETRY_WAIT_EX,
+    TIMEOUT_SMALL,
+    check_new_version,
+)
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -28,6 +35,8 @@ class SettingUI:
         self.init_about(mainGUI)
         self.init_clearUserData(mainGUI)
         self.init_saveMethod(mainGUI)
+        self.init_checkUpdate(mainGUI)
+        self.init_theme(mainGUI)
 
     ############################################################
     def init_cookie(self, mainGUI: MainGUI) -> None:
@@ -109,10 +118,13 @@ class SettingUI:
         """
 
         def _():
-            save_path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
-            if save_path:
-                mainGUI.lineEdit_save_path.setText(save_path)
-                mainGUI.updateConfig("save_path", save_path)
+            path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
+            if os.path.exists(path):
+                mainGUI.lineEdit_save_path.setText(path)
+                mainGUI.updateConfig("save_path", path)
+            else:
+                mainGUI.lineEdit_save_path.setText(os.getcwd())
+                mainGUI.updateConfig("save_path", os.getcwd())
 
         mainGUI.pushButton_save_path.clicked.connect(_)
 
@@ -122,6 +134,7 @@ class SettingUI:
                 mainGUI.updateConfig("save_path", path)
             else:
                 mainGUI.lineEdit_save_path.setText(os.getcwd())
+                mainGUI.updateConfig("save_path", os.getcwd())
             mainGUI.lineEdit_save_path.clearFocus()
 
         mainGUI.lineEdit_save_path.returnPressed.connect(_)
@@ -222,3 +235,102 @@ class SettingUI:
                 i
             ).widget()
             button.toggled.connect(partial(_, button))
+
+    def init_checkUpdate(self, mainGUI: MainGUI) -> None:
+        """绑定检查更新按钮
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        mainGUI.pushButton_check_update.clicked.connect(
+            partial(check_new_version, mainGUI)
+        )
+
+    def init_theme(self, mainGUI: MainGUI) -> None:
+        """绑定主题相关设置
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        # ? 绑定主题样式设置
+        theme_style = mainGUI.getConfig("theme_style")
+        if theme_style is None:
+            mainGUI.updateConfig("theme_style", "default")
+            theme_style = "default"
+
+        styles_list = {
+            "default": "默认",
+            "dark_amber.xml": "深色-琥珀",
+            "dark_blue.xml": "深色-蓝色",
+            "dark_cyan.xml": "深色-青色",
+            "dark_lightgreen.xml": "深色-浅绿",
+            "dark_pink.xml": "深色-粉色",
+            "dark_purple.xml": "深色-紫色",
+            "dark_red.xml": "深色-红色",
+            "dark_teal.xml": "深色-靛青",
+            "dark_yellow.xml": "深色-黄色",
+            "light_amber.xml": "浅色-琥珀",
+            "light_blue.xml": "浅色-蓝色",
+            "light_cyan.xml": "浅色-青色",
+            "light_cyan_500.xml": "浅色-青色500",
+            "light_lightgreen.xml": "浅色-浅绿",
+            "light_pink.xml": "浅色-粉色",
+            "light_purple.xml": "浅色-紫色",
+            "light_red.xml": "浅色-红色",
+            "light_teal.xml": "浅色-靛青",
+            "light_yellow.xml": "浅色-黄色",
+        }
+
+        reversed_styles_list = {value: key for key, value in styles_list.items()}
+        mainGUI.comboBox_theme_style.addItems(styles_list.values())
+        mainGUI.comboBox_theme_style.setCurrentText(styles_list[theme_style])
+
+        def _(text: str) -> None:
+            mainGUI.updateConfig("theme_style", reversed_styles_list[text])
+            mainGUI.apply_stylesheet(
+                mainGUI,
+                reversed_styles_list[text],
+                extra={
+                    "density_scale": f"{mainGUI.getConfig('theme_density')}",
+                },
+            )
+
+            if text == "默认":
+                mainGUI.comboBox_theme_density.setEnabled(False)
+            else:
+                mainGUI.comboBox_theme_density.setEnabled(True)
+
+        mainGUI.comboBox_theme_style.currentTextChanged.connect(_)
+
+        # ? 绑定主题密度设置
+        theme_density = mainGUI.getConfig("theme_density")
+        if theme_density is None:
+            mainGUI.updateConfig("theme_density", 0)
+            theme_density = 0
+
+        mainGUI.comboBox_theme_density.addItems(["-2", "-1", "0", "1", "2"])
+        mainGUI.comboBox_theme_density.setCurrentText(str(theme_density))
+
+        def _(text: str) -> None:
+            mainGUI.updateConfig("theme_density", int(text))
+            mainGUI.apply_stylesheet(
+                mainGUI,
+                mainGUI.getConfig("theme_style"),
+                extra={
+                    "density_scale": f"{int(text)}",
+                },
+            )
+
+        mainGUI.comboBox_theme_density.currentTextChanged.connect(_)
+
+        # ? 初始化主题样式+密度
+        mainGUI.apply_stylesheet(
+            mainGUI,
+            mainGUI.getConfig("theme_style"),
+            extra={
+                "density_scale": f"{mainGUI.getConfig('theme_density')}",
+            },
+        )
+
+        if mainGUI.comboBox_theme_style.currentText() == "默认":
+            mainGUI.comboBox_theme_density.setEnabled(False)

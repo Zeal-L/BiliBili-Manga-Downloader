@@ -11,9 +11,6 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub all releases - Download](https://img.shields.io/github/downloads/Zeal-L/BiliBili-Manga-Downloader/total)
 
-[![CodeQL](https://github.com/Zeal-L/BiliBili-Manga-Downloader/actions/workflows/codeql.yml/badge.svg)](https://github.com/Zeal-L/BiliBili-Manga-Downloader/actions/workflows/codeql.yml)
-[![Codiga](https://api.codiga.io/project/35529/status/svg)](https://app.codiga.io/hub/project/35529/BiliBili-Manga-Downloader)
-[![Codiga](https://api.codiga.io/project/35529/score/svg)](https://app.codiga.io/hub/project/35529/BiliBili-Manga-Downloader)
 
 ## 💬 简介
 **由于作者某天实在是受不了B漫网页版的观看体验 ~~(时而混入漫画中的广告，无法便捷快速的放大图片，进度栏作死一样的反复横跳挡视线等等...)~~，再加上作者的仓鼠属性 😛**
@@ -42,6 +39,7 @@
 - **漫画保存地址和用户Cookie等用户设置的本地缓存，不需要每次重启软件就重新输入！**
 - **丰富的错误信息日志，可按照日期滚动储存，不会浪费内存**
 - **一键清空用户数据，妈妈再也不用担心我删不干净软件了！~~(bushi)~~**
+- **多种主题选择**
 
 ## 📝 使用指南
 - **本软件只能下载免费章节和用户已解锁的章节 ~~(很遗憾并没有什么黑科技钞能力,不过呢有需要的可以参考联系方式)~~**
@@ -75,11 +73,11 @@
 - **PS: 也欢迎小伙伴们多多的在Issues里提意见，不管是Bug还是操作逻辑，界面优化等等作者统统笑纳~**
   - 🟦 缓存更多资源，减少网络请求
   - 🟦 添加二维码扫码登入功能
-  - 🟦 添加不同的界面主题
   - 🟦 添加一个启动程序加载进度条
   - 🟦 添加我的追漫界面，以及追漫功能
   - 🟦 对于有特典的漫画，提供特典下载界面
 - **已解决**
+  - ✅ ~~添加不同的界面主题~~
   - ✅ ~~添加检测cookie无效或者过期功能，并且弹窗~~
   - ✅ ~~鼠标移动到漫画封面改变鼠标图标，提示用户可以点击跳转~~
   - ✅ ~~给章节详情添加一个提示，告诉用户可以右键多选~~
@@ -87,7 +85,6 @@
   - ✅ ~~启动程序时多线程加载本地库存，避免用户等待太久~~
   - ✅ ~~给打包好的程序添加版本号版权等属性信息~~
   - ✅ ~~因为网络错误跳过任务后，更新总进度条的进度，速度和剩余时间信息~~
-
 
 ## 🏗️ 本地构建 / 编译
 - **首先确保你安装了 Python >= 3.11 和 git**
@@ -109,13 +106,7 @@
   2. 执行 `pipenv --rm `
   3. 执行 `cd .. && rm -rf BiliBili-Manga-Downloader/`
 
-## 🔨 Issues / PR 格式
-- **Issues**
-  - 正确的标记 Issue Label
-  - 标注你的系统环境
-  - 问题简介与复现条件
-  - 找到日志文件并截取错误信息
-
+## 🔨 PR 格式
 - **PR**
   - 遵循项目已有代码的 python doc 格式
   - 明确的注释信息
@@ -123,9 +114,17 @@
   - 在可能出错的IO/网络申请等部分都加上retry装饰器
   - 在需要的地方写入logger日志，格式参考已有代码
   - 更改 / 新增 的功能说明，理由
-  - 是否更改依赖性
+  - 是否 更改 / 新增 依赖项
 
 ## ⚰️ 更新记录
+
+![Alt](https://repobeats.axiom.co/api/embed/da4fa229ddede4560beefbe2dee47490257186e5.svg "Repobeats analytics image")
+
+### v1.1.0 - *2022-05-19*
+- 新增功能：添加了多种主题选择
+- 新增功能：一键检查软件更新
+- 修复bug: 修复了一个可能会导致启动失败的保存路径设置；现在如果保存的路径意外失效会初始化为默认路径（cwd）
+
 ### v1.0.4 - *2022-04-24*
 - 优化使用体验：我的库存列表现在按照漫画名排序
 - 优化项目结构: 重新分类了原始UI文件和资源文件，并更新了打包脚本
@@ -161,5 +160,8 @@
 - 如对代码有所修改，请按照许可协议要求发布
 - 本程序仅供学习交流使用，严禁用于商业用途
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Zeal-L/BiliBili-Manga-Downloader&type=Date)](https://star-history.com/#Zeal-L/BiliBili-Manga-Downloader)
 
 

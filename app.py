@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 from src.ui.MainGUI import MainGUI
 from src.utils import __version__
 
+
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(sys.argv)
 
@@ -16,6 +17,6 @@ if __name__ == "__main__":
         box = QMessageBox.information(None, "提示", "有一个我已经不满足不了你吗？\n\t...(｡•ˇ‸ˇ•｡) ...")
         sys.exit(0)
 
-    window = MainGUI()
+    window = MainGUI(app)
     window.show()
     app.exec()
