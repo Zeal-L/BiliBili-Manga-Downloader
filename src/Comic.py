@@ -83,7 +83,7 @@ class Comic:
         self.data[
             "save_path"
         ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comic_id}"
-        self.data["ID"] = self.comic_id
+
         return self.data
 
     ############################################################

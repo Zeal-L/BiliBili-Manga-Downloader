@@ -232,30 +232,14 @@ class Episode:
             )
 
         # ?###########################################################
-        # ? 统一转换为RGB模式
-        temp_imgs = [Image.open(x) for x in imgs_path]
-        for i, img in enumerate(temp_imgs):
-            if img.mode != "RGB":
-                temp_imgs[i] = img.convert("RGB")
-
-        # ?###########################################################
         # ? 保存图片
 
-        # 现版本的 pyinstaller 不支持switch语句，等待后续更新
-        # match self.save_method:
-        #     case 'PDF':
-        #         self.saveToPDF(mainGUI, temp_imgs)
-        #     case '文件夹-图片':
-        #         self.saveToFolder(mainGUI, temp_imgs)
-        #     case '7z压缩包':
-        #         self.saveTo7z(mainGUI, temp_imgs)
-
         if self.save_method == "PDF":
-            self.saveToPDF(mainGUI, temp_imgs)
+            self.saveToPDF(mainGUI, imgs_path)
         elif self.save_method == "文件夹-图片":
-            self.saveToFolder(mainGUI, temp_imgs)
+            self.saveToFolder(mainGUI, imgs_path)
         elif self.save_method == "7z压缩包":
-            self.saveTo7z(mainGUI, temp_imgs)
+            self.saveTo7z(mainGUI, imgs_path)
 
         self.clearAfterSave(mainGUI, imgs_path)
 
@@ -294,17 +278,23 @@ class Episode:
             )
 
     ############################################################
-    def saveToPDF(self, mainGUI: MainGUI, temp_imgs: list[Image.Image]) -> None:
+    def saveToPDF(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
         """将图片保存为PDF文件
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
-            temp_imgs (list): 临时图片路径
+            imgs_path (list): 临时图片路径列表
         """
 
         @retry(stop_max_attempt_number=5)
         def _():
             try:
+                # 因为pdf的兼容性, 统一转换为RGB模式
+                temp_imgs = [Image.open(x) for x in imgs_path]
+                for i, img in enumerate(temp_imgs):
+                    if img.mode != "RGB":
+                        temp_imgs[i] = img.convert("RGB")
+
                 temp_imgs[0].save(
                     self.epi_path_pdf,
                     save_all=True,
@@ -340,18 +330,18 @@ class Episode:
             )
 
     ############################################################
-    def saveToFolder(self, mainGUI: MainGUI, temp_imgs: list[Image.Image]) -> None:
+    def saveToFolder(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
         """将图片保存到文件夹
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
-            temp_imgs (list): 临时图片路径
+            imgs_path (list): 临时图片路径列表
         """
 
         @retry(stop_max_attempt_number=5)
         def _():
             try:
-                for index, img in enumerate(temp_imgs, start=1):
+                for index, path in enumerate(imgs_path, start=1):
                     # 在图片文件属性中记录章节标题作者和软件版本以及版权信息
                     info = {}
                     info[
@@ -363,11 +353,23 @@ class Episode:
                     ] = f"{__app_name__} {__version__}".encode("utf-8")
                     info[piexif.ImageIFD.Copyright] = __copyright__.encode("utf-8")
                     exif_bytes = piexif.dump({"0th": info})
-                    img.save(
+
+                    # 将 exif 数据插入到图像文件中, 如果插入失败则跳过
+                    try:
+                        piexif.insert(
+                            exif_bytes,
+                            path,
+                        )
+                    except piexif.InvalidImageDataError as e:
+                        logger.warning(f"Failed to insert exif data for {path}: {e}")
+                        logger.exception(e)
+
+                    # 复制图片到文件夹
+                    shutil.copy2(
+                        path,
                         os.path.join(
                             self.epi_path_folder, f"{str(index).zfill(3)}.jpg"
                         ),
-                        exif=exif_bytes,
                     )
 
             except OSError as e:
@@ -388,15 +390,15 @@ class Episode:
             )
 
     ############################################################
-    def saveTo7z(self, mainGUI: MainGUI, temp_imgs: list[Image.Image]) -> None:
+    def saveTo7z(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
         """将图片保存到7z压缩文件
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
-            temp_imgs (list): 临时图片路径
+            imgs_path (list): 临时图片路径列表
         """
 
-        self.saveToFolder(mainGUI, temp_imgs)
+        self.saveToFolder(mainGUI, imgs_path)
 
         @retry(stop_max_attempt_number=5)
         def _():

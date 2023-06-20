@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from hashlib import md5
@@ -158,7 +159,6 @@ class MangaUI:
         else:
             mainGUI.lineEdit_save_path.setText(os.getcwd())
             mainGUI.updateConfig("save_path", os.getcwd())
-
 
         mainGUI.label_myLibrary_count.setText(f"我的库存：{len(my_library)}部")
 
@@ -324,6 +324,8 @@ class MangaUI:
             f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}"
         )
 
+        self.init_save_mata(mainGUI, data)
+
         # ?###########################################################
         # ? 加载图片，以及绑定双击和悬停事件
         @retry(
@@ -360,11 +362,11 @@ class MangaUI:
 
         mainGUI.label_manga_image.mouseDoubleClickEvent = (
             lambda _event: QDesktopServices.openUrl(
-                QUrl(f"https://manga.bilibili.com/detail/mc{data['ID']}")
+                QUrl(f"https://manga.bilibili.com/detail/mc{data['id']}")
             )
         )
         mainGUI.label_manga_image.setToolTip(
-            f"双击打开漫画详情页\nhttps://manga.bilibili.com/detail/mc{data['ID']}"
+            f"双击打开漫画详情页\nhttps://manga.bilibili.com/detail/mc{data['id']}"
         )
 
         # ?###########################################################
@@ -413,6 +415,48 @@ class MangaUI:
             f"已下载：{comic.getNumDownloaded()}"
         )
         mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+
+    ############################################################
+
+    def init_save_mata(self, mainGUI: MainGUI, data: dict) -> None:
+        """保存元数据
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            data (dict): 漫画元数据
+
+        """
+
+        def _(data: dict) -> None:
+            mata = {}
+
+            # 过滤信息
+            mata['id'] = data['id']
+            mata['title'] = data['title']
+            mata['horizontal_cover'] = data['horizontal_cover']
+            mata['square_cover'] = data['square_cover']
+            mata['vertical_cover'] = data['vertical_cover']
+            mata['author_name'] = data['author_name']
+            mata['styles'] = data['styles']
+            mata['evaluate'] = data['evaluate']
+            mata['renewal_time'] = data['renewal_time']
+            mata['hall_icon_text'] = data['hall_icon_text']
+            mata['tags'] = data['tags']
+
+            # ? 如果文件夹不存在，创建文件夹
+            if not os.path.exists(data['save_path']):
+                os.makedirs(data['save_path'])
+
+            with open(os.path.join(data['save_path'], "元数据.json"), "w", encoding='utf-8') as f:
+                json.dump(mata, f, indent=4, ensure_ascii=False)
+
+            # ? 弹出提示框
+            QMessageBox.information(mainGUI, "提示", "保存成功！")
+            mainGUI.pushButton_save_mata.setEnabled(False)
+            mainGUI.pushButton_save_mata.clicked.disconnect()
+
+        mainGUI.pushButton_save_mata.setEnabled(True)
+        mainGUI.pushButton_save_mata.clicked.connect(partial(_, data))
 
     ############################################################
 

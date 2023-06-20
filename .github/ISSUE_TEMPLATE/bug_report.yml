@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        为了使我更好地帮助你，请提供以下信息。以及上方的标题
+        为了使我更好地帮助你，请提供以下信息。以及修改上方的标题
   - type: textarea
     id: desc
     attributes:
@@ -38,7 +38,7 @@ body:
     id: version
     attributes:
       label: 哔哩哔哩漫画下载器版本号
-      placeholder: v1.0.0
+      placeholder: v1.1.1
     validations:
       required: true
   - type: dropdown

@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
