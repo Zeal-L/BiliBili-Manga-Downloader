@@ -236,6 +236,8 @@ class SettingUI:
             ).widget()
             button.toggled.connect(partial(_, button))
 
+    ############################################################
+
     def init_checkUpdate(self, mainGUI: MainGUI) -> None:
         """绑定检查更新按钮
 
@@ -246,6 +248,8 @@ class SettingUI:
             partial(check_new_version, mainGUI)
         )
 
+    ############################################################
+    
     def init_theme(self, mainGUI: MainGUI) -> None:
         """绑定主题相关设置
 
