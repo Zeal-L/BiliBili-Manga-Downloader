@@ -17,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint
+        sh setup.sh
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py' | grep -v "PySide_src")
+        pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
