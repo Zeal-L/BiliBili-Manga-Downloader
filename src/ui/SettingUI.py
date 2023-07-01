@@ -29,6 +29,7 @@ class SettingUI:
     def __init__(self, mainGUI: MainGUI):
         self.clearUserData = False
         self.init_cookie(mainGUI)
+        self.init_biliplus_cookie(mainGUI)
         self.init_savePath(mainGUI)
         self.init_num_thread(mainGUI)
         self.init_openLog(mainGUI)
@@ -105,6 +106,85 @@ class SettingUI:
                 mainGUI,
                 "警告",
                 "重复测试Cookie是否有效多次后失败!\n请核对输入的Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
+            )
+            return False
+        return True
+
+    ############################################################
+    def init_biliplus_cookie(self, mainGUI: MainGUI) -> None:
+        """绑定BiliPlus Cookie值
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        stored_cookie = mainGUI.getConfig("biliplus_cookie")
+        if stored_cookie:
+            mainGUI.lineEdit_biliplus_cookie.setText(stored_cookie)
+            self.is_biliplus_cookie_valid(mainGUI, stored_cookie)
+
+        def _():
+            new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
+            mainGUI.updateConfig("biliplus_cookie", new_cookie)
+            mainGUI.lineEdit_biliplus_cookie.clearFocus()
+            if self.is_biliplus_cookie_valid(mainGUI, new_cookie):
+                QMessageBox.information(mainGUI, "提示", "Cookie有效！")
+
+        mainGUI.lineEdit_biliplus_cookie.returnPressed.connect(_)
+        mainGUI.pushButton_biliplus_cookie.clicked.connect(_)
+
+    ############################################################
+    def is_biliplus_cookie_valid(self, mainGUI: MainGUI, cookie: str) -> bool:
+        """判断BiliPlus Cookie是否有效
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            cookie (str): Cookie值
+        Returns:
+            bool: Cookie是否有效
+        """
+        main_url = "https://www.biliplus.com/manga/"
+        headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "cookie": f"login=2;access_key={cookie}",
+        }
+        payload = {}
+
+        @retry(
+            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+        )
+        def _() -> None:
+            try:
+                res = requests.post(
+                    main_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
+                )
+            except requests.RequestException as e:
+                logger.warning(f"测试Cookie是否有效失败! 重试中...\n{e}")
+                raise e
+            if res.status_code != 200:
+                logger.warning(
+                    f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
+                raise requests.HTTPError()
+            if "未登录" in res.text:
+                logger.warning(
+                    f"BiliPlus Cookie无效！"
+                )
+                QMessageBox.warning(
+                    mainGUI,
+                    "警告",
+                    "biliplus Cookie无效！\n请从[https://www.biliplus.com/manga/]获取有效cookie",
+                )
+                return
+
+        try:
+            _()
+        except requests.RequestException as e:
+            logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
+            logger.exception(e)
+            QMessageBox.warning(
+                mainGUI,
+                "警告",
+                "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
             return False
         return True
