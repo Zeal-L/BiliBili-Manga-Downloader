@@ -458,9 +458,10 @@ class Episode:
                     f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            if res.headers["Etag"] != hashlib.md5(res.content).hexdigest():
+            isValid, etag, md5 = self.isCheckSumValid(res.headers["Etag"], res.content)
+            if not isValid:
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n\t{res.headers['Etag']} ≠ {hashlib.md5(res.content).hexdigest()}"
+                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n\t{etag} ≠ {md5}"
                 )
                 raise requests.HTTPError()
             return res.content
@@ -505,6 +506,16 @@ class Episode:
             return None
 
         return path_to_save
+
+    ############################################################
+    def isCheckSumValid(self, etag, content) -> bool:
+        """判断MD5是否有效
+
+        Returns:
+            bool: True: 有效; False: 无效
+        """
+        md5 = hashlib.md5(content).hexdigest()
+        return etag == md5, etag, md5
 
     ############################################################
     def isAvailable(self) -> bool:

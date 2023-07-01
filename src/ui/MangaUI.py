@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 from retrying import RetryError, retry
 
 from src.Comic import Comic
+from src.BiliPlus import BiliPlusComic
 from src.searchComic import SearchComic
 from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
@@ -32,9 +33,11 @@ if TYPE_CHECKING:
 
 class MangaUI:
     def __init__(self, mainGUI: MainGUI):
+        self.source_type = "bilibili"
         self.search_info = None
         self.num_selected = 0
         self.epi_list = None
+        self.present_comic_id = 0
         self.init_mangaSearch(mainGUI)
         self.init_mangaDetails(mainGUI)
         self.init_myLibrary(mainGUI)
@@ -95,8 +98,11 @@ class MangaUI:
 
         def _(item: QListWidgetItem) -> None:
             index = mainGUI.listWidget_manga_search.indexFromItem(item).row()
-            comic = Comic(self.search_info[index]["id"], mainGUI)
+            self.present_comic_id = self.search_info[index]["id"]
+            comic = Comic(self.present_comic_id, mainGUI)
             self.updateComicInfo(mainGUI, comic)
+            self.source_type = "bilibili"
+            self.biliPlusEnable(mainGUI)
 
         mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
         # 鼠标移动到图片上的时候更改鼠标样式, 提示用户可以用鼠标点击
@@ -228,6 +234,7 @@ class MangaUI:
         comic: Comic = info["comic"]
         epi_list: list = info["epi_list"]
         comic_path: str = info["comic_path"]
+        self.present_comic_id = comic.comic_id
 
         h_layout_my_library = QHBoxLayout()
         h_layout_my_library.addWidget(
@@ -347,6 +354,8 @@ class MangaUI:
                     f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5(res.content).hexdigest()}"
                 )
                 raise requests.HTTPError()
+            self.source_type = "bilibili"
+            self.biliPlusEnable(mainGUI)
             return res.content
 
         logger.info(f"获取《{data['title']}》的封面图片中...")
@@ -593,3 +602,44 @@ class MangaUI:
             mainGUI.tabWidget_download_list.setCurrentIndex(0)
 
         mainGUI.pushButton_chp_detail_download_selected.clicked.connect(_)
+        mainGUI.pushButton_biliplus_detail_download_selected.clicked.connect(_)
+
+        # ?###########################################################
+        # ? 绑定B站解析按钮事件
+        def _() -> None:
+            if not mainGUI.getConfig("cookie"):
+                QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+                return
+            comic = Comic(self.present_comic_id, mainGUI)
+            self.updateComicInfo(mainGUI, comic)
+            self.source_type = "bilibili"
+            self.biliPlusEnable(mainGUI)
+        mainGUI.pushButton_resolve_detail.clicked.connect(_)
+
+        # ?###########################################################
+        # ? 绑定BiliPlus解析按钮事件
+        def _() -> None:
+            if not mainGUI.getConfig("biliplus_cookie"):
+                QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
+                return
+            comic = BiliPlusComic(self.present_comic_id, mainGUI)
+            self.updateComicInfo(mainGUI, comic)
+            self.source_type = "biliplus"
+            self.biliPlusEnable(mainGUI)
+        mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
+
+    ###########################################################
+    def biliPlusEnable(self, mainGUI: MainGUI) -> None:
+        """BiliPlus功能启用操作
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        if self.source_type == "biliplus":
+            mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
+            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
+        else:
+            mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
+            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
+        mainGUI.pushButton_resolve_detail.setEnabled(True)
+        mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
