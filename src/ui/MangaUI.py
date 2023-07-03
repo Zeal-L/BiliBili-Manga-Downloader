@@ -90,12 +90,14 @@ class MangaUI:
 
     ############################################################
     def init_mangaDetails(self, mainGUI: MainGUI) -> None:
-        """绑定双击显示漫画详情事件
+        """绑定漫画详情点击事件
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
 
+        # ?###########################################################
+        # ? 双击获取选中漫画详情绑定
         def _(item: QListWidgetItem) -> None:
             index = mainGUI.listWidget_manga_search.indexFromItem(item).row()
             self.present_comic_id = self.search_info[index]["id"]
@@ -103,8 +105,14 @@ class MangaUI:
             self.updateComicInfo(mainGUI, comic)
             self.source_type = "bilibili"
             self.biliPlusEnable(mainGUI)
-
         mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
+
+        # ?###########################################################
+        # ? 单击修改当前选择id绑定
+        def _(item: QListWidgetItem) -> None:
+            index = mainGUI.listWidget_manga_search.indexFromItem(item).row()
+            self.present_comic_id = self.search_info[index]["id"]
+        mainGUI.listWidget_manga_search.itemClicked.connect(_)
         # 鼠标移动到图片上的时候更改鼠标样式, 提示用户可以用鼠标点击
         mainGUI.label_manga_image.setCursor(Qt.PointingHandCursor)
 
@@ -234,7 +242,6 @@ class MangaUI:
         comic: Comic = info["comic"]
         epi_list: list = info["epi_list"]
         comic_path: str = info["comic_path"]
-        self.present_comic_id = comic.comic_id
 
         h_layout_my_library = QHBoxLayout()
         h_layout_my_library.addWidget(
@@ -252,7 +259,8 @@ class MangaUI:
 
         # ?###########################################################
         # ? 绑定列表内漫画被点击事件：当前点击变色，剩余恢复
-        def _(_event: QEvent, widget: QWidget) -> None:
+        def _(_event: QEvent, widget: QWidget, comic: Comic) -> None:
+            self.present_comic_id = comic.comic_id
             for i in range(mainGUI.v_Layout_myLibrary.count()):
                 temp = mainGUI.v_Layout_myLibrary.itemAt(i).widget()
                 temp.setStyleSheet("font-size: 10pt;")
@@ -260,7 +268,7 @@ class MangaUI:
                 "background-color:rgb(200, 200, 255); font-size: 10pt;"
             )
 
-        widget.mousePressEvent = partial(_, widget=widget)
+        widget.mousePressEvent = partial(_, widget=widget, comic=comic)
         widget.mouseDoubleClickEvent = partial(self.updateComicInfo, mainGUI, comic)
         widget.setLayout(h_layout_my_library)
 
@@ -309,6 +317,7 @@ class MangaUI:
         # ?###########################################################
         # ? 更新漫画信息
         data = comic.getComicInfo()
+        self.present_comic_id = comic.comic_id
         # ? 获取漫画信息失败直接跳过
         if not data:
             mainGUI.message_box.emit(
@@ -607,6 +616,9 @@ class MangaUI:
         # ?###########################################################
         # ? 绑定B站解析按钮事件
         def _() -> None:
+            if self.present_comic_id == 0:
+                QMessageBox.critical(mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
+                return
             if not mainGUI.getConfig("cookie"):
                 QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
@@ -619,6 +631,9 @@ class MangaUI:
         # ?###########################################################
         # ? 绑定BiliPlus解析按钮事件
         def _() -> None:
+            if self.present_comic_id == 0:
+                QMessageBox.critical(mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
+                return
             if not mainGUI.getConfig("biliplus_cookie"):
                 QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
                 return
@@ -641,5 +656,3 @@ class MangaUI:
         else:
             mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
             mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
-        mainGUI.pushButton_resolve_detail.setEnabled(True)
-        mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
