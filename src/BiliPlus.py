@@ -109,7 +109,7 @@ class BiliPlusComic(Comic):
             logger.error(f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n{e}")
             logger.exception(e)
             mainGUI.message_box.emit(
-                f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+                f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
 ############################################################
@@ -184,6 +184,8 @@ class BiliPlusEpisode(Episode):
                 url, token = img_url.split("?token=")
                 biliplus_imgs_token.append({"url": url, "token": token})
             self.imgs_token = biliplus_imgs_token
+            if biliplus_imgs_token == []:
+                return False
         except Exception as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}")
             logger.exception(e)

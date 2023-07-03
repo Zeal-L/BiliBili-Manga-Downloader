@@ -295,14 +295,14 @@ class Ui_MainWindow(object):
         self.h_Layout_biliplus_detail.setObjectName(u"h_Layout_biliplus_detail")
         self.pushButton_resolve_detail = QPushButton(self.widget_biliplus_detail)
         self.pushButton_resolve_detail.setObjectName(u"pushButton_resolve_detail")
-        self.pushButton_resolve_detail.setEnabled(False)
+        self.pushButton_resolve_detail.setEnabled(True)
         self.pushButton_resolve_detail.setMaximumSize(QSize(80, 25))
 
         self.h_Layout_biliplus_detail.addWidget(self.pushButton_resolve_detail)
 
         self.pushButton_biliplus_resolve_detail = QPushButton(self.widget_biliplus_detail)
         self.pushButton_biliplus_resolve_detail.setObjectName(u"pushButton_biliplus_resolve_detail")
-        self.pushButton_biliplus_resolve_detail.setEnabled(False)
+        self.pushButton_biliplus_resolve_detail.setEnabled(True)
         self.pushButton_biliplus_resolve_detail.setMaximumSize(QSize(80, 25))
 
         self.h_Layout_biliplus_detail.addWidget(self.pushButton_biliplus_resolve_detail)
@@ -374,7 +374,7 @@ class Ui_MainWindow(object):
         self.progressBar_total_progress = QProgressBar(self.tab_download)
         self.progressBar_total_progress.setObjectName(u"progressBar_total_progress")
         self.progressBar_total_progress.setEnabled(True)
-        self.progressBar_total_progress.setValue(100)
+        self.progressBar_total_progress.setValue(0)
         self.progressBar_total_progress.setTextVisible(True)
 
         self.h_Layout_total_progress.addWidget(self.progressBar_total_progress)
@@ -576,7 +576,7 @@ class Ui_MainWindow(object):
         self.h_Layout_num_thread.setObjectName(u"h_Layout_num_thread")
         self.label_num_thread_count = QLabel(self.groupBox)
         self.label_num_thread_count.setObjectName(u"label_num_thread_count")
-        self.label_num_thread_count.setMinimumSize(QSize(110, 0))
+        self.label_num_thread_count.setMinimumSize(QSize(120, 0))
         self.label_num_thread_count.setMaximumSize(QSize(16777215, 16777215))
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread_count)

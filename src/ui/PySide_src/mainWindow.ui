@@ -398,7 +398,7 @@
                 <item>
                  <widget class="QPushButton" name="pushButton_resolve_detail">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="maximumSize">
                    <size>
@@ -414,7 +414,7 @@
                 <item>
                  <widget class="QPushButton" name="pushButton_biliplus_resolve_detail">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="maximumSize">
                    <size>
@@ -534,7 +534,7 @@
              <bool>true</bool>
             </property>
             <property name="value">
-             <number>100</number>
+             <number>0</number>
             </property>
             <property name="textVisible">
              <bool>true</bool>
@@ -845,7 +845,7 @@
               <widget class="QLabel" name="label_num_thread_count">
                <property name="minimumSize">
                 <size>
-                 <width>110</width>
+                 <width>120</width>
                  <height>0</height>
                 </size>
                </property>
