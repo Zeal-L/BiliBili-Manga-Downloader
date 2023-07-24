@@ -110,18 +110,18 @@ class DownloadUI(QObject):
         """
         # ?###########################################################
         # ? 添加到已完成列表
-        h_layout_donwlowd_list = QHBoxLayout()
-        h_layout_donwlowd_list.addWidget(label_title)
-        h_layout_donwlowd_list.addStretch(1)
+        h_layout_download_list = QHBoxLayout()
+        h_layout_download_list.addWidget(label_title)
+        h_layout_download_list.addStretch(1)
 
         # ?###########################################################
         # ? 超链接打开保存路径
         label_file_path = QLabel("<a href='file:///'>打开文件夹</a>")
         label_file_path.linkActivated.connect(lambda: openFolderAndSelectItems(path))
-        h_layout_donwlowd_list.addWidget(label_file_path)
+        h_layout_download_list.addWidget(label_file_path)
 
         widget = QWidget()
-        widget.setLayout(h_layout_donwlowd_list)
+        widget.setLayout(h_layout_download_list)
         mainGUI.verticalLayout_finished.addWidget(widget)
 
     ############################################################
@@ -149,8 +149,8 @@ class DownloadUI(QObject):
 
         # ?###########################################################
         # ? 添加任务组件到正在下载列表
-        h_layout_donwlowd_list = QHBoxLayout()
-        h_layout_donwlowd_list.addWidget(
+        h_layout_download_list = QHBoxLayout()
+        h_layout_download_list.addWidget(
             QLabel(
                 f"<span style='color:blue;font-weight:bold'>{epi.comic_name}</span>   >  {epi.title}"
             )
@@ -159,11 +159,11 @@ class DownloadUI(QObject):
         bar.setTextVisible(True)
 
         self.all_tasks[task_id]["bar"] = bar
-        h_layout_donwlowd_list.addWidget(bar)
-        h_layout_donwlowd_list.setStretch(0, 1)
-        h_layout_donwlowd_list.setStretch(1, 1)
+        h_layout_download_list.addWidget(bar)
+        h_layout_download_list.setStretch(0, 1)
+        h_layout_download_list.setStretch(1, 1)
         widget = QWidget()
         widget.setObjectName(task_id)
-        widget.setLayout(h_layout_donwlowd_list)
+        widget.setLayout(h_layout_download_list)
         mainGUI.verticalLayout_processing.addWidget(widget)
         self.id_count += 1

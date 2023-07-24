@@ -53,6 +53,9 @@ class SettingUI:
 
         def _():
             new_cookie = mainGUI.lineEdit_my_cookie.text()
+            if new_cookie == "":
+                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                return
             mainGUI.updateConfig("cookie", new_cookie)
             mainGUI.lineEdit_my_cookie.clearFocus()
             if self.is_cookie_valid(mainGUI, new_cookie):
@@ -124,6 +127,9 @@ class SettingUI:
 
         def _():
             new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
+            if new_cookie == "":
+                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                return
             mainGUI.updateConfig("biliplus_cookie", new_cookie)
             mainGUI.lineEdit_biliplus_cookie.clearFocus()
             if self.is_biliplus_cookie_valid(mainGUI, new_cookie):
@@ -142,7 +148,8 @@ class SettingUI:
         Returns:
             bool: Cookie是否有效
         """
-        main_url = "https://www.biliplus.com/manga/"
+        # 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
+        main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "cookie": f"login=2;access_key={cookie}",
@@ -158,24 +165,23 @@ class SettingUI:
                     main_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
                 )
             except requests.RequestException as e:
-                logger.warning(f"测试Cookie是否有效失败! 重试中...\n{e}")
+                logger.warning(f"测试BiliPlus Cookie是否有效失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
                 logger.warning(
-                    f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"测试BiliPlus Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            if "未登录" in res.text:
+            if "hoz-container" not in res.text:
                 logger.warning(
-                    f"BiliPlus Cookie无效！"
+                    f"BiliPlus Cookie检测出现故障，暂时无法检测是否有效..."
                 )
-                QMessageBox.warning(
-                    mainGUI,
-                    "警告",
-                    "biliplus Cookie无效！\n请从[https://www.biliplus.com/manga/]获取有效cookie",
+                raise ReferenceError
+            elif 'class="comic-single"' not in res.text:
+                logger.warning(
+                    f"BiliPlus Cookie无效!重试中..."
                 )
-                return
-
+                raise requests.HTTPError()
         try:
             _()
         except requests.RequestException as e:
@@ -186,6 +192,9 @@ class SettingUI:
                 "警告",
                 "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
+            return False
+        except ReferenceError:
+            QMessageBox.warning(mainGUI,"警告","BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者")
             return False
         return True
 

@@ -65,10 +65,10 @@ class BiliPlusComic(Comic):
         @retry(
             stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
         )
-        def _() -> dict:
+        def _(url: str=biliplus_detail_url) -> dict:
             try:
                 res = requests.post(
-                    biliplus_detail_url,
+                    url,
                     headers=self.headers,
                     timeout=TIMEOUT_SMALL,
                 )
@@ -102,6 +102,18 @@ class BiliPlusComic(Comic):
             for ep in ep_items:
                 if ep.img['src'] != "about:blank":
                     ep_available.append(ep.a["href"].split("epid=")[1])
+            total_ep_element = document.select_one("center p")
+            if total_ep_element:
+                total_ep = total_ep_element.contents[0].split("/")[1]
+                total_pages =  int(int(total_ep) / 200) + 1
+                for pages in range(2, total_pages + 1):
+                    mainGUI.resolve_status.emit(f"正在解析漫画章节({pages}/{total_pages})...")
+                    page_html = _(f"{biliplus_detail_url}&page={pages}")
+                    document = BeautifulSoup(page_html, "html.parser")
+                    ep_items = document.find_all("div", {"class":"episode-item"})
+                    for ep in ep_items:
+                        if ep.img['src'] != "about:blank":
+                            ep_available.append(ep.a["href"].split("epid=")[1])
             for ep in episodes:
                 if str(ep.id) in ep_available:
                     ep.available = True
@@ -185,6 +197,10 @@ class BiliPlusEpisode(Episode):
                 biliplus_imgs_token.append({"url": url, "token": token})
             self.imgs_token = biliplus_imgs_token
             if biliplus_imgs_token == []:
+                logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因Cookie有误导致失败!")
+                mainGUI.message_box.emit(
+                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因Cookie有误导致失败!"
+                )
                 return False
         except Exception as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}")

@@ -268,7 +268,7 @@
                   </spacer>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_save_mata">
+                  <widget class="QPushButton" name="pushButton_save_meta">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -431,6 +431,25 @@
                  <widget class="Line" name="line_10">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_resolve_status">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="cursor">
+                   <cursorShape>IBeamCursor</cursorShape>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
