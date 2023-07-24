@@ -53,6 +53,9 @@ class SettingUI:
 
         def _():
             new_cookie = mainGUI.lineEdit_my_cookie.text()
+            if new_cookie == "":
+                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                return
             mainGUI.updateConfig("cookie", new_cookie)
             mainGUI.lineEdit_my_cookie.clearFocus()
             if self.is_cookie_valid(mainGUI, new_cookie):
@@ -124,6 +127,9 @@ class SettingUI:
 
         def _():
             new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
+            if new_cookie == "":
+                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                return
             mainGUI.updateConfig("biliplus_cookie", new_cookie)
             mainGUI.lineEdit_biliplus_cookie.clearFocus()
             if self.is_biliplus_cookie_valid(mainGUI, new_cookie):
@@ -142,7 +148,7 @@ class SettingUI:
         Returns:
             bool: Cookie是否有效
         """
-        main_url = "https://www.biliplus.com/manga/"
+        main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "cookie": f"login=2;access_key={cookie}",
@@ -158,24 +164,18 @@ class SettingUI:
                     main_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
                 )
             except requests.RequestException as e:
-                logger.warning(f"测试Cookie是否有效失败! 重试中...\n{e}")
+                logger.warning(f"测试BiliPlus Cookie是否有效失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
                 logger.warning(
-                    f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"测试BiliPlus Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            if "未登录" in res.text:
+            if 'class="comic-single"' not in res.text:
                 logger.warning(
-                    f"BiliPlus Cookie无效！"
+                    f"BiliPlus Cookie无效！重试中..."
                 )
-                QMessageBox.warning(
-                    mainGUI,
-                    "警告",
-                    "biliplus Cookie无效！\n请从[https://www.biliplus.com/manga/]获取有效cookie",
-                )
-                return
-
+                raise requests.HTTPError()
         try:
             _()
         except requests.RequestException as e:

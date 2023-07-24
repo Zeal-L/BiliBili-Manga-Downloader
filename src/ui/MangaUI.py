@@ -4,13 +4,11 @@ import os
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
-from hashlib import md5
 from re import search, sub
 from typing import TYPE_CHECKING
 
-import requests
 from pypinyin import lazy_pinyin
-from PySide6.QtCore import QEvent, QPoint, QSize, Qt, QUrl
+from PySide6.QtCore import QObject, QEvent, QPoint, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -20,20 +18,34 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QWidget,
 )
-from retrying import RetryError, retry
 
 from src.Comic import Comic
 from src.BiliPlus import BiliPlusComic
 from src.searchComic import SearchComic
-from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
+from src.utils import logger
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
 
 
-class MangaUI:
+class MangaUI(QObject):
+    """漫画UI类，用于搜索、下载、管理漫画"""
+    
+    # ?###########################################################
+    # ? 用于多线程更新我的库存
+    my_library_add_widget = Signal(dict)
+
+    # ? 用于多线程更新漫画详情
+    my_comic_detail_widget = Signal(dict)
+
+    # ? 用于多线程更新封面图
+    my_cover_update_widget = Signal(dict)
+
+    # ? 用于多线程刷新漫画章节列表
+    my_comic_list_widget = Signal(dict)
+    
     def __init__(self, mainGUI: MainGUI):
-        self.source_type = "bilibili"
+        super().__init__()
         self.search_info = None
         self.num_selected = 0
         self.epi_list = None
@@ -42,6 +54,7 @@ class MangaUI:
         self.init_mangaDetails(mainGUI)
         self.init_myLibrary(mainGUI)
         self.init_episodesDetails(mainGUI)
+        self.executor = ThreadPoolExecutor()
 
     ############################################################
 
@@ -101,10 +114,9 @@ class MangaUI:
         def _(item: QListWidgetItem) -> None:
             index = mainGUI.listWidget_manga_search.indexFromItem(item).row()
             self.present_comic_id = self.search_info[index]["id"]
+            self.resolveEnable(mainGUI, "resolving")
             comic = Comic(self.present_comic_id, mainGUI)
-            self.updateComicInfo(mainGUI, comic)
-            self.source_type = "bilibili"
-            self.biliPlusEnable(mainGUI)
+            self.updateComicInfoEvent(mainGUI, comic, "bilibili")
         mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
 
         # ?###########################################################
@@ -115,6 +127,18 @@ class MangaUI:
         mainGUI.listWidget_manga_search.itemClicked.connect(_)
         # 鼠标移动到图片上的时候更改鼠标样式, 提示用户可以用鼠标点击
         mainGUI.label_manga_image.setCursor(Qt.PointingHandCursor)
+        
+        # ?###########################################################
+        # ? 漫画封面图更新触发函数绑定
+        self.my_cover_update_widget.connect(self.updateComicCover)
+        
+        # ?###########################################################
+        # ? 漫画解析触发函数绑定
+        self.my_comic_detail_widget.connect(self.updateComicInfo)
+        
+        # ?###########################################################
+        # ? 漫画章节列表更新触发函数绑定
+        self.my_comic_list_widget.connect(self.updateComicList)
 
     ############################################################
     def init_myLibrary(self, mainGUI: MainGUI) -> None:
@@ -125,7 +149,7 @@ class MangaUI:
         """
         # 布局对齐
         mainGUI.v_Layout_myLibrary.setAlignment(Qt.AlignTop)
-        mainGUI.my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
+        self.my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
         if mainGUI.getConfig("cookie"):
             self.updateMyLibrary(mainGUI)
 
@@ -227,7 +251,7 @@ class MangaUI:
             "comic_path": comic_path,
         }
 
-        mainGUI.my_library_add_widget.emit(info)
+        self.my_library_add_widget.emit(info)
         return None
 
     ############################################################
@@ -269,7 +293,7 @@ class MangaUI:
             )
 
         widget.mousePressEvent = partial(_, widget=widget, comic=comic)
-        widget.mouseDoubleClickEvent = partial(self.updateComicInfo, mainGUI, comic)
+        widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, mainGUI, comic, "bilibili")
         widget.setLayout(h_layout_my_library)
 
         # ?###########################################################
@@ -295,28 +319,73 @@ class MangaUI:
                     .findChild(QLabel)
                     .text()
                 )
-                left_titile: str = left[left.find(">") + 1 : left.rfind("<")]
+                left_title: str = left[left.find(">") + 1 : left.rfind("<")]
                 if i == mainGUI.v_Layout_myLibrary.count() - 1:
                     mainGUI.v_Layout_myLibrary.addWidget(widget)
                     break
-                if lazy_pinyin(data["title"]) <= lazy_pinyin(left_titile):
+                if lazy_pinyin(data["title"]) <= lazy_pinyin(left_title):
                     mainGUI.v_Layout_myLibrary.insertWidget(i, widget)
                     break
 
     ############################################################
+    # 以下三个函数是为了获取漫画信息详情
+    ############################################################
 
-    def updateComicInfo(
-        self, mainGUI: MainGUI, comic: Comic, _event: QEvent = None
+    ############################################################
+    def updateComicInfoEvent(
+        self, mainGUI: MainGUI, comic: Comic, resolve_type: str, _event: QEvent = None
     ) -> None:
         """更新漫画信息详情界面
 
         Args:
             comic (Comic): 漫画类实例
             mainGUI (MainGUI): 主窗口类实例
+            resolve_type (str): 更新的解析类型
         """
-        # ?###########################################################
-        # ? 更新漫画信息
+
+        # 用多线程更新漫画信息，避免卡顿
+        self.executor.submit(
+            self.getComicInfo,
+            mainGUI,
+            comic,
+            resolve_type,
+        )
+
+    ############################################################
+    def getComicInfo(self, mainGUI: MainGUI, comic: Comic, resolve_type: str) -> None:
+        """更新封面的执行函数
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            comic (Comic): 获取的漫画实例
+            resolve_type (str): 更新的解析类型
+
+        """
+        mainGUI.resolve_status.emit("正在解析漫画详情...")
         data = comic.getComicInfo()
+        mainGUI.resolve_status.emit("解析漫画详情完毕")
+        self.my_comic_detail_widget.emit(
+                    {
+                        "mainGUI": mainGUI,
+                        "comic": comic,
+                        "data": data,
+                        "resolve_type": resolve_type,
+                    }
+                )
+
+    ############################################################
+    def updateComicInfo(self, info: dict) -> None:
+        """更新漫画信息详情回调函数
+
+        Args:
+            info (dict): 执行更新漫画信息详情后返回的数据
+        """
+
+        mainGUI: MainGUI = info["mainGUI"]
+        comic: Comic = info["comic"]
+        data: dict = info["data"]
+        resolve_type: str = info["resolve_type"]
+
         self.present_comic_id = comic.comic_id
         # ? 获取漫画信息失败直接跳过
         if not data:
@@ -340,43 +409,19 @@ class MangaUI:
             f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}"
         )
 
-        self.init_save_mata(mainGUI, data)
+        self.init_save_meta(mainGUI, data)
 
         # ?###########################################################
-        # ? 加载图片，以及绑定双击和悬停事件
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+        # ? 用多线程获取封面，避免卡顿
+        self.executor.submit(
+            self.getComicCover,
+            mainGUI,
+            comic,
+            data
         )
-        def _() -> bytes:
-            try:
-                res = requests.get(data["vertical_cover"], timeout=TIMEOUT_SMALL)
-            except requests.RequestException() as e:
-                logger.warning(f"获取封面图片失败! 重试中...\n{e}")
-                raise e
-            if res.status_code != 200:
-                logger.warning(
-                    f"获取封面图片失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
-                raise requests.HTTPError()
-            if res.headers["Etag"] != md5(res.content).hexdigest():
-                logger.warning(
-                    f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5(res.content).hexdigest()}"
-                )
-                raise requests.HTTPError()
-            self.source_type = "bilibili"
-            self.biliPlusEnable(mainGUI)
-            return res.content
 
-        logger.info(f"获取《{data['title']}》的封面图片中...")
-        try:
-            img = _()
-            label_img = QPixmap.fromImage(QImage.fromData(img))
-        except RetryError as e:
-            logger.error(f"获取封面图片多次后失败，跳过!\n{e}")
-            label_img = QPixmap(":/imgs/fail_img.jpg")
-            QMessageBox.warning(
-                mainGUI, "警告", "获取封面图片多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
-            )
+        # ?###########################################################
+        # ? 封面的绑定双击和悬停事件
 
         mainGUI.label_manga_image.mouseDoubleClickEvent = (
             lambda _event: QDesktopServices.openUrl(
@@ -386,9 +431,51 @@ class MangaUI:
         mainGUI.label_manga_image.setToolTip(
             f"双击打开漫画详情页\nhttps://manga.bilibili.com/detail/mc{data['id']}"
         )
-
+        
         # ?###########################################################
-        # ? 重写图片大小改变事件，使图片不会变形
+        # ? 用多线程更新漫画章节详情界面显示，避免卡顿
+        self.executor.submit(
+            self.getComicList,
+            mainGUI,
+            comic,
+            resolve_type
+        )
+        
+    ############################################################
+    # 以下两个函数是为了获取漫画封面
+    ############################################################
+
+    ############################################################
+    def getComicCover(self, mainGUI: MainGUI, comic: Comic, data: dict) -> None:
+        """更新封面的执行函数
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            comic (Comic): 获取的漫画实例
+            data (dict): 漫画实例的数据
+
+        """
+        img_byte = comic.getComicCover(data)
+        self.my_cover_update_widget.emit(
+                    {
+                        "mainGUI": mainGUI,
+                        "img_byte": img_byte,
+                    }
+                )
+
+    ############################################################
+    def updateComicCover(self, info: dict) -> None:
+        """更新封面的回调函数
+
+        Args:
+            info (dict): 执行更新封面后返回的数据
+
+        """
+        mainGUI: MainGUI = info["mainGUI"]
+        img_byte: bytes = info["img_byte"]
+
+        # 重写图片大小改变事件，使图片不会变形
+        label_img = QPixmap.fromImage(QImage.fromData(img_byte))
         def _(event: QEvent = None) -> None:
             new_size = event.size() if event else mainGUI.label_manga_image.size()
             if new_size.width() < 200:
@@ -402,13 +489,50 @@ class MangaUI:
         mainGUI.label_manga_image.resizeEvent = _
         _()
 
-        # ?###########################################################
-        # ? 更新漫画章节详情
-        mainGUI.listWidget_chp_detail.clear()
+    ############################################################
+    # 以下两个函数是为了刷新漫画详情界面
+    ############################################################
+
+    ############################################################
+    def getComicList(self, mainGUI: MainGUI, comic: Comic, resolve_type: str) -> None:
+        """更新详情界面的执行函数
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            comic (Comic): 获取的漫画实例
+
+        """
+        mainGUI.resolve_status.emit("正在解析漫画章节...")
         self.num_selected = 0
         num_unlocked = 0
         if comic:
             self.epi_list = comic.getEpisodesInfo()
+        mainGUI.resolve_status.emit("解析漫画章节完毕")
+        self.my_comic_list_widget.emit(
+                    {
+                        "mainGUI": mainGUI,
+                        "comic": comic,
+                        "resolve_type": resolve_type,
+                        "num_unlocked": num_unlocked,
+                    }
+                )
+
+    ############################################################
+    def updateComicList(self, info: dict) -> None:
+        """更新漫画详情界面的回调函数
+
+        Args:
+            info (dict): 执行更新封面后返回的数据
+
+        """
+        mainGUI: MainGUI = info["mainGUI"]
+        comic: Comic = info["comic"]
+        resolve_type: str = info["resolve_type"]
+        num_unlocked: int = info["num_unlocked"]
+
+        # ?###########################################################
+        # ? 更新漫画章节详情
+        mainGUI.listWidget_chp_detail.clear()
         for epi in self.epi_list:
             temp = QListWidgetItem(epi.title)
             temp.setCheckState(Qt.Unchecked)
@@ -433,10 +557,11 @@ class MangaUI:
             f"已下载：{comic.getNumDownloaded()}"
         )
         mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+        self.resolveEnable(mainGUI, resolve_type)
+        mainGUI.resolve_status.emit("")
 
     ############################################################
-
-    def init_save_mata(self, mainGUI: MainGUI, data: dict) -> None:
+    def init_save_meta(self, mainGUI: MainGUI, data: dict) -> None:
         """保存元数据
 
         Args:
@@ -446,38 +571,37 @@ class MangaUI:
         """
 
         def _(data: dict) -> None:
-            mata = {}
+            meta = {}
 
             # 过滤信息
-            mata['id'] = data['id']
-            mata['title'] = data['title']
-            mata['horizontal_cover'] = data['horizontal_cover']
-            mata['square_cover'] = data['square_cover']
-            mata['vertical_cover'] = data['vertical_cover']
-            mata['author_name'] = data['author_name']
-            mata['styles'] = data['styles']
-            mata['evaluate'] = data['evaluate']
-            mata['renewal_time'] = data['renewal_time']
-            mata['hall_icon_text'] = data['hall_icon_text']
-            mata['tags'] = data['tags']
+            meta['id'] = data['id']
+            meta['title'] = data['title']
+            meta['horizontal_cover'] = data['horizontal_cover']
+            meta['square_cover'] = data['square_cover']
+            meta['vertical_cover'] = data['vertical_cover']
+            meta['author_name'] = data['author_name']
+            meta['styles'] = data['styles']
+            meta['evaluate'] = data['evaluate']
+            meta['renewal_time'] = data['renewal_time']
+            meta['hall_icon_text'] = data['hall_icon_text']
+            meta['tags'] = data['tags']
 
             # ? 如果文件夹不存在，创建文件夹
             if not os.path.exists(data['save_path']):
                 os.makedirs(data['save_path'])
 
             with open(os.path.join(data['save_path'], "元数据.json"), "w", encoding='utf-8') as f:
-                json.dump(mata, f, indent=4, ensure_ascii=False)
+                json.dump(meta, f, indent=4, ensure_ascii=False)
 
             # ? 弹出提示框
             QMessageBox.information(mainGUI, "提示", "保存成功！")
-            mainGUI.pushButton_save_mata.setEnabled(False)
-            mainGUI.pushButton_save_mata.clicked.disconnect()
+            mainGUI.pushButton_save_meta.setEnabled(False)
+            mainGUI.pushButton_save_meta.clicked.disconnect()
 
-        mainGUI.pushButton_save_mata.setEnabled(True)
-        mainGUI.pushButton_save_mata.clicked.connect(partial(_, data))
+        mainGUI.pushButton_save_meta.setEnabled(True)
+        mainGUI.pushButton_save_meta.clicked.connect(partial(_, data))
 
     ############################################################
-
     def init_episodesDetails(self, mainGUI: MainGUI) -> None:
         """绑定章节界面的多选以及右键菜单事件
 
@@ -622,10 +746,9 @@ class MangaUI:
             if not mainGUI.getConfig("cookie"):
                 QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
+            self.resolveEnable(mainGUI, "resolving")
             comic = Comic(self.present_comic_id, mainGUI)
-            self.updateComicInfo(mainGUI, comic)
-            self.source_type = "bilibili"
-            self.biliPlusEnable(mainGUI)
+            self.updateComicInfoEvent(mainGUI, comic,"bilibili")
         mainGUI.pushButton_resolve_detail.clicked.connect(_)
 
         # ?###########################################################
@@ -637,22 +760,31 @@ class MangaUI:
             if not mainGUI.getConfig("biliplus_cookie"):
                 QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
                 return
+            self.resolveEnable(mainGUI, "resolving")
             comic = BiliPlusComic(self.present_comic_id, mainGUI)
-            self.updateComicInfo(mainGUI, comic)
-            self.source_type = "biliplus"
-            self.biliPlusEnable(mainGUI)
+            self.updateComicInfoEvent(mainGUI, comic, "biliplus")
         mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
 
     ###########################################################
-    def biliPlusEnable(self, mainGUI: MainGUI) -> None:
-        """BiliPlus功能启用操作
+    def resolveEnable(self, mainGUI: MainGUI, resolve_type: str) -> None:
+        """根据解析状态对按钮进行允许和禁用状态的改变
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
+            resolve_type (str): 解析状态
         """
-        if self.source_type == "biliplus":
+        if resolve_type == "resolving":
+            mainGUI.pushButton_resolve_detail.setEnabled(False)
+            mainGUI.pushButton_biliplus_resolve_detail.setEnabled(False)
             mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
-            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
+            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
         else:
+            mainGUI.pushButton_resolve_detail.setEnabled(True)
+            mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
+
+        if resolve_type == "bilibili":
             mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
             mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
+        elif resolve_type == "biliplus":
+            mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
+            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
