@@ -3,12 +3,17 @@ from __future__ import annotations
 import typing
 
 import requests
-from hashlib import md5
 from retrying import RetryError, retry
 import re
 
 from src.Episode import Episode
-from src.utils import logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.utils import (
+    logger,
+    MAX_RETRY_SMALL,
+    RETRY_WAIT_EX,
+    TIMEOUT_SMALL,
+    isCheckSumValid,
+)
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -109,9 +114,10 @@ class Comic:
                     f"获取封面图片失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            if res.headers["Etag"] != md5(res.content).hexdigest():
+            isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
+            if not isValid:
                 logger.warning(
-                    f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5(res.content).hexdigest()}"
+                    f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5}"
                 )
                 raise requests.HTTPError()
             return res.content

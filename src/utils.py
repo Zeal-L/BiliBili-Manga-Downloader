@@ -1,4 +1,5 @@
 from __future__ import annotations
+import hashlib
 
 import typing
 import requests
@@ -72,6 +73,19 @@ logger.addHandler(log_handler)
 ############################################################
 # Helper Functions
 ############################################################
+
+
+def isCheckSumValid(etag, content) -> tuple[bool, str]:
+    """判断MD5是否有效
+
+    Returns:
+        tuple[bool, str]: (是否有效, MD5)
+    """
+    md5 = hashlib.md5(content).hexdigest()
+    return etag == md5, md5
+
+############################################################
+
 def openFolderAndSelectItems(path: str) -> None:
     """读取一个文件的父目录, 如果可能的话，选择该文件。
 

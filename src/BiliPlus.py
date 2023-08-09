@@ -221,13 +221,3 @@ class BiliPlusEpisode(Episode):
             return False
 
         return True
-
-    ############################################################
-    # def isCheckSumValid(self, etag, content) -> bool:
-    #     """判断MD5是否有效
-
-    #     Returns:
-    #         bool: True: 有效; False: 无效
-    #     """
-    #     md5 = base64.b64encode(hashlib.md5(content).digest()).decode()
-    #     return etag == md5, etag, md5
