@@ -37,7 +37,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_my_manga">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="tab_manga_search">
              <attribute name="title">
@@ -153,8 +153,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>28</height>
+                   <width>517</width>
+                   <height>191</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -210,7 +210,7 @@
               </layout>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="v_Layout_manga_detail" stretch="0,0,0,0,1,0">
+              <layout class="QVBoxLayout" name="v_Layout_manga_detail" stretch="0,0,0,0,1">
                <property name="spacing">
                 <number>6</number>
                </property>
@@ -252,39 +252,6 @@
                  </property>
                 </widget>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_3">
-                 <item>
-                  <spacer name="horizontalSpacer_7">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_save_meta">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>保存元数据</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
               </layout>
              </item>
             </layout>
@@ -297,7 +264,7 @@
           <property name="title">
            <string>章节详情 (右键确认鼠标框选内容)</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0">
            <item>
             <layout class="QHBoxLayout" name="h_Layout_chp_detail">
              <item>
@@ -612,8 +579,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>28</height>
+                   <width>1068</width>
+                   <height>554</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_processing"/>
@@ -691,7 +658,7 @@
        <attribute name="title">
         <string>设置</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,1,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,1,0,0,0">
         <item>
          <spacer name="verticalSpacer_4">
           <property name="orientation">

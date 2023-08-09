@@ -31,7 +31,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
         self.message_box.connect(lambda msg: QMessageBox.warning(None, "警告", msg))
-        self.resolve_status.connect(lambda status: self.label_resolve_status.setText(status))
+        self.resolve_status.connect(
+            lambda status: self.label_resolve_status.setText(status)
+        )
 
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 

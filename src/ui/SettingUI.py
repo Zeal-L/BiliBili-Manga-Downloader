@@ -173,15 +173,12 @@ class SettingUI:
                 )
                 raise requests.HTTPError()
             if "hoz-container" not in res.text:
-                logger.warning(
-                    f"BiliPlus Cookie检测出现故障，暂时无法检测是否有效..."
-                )
+                logger.warning("BiliPlus Cookie检测出现故障，暂时无法检测是否有效...")
                 raise ReferenceError
             elif 'class="comic-single"' not in res.text:
-                logger.warning(
-                    f"BiliPlus Cookie无效!重试中..."
-                )
+                logger.warning("BiliPlus Cookie无效!重试中...")
                 raise requests.HTTPError()
+
         try:
             _()
         except requests.RequestException as e:
@@ -194,7 +191,9 @@ class SettingUI:
             )
             return False
         except ReferenceError:
-            QMessageBox.warning(mainGUI,"警告","BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者")
+            QMessageBox.warning(
+                mainGUI, "警告", "BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者"
+            )
             return False
         return True
 
@@ -338,7 +337,7 @@ class SettingUI:
         )
 
     ############################################################
-    
+
     def init_theme(self, mainGUI: MainGUI) -> None:
         """绑定主题相关设置
 

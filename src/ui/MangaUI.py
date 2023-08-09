@@ -4,7 +4,7 @@ import os
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
-from re import search, sub
+from re import sub
 from typing import TYPE_CHECKING
 
 from pypinyin import lazy_pinyin
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 class MangaUI(QObject):
     """漫画UI类，用于搜索、下载、管理漫画"""
-    
+
     # ?###########################################################
     # ? 用于多线程更新我的库存
     my_library_add_widget = Signal(dict)
@@ -43,7 +43,7 @@ class MangaUI(QObject):
 
     # ? 用于多线程刷新漫画章节列表
     my_comic_list_widget = Signal(dict)
-    
+
     def __init__(self, mainGUI: MainGUI):
         super().__init__()
         self.search_info = None
@@ -117,6 +117,7 @@ class MangaUI(QObject):
             self.resolveEnable(mainGUI, "resolving")
             comic = Comic(self.present_comic_id, mainGUI)
             self.updateComicInfoEvent(mainGUI, comic, "bilibili")
+
         mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
 
         # ?###########################################################
@@ -124,18 +125,19 @@ class MangaUI(QObject):
         def _(item: QListWidgetItem) -> None:
             index = mainGUI.listWidget_manga_search.indexFromItem(item).row()
             self.present_comic_id = self.search_info[index]["id"]
+
         mainGUI.listWidget_manga_search.itemClicked.connect(_)
         # 鼠标移动到图片上的时候更改鼠标样式, 提示用户可以用鼠标点击
         mainGUI.label_manga_image.setCursor(Qt.PointingHandCursor)
-        
+
         # ?###########################################################
         # ? 漫画封面图更新触发函数绑定
         self.my_cover_update_widget.connect(self.updateComicCover)
-        
+
         # ?###########################################################
         # ? 漫画解析触发函数绑定
         self.my_comic_detail_widget.connect(self.updateComicInfo)
-        
+
         # ?###########################################################
         # ? 漫画章节列表更新触发函数绑定
         self.my_comic_list_widget.connect(self.updateComicList)
@@ -189,11 +191,15 @@ class MangaUI(QObject):
 
         if os.path.exists(path):
             for item in os.listdir(path):
-                if search(r"ID-\d+", item):
-                    my_library[int(search(r"ID-(\d+)", item)[1])] = {
-                        "comic_name": search(r"(《.*》)", item)[1],
-                        "comic_path": os.path.join(path, item),
-                    }
+                if os.path.exists(os.path.join(path, item, "元数据.json")):
+                    with open(
+                        os.path.join(path, item, "元数据.json"), "r", encoding="utf-8"
+                    ) as f:
+                        data = json.load(f)
+                        my_library[data["id"]] = {
+                            "comic_name": data["title"],
+                            "comic_path": os.path.join(path, item),
+                        }
         else:
             mainGUI.lineEdit_save_path.setText(os.getcwd())
             mainGUI.updateConfig("save_path", os.getcwd())
@@ -293,7 +299,9 @@ class MangaUI(QObject):
             )
 
         widget.mousePressEvent = partial(_, widget=widget, comic=comic)
-        widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, mainGUI, comic, "bilibili")
+        widget.mouseDoubleClickEvent = partial(
+            self.updateComicInfoEvent, mainGUI, comic, "bilibili"
+        )
         widget.setLayout(h_layout_my_library)
 
         # ?###########################################################
@@ -365,13 +373,13 @@ class MangaUI(QObject):
         data = comic.getComicInfo()
         mainGUI.resolve_status.emit("解析漫画详情完毕")
         self.my_comic_detail_widget.emit(
-                    {
-                        "mainGUI": mainGUI,
-                        "comic": comic,
-                        "data": data,
-                        "resolve_type": resolve_type,
-                    }
-                )
+            {
+                "mainGUI": mainGUI,
+                "comic": comic,
+                "data": data,
+                "resolve_type": resolve_type,
+            }
+        )
 
     ############################################################
     def updateComicInfo(self, info: dict) -> None:
@@ -409,16 +417,9 @@ class MangaUI(QObject):
             f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}"
         )
 
-        self.init_save_meta(mainGUI, data)
-
         # ?###########################################################
         # ? 用多线程获取封面，避免卡顿
-        self.executor.submit(
-            self.getComicCover,
-            mainGUI,
-            comic,
-            data
-        )
+        self.executor.submit(self.getComicCover, mainGUI, comic, data)
 
         # ?###########################################################
         # ? 封面的绑定双击和悬停事件
@@ -431,16 +432,11 @@ class MangaUI(QObject):
         mainGUI.label_manga_image.setToolTip(
             f"双击打开漫画详情页\nhttps://manga.bilibili.com/detail/mc{data['id']}"
         )
-        
+
         # ?###########################################################
         # ? 用多线程更新漫画章节详情界面显示，避免卡顿
-        self.executor.submit(
-            self.getComicList,
-            mainGUI,
-            comic,
-            resolve_type
-        )
-        
+        self.executor.submit(self.getComicList, mainGUI, comic, resolve_type)
+
     ############################################################
     # 以下两个函数是为了获取漫画封面
     ############################################################
@@ -457,11 +453,11 @@ class MangaUI(QObject):
         """
         img_byte = comic.getComicCover(data)
         self.my_cover_update_widget.emit(
-                    {
-                        "mainGUI": mainGUI,
-                        "img_byte": img_byte,
-                    }
-                )
+            {
+                "mainGUI": mainGUI,
+                "img_byte": img_byte,
+            }
+        )
 
     ############################################################
     def updateComicCover(self, info: dict) -> None:
@@ -476,6 +472,7 @@ class MangaUI(QObject):
 
         # 重写图片大小改变事件，使图片不会变形
         label_img = QPixmap.fromImage(QImage.fromData(img_byte))
+
         def _(event: QEvent = None) -> None:
             new_size = event.size() if event else mainGUI.label_manga_image.size()
             if new_size.width() < 200:
@@ -509,13 +506,13 @@ class MangaUI(QObject):
             self.epi_list = comic.getEpisodesInfo()
         mainGUI.resolve_status.emit("解析漫画章节完毕")
         self.my_comic_list_widget.emit(
-                    {
-                        "mainGUI": mainGUI,
-                        "comic": comic,
-                        "resolve_type": resolve_type,
-                        "num_unlocked": num_unlocked,
-                    }
-                )
+            {
+                "mainGUI": mainGUI,
+                "comic": comic,
+                "resolve_type": resolve_type,
+                "num_unlocked": num_unlocked,
+            }
+        )
 
     ############################################################
     def updateComicList(self, info: dict) -> None:
@@ -559,47 +556,6 @@ class MangaUI(QObject):
         mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
         self.resolveEnable(mainGUI, resolve_type)
         mainGUI.resolve_status.emit("")
-
-    ############################################################
-    def init_save_meta(self, mainGUI: MainGUI, data: dict) -> None:
-        """保存元数据
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-            data (dict): 漫画元数据
-
-        """
-
-        def _(data: dict) -> None:
-            meta = {}
-
-            # 过滤信息
-            meta['id'] = data['id']
-            meta['title'] = data['title']
-            meta['horizontal_cover'] = data['horizontal_cover']
-            meta['square_cover'] = data['square_cover']
-            meta['vertical_cover'] = data['vertical_cover']
-            meta['author_name'] = data['author_name']
-            meta['styles'] = data['styles']
-            meta['evaluate'] = data['evaluate']
-            meta['renewal_time'] = data['renewal_time']
-            meta['hall_icon_text'] = data['hall_icon_text']
-            meta['tags'] = data['tags']
-
-            # ? 如果文件夹不存在，创建文件夹
-            if not os.path.exists(data['save_path']):
-                os.makedirs(data['save_path'])
-
-            with open(os.path.join(data['save_path'], "元数据.json"), "w", encoding='utf-8') as f:
-                json.dump(meta, f, indent=4, ensure_ascii=False)
-
-            # ? 弹出提示框
-            QMessageBox.information(mainGUI, "提示", "保存成功！")
-            mainGUI.pushButton_save_meta.setEnabled(False)
-            mainGUI.pushButton_save_meta.clicked.disconnect()
-
-        mainGUI.pushButton_save_meta.setEnabled(True)
-        mainGUI.pushButton_save_meta.clicked.connect(partial(_, data))
 
     ############################################################
     def init_episodesDetails(self, mainGUI: MainGUI) -> None:
@@ -702,19 +658,24 @@ class MangaUI(QObject):
 
             # ?###########################################################
             # ? 更新章节详情界面
-            num_num_downloaded = (
+            num_downloaded = (
                 int(mainGUI.label_chp_detail_num_downloaded.text().split("：")[1])
                 + self.num_selected
             )
             self.num_selected = 0
-            mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{num_num_downloaded}")
+            mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{num_downloaded}")
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
 
+            # ?###########################################################
+            # ? 开始下载选中章节
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for i in range(mainGUI.listWidget_chp_detail.count()):
                 item = mainGUI.listWidget_chp_detail.item(i)
                 if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Checked:
-                    mainGUI.downloadUI.addTask(mainGUI, self.epi_list[i])
+                    comic = Comic(self.present_comic_id, mainGUI)
+                    mainGUI.downloadUI.addTask(
+                        mainGUI, self.epi_list[i], comic.getComicInfo()
+                    )
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
             mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
@@ -725,7 +686,7 @@ class MangaUI(QObject):
                 temp = mainGUI.v_Layout_myLibrary.itemAt(i).widget().layout()
                 if self.epi_list[0].comic_name in temp.itemAt(0).widget().text():
                     temp.itemAt(2).widget().setText(
-                        f"{num_num_downloaded}/{len(self.epi_list)}"
+                        f"{num_downloaded}/{len(self.epi_list)}"
                     )
                     break
 
@@ -748,7 +709,8 @@ class MangaUI(QObject):
                 return
             self.resolveEnable(mainGUI, "resolving")
             comic = Comic(self.present_comic_id, mainGUI)
-            self.updateComicInfoEvent(mainGUI, comic,"bilibili")
+            self.updateComicInfoEvent(mainGUI, comic, "bilibili")
+
         mainGUI.pushButton_resolve_detail.clicked.connect(_)
 
         # ?###########################################################
@@ -763,6 +725,7 @@ class MangaUI(QObject):
             self.resolveEnable(mainGUI, "resolving")
             comic = BiliPlusComic(self.present_comic_id, mainGUI)
             self.updateComicInfoEvent(mainGUI, comic, "biliplus")
+
         mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
 
     ###########################################################

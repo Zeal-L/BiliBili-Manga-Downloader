@@ -83,7 +83,7 @@ class Comic:
         self.data["styles"] = "，".join(self.data["styles"])
         self.data[
             "save_path"
-        ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comic_id}"
+        ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']}"
 
         return self.data
 
@@ -94,6 +94,7 @@ class Comic:
         Returns:
             QPixmap: 漫画封面图片
         """
+
         @retry(
             stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
         )

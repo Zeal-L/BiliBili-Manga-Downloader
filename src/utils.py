@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.2.0-alpha"
+__version__ = "1.3.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -332,9 +332,7 @@ def check_new_version(mainGUI: MainGUI):
         mainGUI (MainGUI): 主窗口类实例
 
     """
-    url = (
-        "https://api.github.com/repos/BiliBili-Manga-Downloader-Dev-Team/BiliBili-Manga-Downloader/releases/latest"
-    )
+    url = "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
 
     @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
     def _() -> dict:
@@ -354,7 +352,9 @@ def check_new_version(mainGUI: MainGUI):
         logger.error(f"重复更新信息多次后失败!\n{e}")
         logger.exception(e)
         QMessageBox.warning(
-            mainGUI, "警告", "重复获取软件版本更新信息多次后失败!\n请检查网络连接或者重启软件!\n因需要访问github，所以请确认拥有外网访问权限（VPN）\n\n更多详细信息请查看日志文件"
+            mainGUI,
+            "警告",
+            "重复获取软件版本更新信息多次后失败!\n请检查网络连接或者重启软件!\n因需要访问github，所以请确认拥有外网访问权限（VPN）\n\n更多详细信息请查看日志文件",
         )
         return
 
@@ -370,6 +370,4 @@ def check_new_version(mainGUI: MainGUI):
         msgBox.exec()
 
     else:
-        QMessageBox.information(
-            mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了"
-        )
+        QMessageBox.information(mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了")

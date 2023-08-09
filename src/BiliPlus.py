@@ -42,28 +42,35 @@ class BiliPlusComic(Comic):
         ep_list = self.data["ep_list"]
         for episode in reversed(ep_list):
             epi = BiliPlusEpisode(
-                episode, self.sessdata, self.headers, self.comic_id, self.data, self.mainGUI
+                episode,
+                self.sessdata,
+                self.headers,
+                self.comic_id,
+                self.data,
+                self.mainGUI,
             )
             self.episodes.append(epi)
             if epi.isDownloaded():
                 self.num_downloaded += 1
 
-        self.retrieveAvailableEpisode(
-            self.episodes, self.comic_id, self.mainGUI
-            )
+        self.retrieveAvailableEpisode(self.episodes, self.comic_id, self.mainGUI)
 
         return self.episodes
 
     ############################################################
-    def retrieveAvailableEpisode(self, episodes: list[BiliPlusEpisode], comic_id: str, mainGUI: MainGUI):
+    def retrieveAvailableEpisode(
+        self, episodes: list[BiliPlusEpisode], comic_id: str, mainGUI: MainGUI
+    ):
         """从BiliPlus重新获取解锁状态"""
-        biliplus_detail_url = f"https://www.biliplus.com/manga/?act=detail_preview&mangaid={comic_id}"
+        biliplus_detail_url = (
+            f"https://www.biliplus.com/manga/?act=detail_preview&mangaid={comic_id}"
+        )
         biliplus_html = ""
 
         @retry(
             stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
         )
-        def _(url: str=biliplus_detail_url) -> dict:
+        def _(url: str = biliplus_detail_url) -> dict:
             try:
                 res = requests.post(
                     url,
@@ -74,9 +81,7 @@ class BiliPlusComic(Comic):
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if "未登录" in res.text:
-                mainGUI.message_box.emit(
-                    "请先在设置界面填写正确的BiliPlus Cookie！"
-                )
+                mainGUI.message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
                 return
             if res.status_code != 200:
                 logger.warning(
@@ -95,22 +100,22 @@ class BiliPlusComic(Comic):
         # ? 解析BiliPlus解锁章节信息
         try:
             document = BeautifulSoup(biliplus_html, "html.parser")
-            ep_items = document.find_all("div", {"class":"episode-item"})
+            ep_items = document.find_all("div", {"class": "episode-item"})
             ep_available = []
             for ep in ep_items:
-                if ep.img['src'] != "about:blank":
+                if ep.img["src"] != "about:blank":
                     ep_available.append(ep.a["href"].split("epid=")[1])
             total_ep_element = document.select_one("center p")
             if total_ep_element:
                 total_ep = total_ep_element.contents[0].split("/")[1]
-                total_pages =  int(int(total_ep) / 200) + 1
+                total_pages = int(int(total_ep) / 200) + 1
                 for pages in range(2, total_pages + 1):
                     mainGUI.resolve_status.emit(f"正在解析漫画章节({pages}/{total_pages})...")
                     page_html = _(f"{biliplus_detail_url}&page={pages}")
                     document = BeautifulSoup(page_html, "html.parser")
-                    ep_items = document.find_all("div", {"class":"episode-item"})
+                    ep_items = document.find_all("div", {"class": "episode-item"})
                     for ep in ep_items:
-                        if ep.img['src'] != "about:blank":
+                        if ep.img["src"] != "about:blank":
                             ep_available.append(ep.a["href"].split("epid=")[1])
             for ep in episodes:
                 if str(ep.id) in ep_available:
@@ -121,6 +126,7 @@ class BiliPlusComic(Comic):
             mainGUI.message_box.emit(
                 f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
+
 
 ############################################################
 class BiliPlusEpisode(Episode):
@@ -176,7 +182,9 @@ class BiliPlusEpisode(Episode):
         try:
             biliplus_html = _()
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!，跳过!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!，跳过!\n{e}"
+            )
             logger.exception(e)
             mainGUI.message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -188,20 +196,24 @@ class BiliPlusEpisode(Episode):
         try:
             biliplus_imgs_token = []
             document = BeautifulSoup(biliplus_html, "html.parser")
-            images = document.find_all("img", {"class":"comic-single"})
+            images = document.find_all("img", {"class": "comic-single"})
             for img in images:
-                img_url = img['_src']
+                img_url = img["_src"]
                 url, token = img_url.split("?token=")
                 biliplus_imgs_token.append({"url": url, "token": token})
             self.imgs_token = biliplus_imgs_token
-            if biliplus_imgs_token == []:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因Cookie有误导致失败!")
+            if not biliplus_imgs_token:
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因Cookie有误导致失败!"
+                )
                 mainGUI.message_box.emit(
                     f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因Cookie有误导致失败!"
                 )
                 return False
         except Exception as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}"
+            )
             logger.exception(e)
             mainGUI.message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"

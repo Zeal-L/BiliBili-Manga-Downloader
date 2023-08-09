@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.1
+## Created by: Qt User Interface Compiler version 6.5.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -123,7 +123,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 517, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -186,22 +186,6 @@ class Ui_MainWindow(object):
         self.label_manga_outline.setWordWrap(True)
 
         self.v_Layout_manga_detail.addWidget(self.label_manga_outline, 0, Qt.AlignTop)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_7)
-
-        self.pushButton_save_meta = QPushButton(self.groupBox_my_manga)
-        self.pushButton_save_meta.setObjectName(u"pushButton_save_meta")
-        self.pushButton_save_meta.setEnabled(False)
-        self.pushButton_save_meta.setMinimumSize(QSize(100, 0))
-
-        self.horizontalLayout_3.addWidget(self.pushButton_save_meta)
-
-
-        self.v_Layout_manga_detail.addLayout(self.horizontalLayout_3)
 
         self.v_Layout_manga_detail.setStretch(4, 1)
 
@@ -431,7 +415,7 @@ class Ui_MainWindow(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1068, 554))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -752,7 +736,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.tabWidget.setCurrentIndex(0)
-        self.tabWidget_my_manga.setCurrentIndex(0)
+        self.tabWidget_my_manga.setCurrentIndex(1)
         self.tabWidget_download_list.setCurrentIndex(0)
 
 
@@ -778,7 +762,6 @@ class Ui_MainWindow(object):
         self.label_manga_style.setText("")
         self.label_manga_isFinish.setText("")
         self.label_manga_outline.setText("")
-        self.pushButton_save_meta.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u5143\u6570\u636e", None))
         self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u8be6\u60c5 (\u53f3\u952e\u786e\u8ba4\u9f20\u6807\u6846\u9009\u5185\u5bb9)", None))
         self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWindow", u"\u603b\u7ae0\u6570\uff1a", None))
         self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u89e3\u9501\uff1a", None))
