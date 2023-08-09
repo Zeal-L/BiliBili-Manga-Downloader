@@ -13,6 +13,7 @@ retrying = "*"
 pillow = "*"
 pypinyin = "*"
 qt-material = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 rich = "*"

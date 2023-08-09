@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.2.0"
+__version__ = "1.2.0-alpha"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -333,7 +333,7 @@ def check_new_version(mainGUI: MainGUI):
 
     """
     url = (
-        "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
+        "https://api.github.com/repos/BiliBili-Manga-Downloader-Dev-Team/BiliBili-Manga-Downloader/releases/latest"
     )
 
     @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
