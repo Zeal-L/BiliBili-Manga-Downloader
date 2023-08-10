@@ -3,11 +3,17 @@ from __future__ import annotations
 import typing
 
 import requests
-from retrying import retry
+from retrying import RetryError, retry
 import re
 
 from src.Episode import Episode
-from src.utils import logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.utils import (
+    logger,
+    MAX_RETRY_SMALL,
+    RETRY_WAIT_EX,
+    TIMEOUT_SMALL,
+    isCheckSumValid,
+)
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -82,9 +88,50 @@ class Comic:
         self.data["styles"] = "，".join(self.data["styles"])
         self.data[
             "save_path"
-        ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']} ID-{self.comic_id}"
+        ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']}"
 
         return self.data
+
+    ############################################################
+    def getComicCover(self, data: dict) -> int:
+        """获取漫画封面图片
+
+        Returns:
+            QPixmap: 漫画封面图片
+        """
+
+        @retry(
+            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+        )
+        def _() -> bytes:
+            try:
+                res = requests.get(data["vertical_cover"], timeout=TIMEOUT_SMALL)
+            except requests.RequestException() as e:
+                logger.warning(f"获取封面图片失败! 重试中...\n{e}")
+                raise e
+            if res.status_code != 200:
+                logger.warning(
+                    f"获取封面图片失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
+                raise requests.HTTPError()
+            isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
+            if not isValid:
+                logger.warning(
+                    f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5}"
+                )
+                raise requests.HTTPError()
+            return res.content
+
+        logger.info(f"获取《{data['title']}》的封面图片中...")
+        try:
+            img = _()
+            return img
+        except RetryError as e:
+            logger.error(f"获取封面图片多次后失败，跳过!\n{e}")
+            self.mainGUI.message_box.emit(
+                f"获取封面图片多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+            )
+            return open(":/imgs/fail_img.jpg")
 
     ############################################################
     def getEpisodesInfo(self) -> list[Episode]:

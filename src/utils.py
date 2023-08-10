@@ -1,4 +1,5 @@
 from __future__ import annotations
+import hashlib
 
 import typing
 import requests
@@ -17,7 +18,7 @@ if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -72,6 +73,19 @@ logger.addHandler(log_handler)
 ############################################################
 # Helper Functions
 ############################################################
+
+
+def isCheckSumValid(etag, content) -> tuple[bool, str]:
+    """判断MD5是否有效
+
+    Returns:
+        tuple[bool, str]: (是否有效, MD5)
+    """
+    md5 = hashlib.md5(content).hexdigest()
+    return etag == md5, md5
+
+############################################################
+
 def openFolderAndSelectItems(path: str) -> None:
     """读取一个文件的父目录, 如果可能的话，选择该文件。
 
@@ -332,9 +346,7 @@ def check_new_version(mainGUI: MainGUI):
         mainGUI (MainGUI): 主窗口类实例
 
     """
-    url = (
-        "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
-    )
+    url = "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
 
     @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
     def _() -> dict:
@@ -354,22 +366,22 @@ def check_new_version(mainGUI: MainGUI):
         logger.error(f"重复更新信息多次后失败!\n{e}")
         logger.exception(e)
         QMessageBox.warning(
-            mainGUI, "警告", "重复获取软件版本更新信息多次后失败!\n请检查网络连接或者重启软件!\n因需要访问github，所以请确认拥有外网访问权限（VPN）\n\n更多详细信息请查看日志文件"
+            mainGUI,
+            "警告",
+            "重复获取软件版本更新信息多次后失败!\n请检查网络连接或者重启软件!\n因需要访问github，所以请确认拥有外网访问权限（VPN）\n\n更多详细信息请查看日志文件",
         )
         return
 
     if data["tag_name"][1:] != __version__:
-        msgBox = QMessageBox()
-        msgBox.setWindowTitle("更新小助手")
-        msgBox.setText(
+        message_box = QMessageBox()
+        message_box.setWindowTitle("更新小助手")
+        message_box.setText(
             f"您当前使用的版本为 v{__version__}，最新版本为 {data['tag_name']} <br> <a href='{data['html_url']}'>请前往 Github 下载最新版本</a>"
         )
-        msgBox.setTextFormat(Qt.RichText)
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
-        msgBox.exec()
+        message_box.setTextFormat(Qt.RichText)
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
+        message_box.exec()
 
     else:
-        QMessageBox.information(
-            mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了"
-        )
+        QMessageBox.information(mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了")

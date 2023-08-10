@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.1
+## Created by: Qt User Interface Compiler version 6.5.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -123,7 +123,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 517, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -186,22 +186,6 @@ class Ui_MainWindow(object):
         self.label_manga_outline.setWordWrap(True)
 
         self.v_Layout_manga_detail.addWidget(self.label_manga_outline, 0, Qt.AlignTop)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_7)
-
-        self.pushButton_save_mata = QPushButton(self.groupBox_my_manga)
-        self.pushButton_save_mata.setObjectName(u"pushButton_save_mata")
-        self.pushButton_save_mata.setEnabled(False)
-        self.pushButton_save_mata.setMinimumSize(QSize(100, 0))
-
-        self.horizontalLayout_3.addWidget(self.pushButton_save_mata)
-
-
-        self.v_Layout_manga_detail.addLayout(self.horizontalLayout_3)
 
         self.v_Layout_manga_detail.setStretch(4, 1)
 
@@ -286,6 +270,71 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addLayout(self.h_Layout_chp_detail)
 
+        self.widget_biliplus_detail = QWidget(self.groupBox_chp_detail)
+        self.widget_biliplus_detail.setObjectName(u"widget_biliplus_detail")
+        self.h_Layout_widget_biliplus_detail = QHBoxLayout(self.widget_biliplus_detail)
+        self.h_Layout_widget_biliplus_detail.setObjectName(u"h_Layout_widget_biliplus_detail")
+        self.h_Layout_widget_biliplus_detail.setContentsMargins(0, 0, 0, 0)
+        self.h_Layout_biliplus_detail = QHBoxLayout()
+        self.h_Layout_biliplus_detail.setObjectName(u"h_Layout_biliplus_detail")
+        self.pushButton_resolve_detail = QPushButton(self.widget_biliplus_detail)
+        self.pushButton_resolve_detail.setObjectName(u"pushButton_resolve_detail")
+        self.pushButton_resolve_detail.setEnabled(True)
+        self.pushButton_resolve_detail.setMaximumSize(QSize(80, 25))
+
+        self.h_Layout_biliplus_detail.addWidget(self.pushButton_resolve_detail)
+
+        self.pushButton_biliplus_resolve_detail = QPushButton(self.widget_biliplus_detail)
+        self.pushButton_biliplus_resolve_detail.setObjectName(u"pushButton_biliplus_resolve_detail")
+        self.pushButton_biliplus_resolve_detail.setEnabled(True)
+        self.pushButton_biliplus_resolve_detail.setMaximumSize(QSize(80, 25))
+
+        self.h_Layout_biliplus_detail.addWidget(self.pushButton_biliplus_resolve_detail)
+
+        self.line_10 = QFrame(self.widget_biliplus_detail)
+        self.line_10.setObjectName(u"line_10")
+        self.line_10.setFrameShape(QFrame.VLine)
+        self.line_10.setFrameShadow(QFrame.Sunken)
+
+        self.h_Layout_biliplus_detail.addWidget(self.line_10)
+
+        self.label_resolve_status = QLabel(self.widget_biliplus_detail)
+        self.label_resolve_status.setObjectName(u"label_resolve_status")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.label_resolve_status.sizePolicy().hasHeightForWidth())
+        self.label_resolve_status.setSizePolicy(sizePolicy1)
+        self.label_resolve_status.setCursor(QCursor(Qt.IBeamCursor))
+        self.label_resolve_status.setAlignment(Qt.AlignCenter)
+
+        self.h_Layout_biliplus_detail.addWidget(self.label_resolve_status)
+
+        self.label_biliplus_empty = QLabel(self.widget_biliplus_detail)
+        self.label_biliplus_empty.setObjectName(u"label_biliplus_empty")
+
+        self.h_Layout_biliplus_detail.addWidget(self.label_biliplus_empty)
+
+        self.line_11 = QFrame(self.widget_biliplus_detail)
+        self.line_11.setObjectName(u"line_11")
+        self.line_11.setFrameShape(QFrame.VLine)
+        self.line_11.setFrameShadow(QFrame.Sunken)
+
+        self.h_Layout_biliplus_detail.addWidget(self.line_11)
+
+        self.pushButton_biliplus_detail_download_selected = QPushButton(self.widget_biliplus_detail)
+        self.pushButton_biliplus_detail_download_selected.setObjectName(u"pushButton_biliplus_detail_download_selected")
+        self.pushButton_biliplus_detail_download_selected.setEnabled(False)
+        self.pushButton_biliplus_detail_download_selected.setMaximumSize(QSize(130, 25))
+
+        self.h_Layout_biliplus_detail.addWidget(self.pushButton_biliplus_detail_download_selected)
+
+
+        self.h_Layout_widget_biliplus_detail.addLayout(self.h_Layout_biliplus_detail)
+
+
+        self.verticalLayout_4.addWidget(self.widget_biliplus_detail)
+
         self.listWidget_chp_detail = QListWidget(self.groupBox_chp_detail)
         self.listWidget_chp_detail.setObjectName(u"listWidget_chp_detail")
         self.listWidget_chp_detail.setAutoFillBackground(True)
@@ -321,7 +370,7 @@ class Ui_MainWindow(object):
         self.progressBar_total_progress = QProgressBar(self.tab_download)
         self.progressBar_total_progress.setObjectName(u"progressBar_total_progress")
         self.progressBar_total_progress.setEnabled(True)
-        self.progressBar_total_progress.setValue(100)
+        self.progressBar_total_progress.setValue(0)
         self.progressBar_total_progress.setTextVisible(True)
 
         self.h_Layout_total_progress.addWidget(self.progressBar_total_progress)
@@ -366,7 +415,7 @@ class Ui_MainWindow(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1068, 554))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -388,7 +437,7 @@ class Ui_MainWindow(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 61, 18))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -431,7 +480,6 @@ class Ui_MainWindow(object):
         self.label_my_cookie = QLabel(self.tab_setting)
         self.label_my_cookie.setObjectName(u"label_my_cookie")
         self.label_my_cookie.setMinimumSize(QSize(110, 0))
-        self.label_my_cookie.setMaximumSize(QSize(16777215, 16777215))
 
         self.h_Layout_my_cookie.addWidget(self.label_my_cookie)
 
@@ -440,6 +488,17 @@ class Ui_MainWindow(object):
 
         self.h_Layout_my_cookie.addWidget(self.lineEdit_my_cookie)
 
+        self.pushButton_qrcode = QPushButton(self.tab_setting)
+        self.pushButton_qrcode.setObjectName(u"pushButton_qrcode")
+        icon1 = QIcon()
+        icon1.addFile(u":/imgs/Scan-qr-code.512.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.pushButton_qrcode.setIcon(icon1)
+        self.pushButton_qrcode.setIconSize(QSize(25, 25))
+        self.pushButton_qrcode.setAutoRepeat(False)
+        self.pushButton_qrcode.setAutoExclusive(False)
+
+        self.h_Layout_my_cookie.addWidget(self.pushButton_qrcode)
+
         self.pushButton_my_cookie = QPushButton(self.tab_setting)
         self.pushButton_my_cookie.setObjectName(u"pushButton_my_cookie")
 
@@ -447,6 +506,36 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_5.addLayout(self.h_Layout_my_cookie)
+
+        self.widget_biliplus_cookie = QWidget(self.tab_setting)
+        self.widget_biliplus_cookie.setObjectName(u"widget_biliplus_cookie")
+        self.h_Layout_widget_biliplus_cookie = QHBoxLayout(self.widget_biliplus_cookie)
+        self.h_Layout_widget_biliplus_cookie.setSpacing(6)
+        self.h_Layout_widget_biliplus_cookie.setObjectName(u"h_Layout_widget_biliplus_cookie")
+        self.h_Layout_widget_biliplus_cookie.setContentsMargins(0, 0, 0, 0)
+        self.h_Layout_biliplus_cookie = QHBoxLayout()
+        self.h_Layout_biliplus_cookie.setObjectName(u"h_Layout_biliplus_cookie")
+        self.label_biliplus_cookie = QLabel(self.widget_biliplus_cookie)
+        self.label_biliplus_cookie.setObjectName(u"label_biliplus_cookie")
+        self.label_biliplus_cookie.setMinimumSize(QSize(110, 0))
+
+        self.h_Layout_biliplus_cookie.addWidget(self.label_biliplus_cookie)
+
+        self.lineEdit_biliplus_cookie = QLineEdit(self.widget_biliplus_cookie)
+        self.lineEdit_biliplus_cookie.setObjectName(u"lineEdit_biliplus_cookie")
+
+        self.h_Layout_biliplus_cookie.addWidget(self.lineEdit_biliplus_cookie)
+
+        self.pushButton_biliplus_cookie = QPushButton(self.widget_biliplus_cookie)
+        self.pushButton_biliplus_cookie.setObjectName(u"pushButton_biliplus_cookie")
+
+        self.h_Layout_biliplus_cookie.addWidget(self.pushButton_biliplus_cookie)
+
+
+        self.h_Layout_widget_biliplus_cookie.addLayout(self.h_Layout_biliplus_cookie)
+
+
+        self.verticalLayout_5.addWidget(self.widget_biliplus_cookie)
 
         self.h_Layout_save_path = QHBoxLayout()
         self.h_Layout_save_path.setObjectName(u"h_Layout_save_path")
@@ -494,7 +583,7 @@ class Ui_MainWindow(object):
         self.h_Layout_num_thread.setObjectName(u"h_Layout_num_thread")
         self.label_num_thread_count = QLabel(self.groupBox)
         self.label_num_thread_count.setObjectName(u"label_num_thread_count")
-        self.label_num_thread_count.setMinimumSize(QSize(110, 0))
+        self.label_num_thread_count.setMinimumSize(QSize(120, 0))
         self.label_num_thread_count.setMaximumSize(QSize(16777215, 16777215))
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread_count)
@@ -684,13 +773,17 @@ class Ui_MainWindow(object):
         self.label_manga_style.setText("")
         self.label_manga_isFinish.setText("")
         self.label_manga_outline.setText("")
-        self.pushButton_save_mata.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u5143\u6570\u636e", None))
         self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u8be6\u60c5 (\u53f3\u952e\u786e\u8ba4\u9f20\u6807\u6846\u9009\u5185\u5bb9)", None))
         self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWindow", u"\u603b\u7ae0\u6570\uff1a", None))
         self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u89e3\u9501\uff1a", None))
         self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u4e0b\u8f7d\uff1a", None))
         self.label_chp_detail_num_selected.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u9009\u4e2d\uff1a", None))
         self.pushButton_chp_detail_download_selected.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u9009\u4e2d\u7ae0\u8282", None))
+        self.pushButton_resolve_detail.setText(QCoreApplication.translate("MainWindow", u"B\u7ad9\u89e3\u6790", None))
+        self.pushButton_biliplus_resolve_detail.setText(QCoreApplication.translate("MainWindow", u"BiliPlus\u89e3\u6790", None))
+        self.label_resolve_status.setText("")
+        self.label_biliplus_empty.setText("")
+        self.pushButton_biliplus_detail_download_selected.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7dBiliPlus\u9009\u4e2d\u7ae0\u8282", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWindow", u"\u603b\u8fdb\u5ea6", None))
         self.label_total_progress_speed.setText(QCoreApplication.translate("MainWindow", u"\u603b\u4e0b\u8f7d\u901f\u5ea6:", None))
@@ -700,7 +793,10 @@ class Ui_MainWindow(object):
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_finished), QCoreApplication.translate("MainWindow", u"\u5df2\u5b8c\u6210", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_download), QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u5217\u8868", None))
         self.label_my_cookie.setText(QCoreApplication.translate("MainWindow", u"\u6211\u7684Cookie\uff1a", None))
+        self.pushButton_qrcode.setText("")
         self.pushButton_my_cookie.setText(QCoreApplication.translate("MainWindow", u"\u786e\u8ba4", None))
+        self.label_biliplus_cookie.setText(QCoreApplication.translate("MainWindow", u"BiliPlus Cookie\uff1a", None))
+        self.pushButton_biliplus_cookie.setText(QCoreApplication.translate("MainWindow", u"\u786e\u8ba4", None))
         self.label_save_path.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\uff1a", None))
         self.pushButton_save_path.setText(QCoreApplication.translate("MainWindow", u"\u6d4f\u89c8...", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))

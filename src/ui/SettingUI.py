@@ -2,14 +2,19 @@ from __future__ import annotations
 
 import os
 from functools import partial
+import threading
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
+from PySide6.QtGui import QPixmap, QImage
+from urllib.parse import urlparse, parse_qs, quote
 import requests
 from retrying import retry
 
 
-from src.ui.MyAbout import MyAbout
+from src.ui.MyAboutUI import MyAboutUI
+from src.ui.QrCodeUI import QrCodeUI
 from src.utils import (
     log_path,
     logger,
@@ -18,17 +23,26 @@ from src.utils import (
     TIMEOUT_SMALL,
     check_new_version,
 )
+from src.BiliQrCode import QrCode
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
 
 
-class SettingUI:
+class SettingUI(QObject):
     """设置窗口类，用于管理设置UI"""
 
+    # ?###########################################################
+    # ? 用于多线程更新我的库存
+    qr_res = Signal(dict)
+
     def __init__(self, mainGUI: MainGUI):
+        super().__init__()
+        self.mainGUI = mainGUI
         self.clearUserData = False
+        self.init_qrCode(mainGUI)
         self.init_cookie(mainGUI)
+        self.init_biliplus_cookie(mainGUI)
         self.init_savePath(mainGUI)
         self.init_num_thread(mainGUI)
         self.init_openLog(mainGUI)
@@ -37,6 +51,74 @@ class SettingUI:
         self.init_saveMethod(mainGUI)
         self.init_checkUpdate(mainGUI)
         self.init_theme(mainGUI)
+        self.qr_ui = QrCodeUI()
+
+    ############################################################
+    def qrCodeCallBack(self, data: dict) -> None:
+        # sourcery skip: extract-method
+
+        if data is None:
+            self.qr_ui.close()
+            return
+
+        # 0：扫码登录成功
+        if data["code"] == 0:
+            self.qr_ui.close()
+
+            parsed_url = urlparse(data["url"])
+            query_params = parse_qs(parsed_url.query)
+            sessdata = quote(query_params["SESSDATA"][0])
+
+            self.mainGUI.updateConfig("cookie", sessdata)
+            self.mainGUI.lineEdit_my_cookie.setText(sessdata)
+            self.qr_ui.label.setText("## 请使用BiliBili手机客户端扫描二维码登入")
+
+            QMessageBox.information(
+                self.mainGUI,
+                "提示",
+                f"扫码登录成功！\n新Cookie为: {sessdata}\n已自动保存！",
+            )
+
+        # 86038：二维码已失效
+        elif data["code"] == 86038:
+            self.qr_ui.close()
+            QMessageBox.warning(self.mainGUI, "警告", "二维码已超时失效！请重新获取二维码！")
+
+        # 86090：二维码已扫码未确认
+        elif data["code"] == 86090:
+            self.qr_ui.label.setText("## 扫码成功！请在手机上确认登录！")
+
+    ############################################################
+    def init_qrCode(self, mainGUI: MainGUI) -> None:
+        """绑定二维码按钮
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+
+        def _():
+            qr = QrCode(mainGUI)
+            img = qr.generate()
+            if img is None:
+                return
+
+            self.qr_ui.label_img.setPixmap(
+                QPixmap.fromImage(QImage.fromData(img)).scaled(400, 400)
+            )
+            self.qr_ui.show()
+
+            # 开一个线程去检测二维码是否扫描成功
+            thread = threading.Thread(
+                target=qr.get_cookie,
+                args=(self.qr_res,),
+            )
+            thread.start()
+
+            # 如果用户把二维码窗口关了，就把线程也关了
+            self.qr_ui.closeEvent = lambda _: setattr(qr, "close_flag", True)
+
+        self.qr_res.connect(self.qrCodeCallBack)
+        mainGUI.pushButton_qrcode.clicked.connect(partial(_))
 
     ############################################################
     def init_cookie(self, mainGUI: MainGUI) -> None:
@@ -52,6 +134,9 @@ class SettingUI:
 
         def _():
             new_cookie = mainGUI.lineEdit_my_cookie.text()
+            if new_cookie == "":
+                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                return
             mainGUI.updateConfig("cookie", new_cookie)
             mainGUI.lineEdit_my_cookie.clearFocus()
             if self.is_cookie_valid(mainGUI, new_cookie):
@@ -105,6 +190,90 @@ class SettingUI:
                 mainGUI,
                 "警告",
                 "重复测试Cookie是否有效多次后失败!\n请核对输入的Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
+            )
+            return False
+        return True
+
+    ############################################################
+    def init_biliplus_cookie(self, mainGUI: MainGUI) -> None:
+        """绑定BiliPlus Cookie值
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+        stored_cookie = mainGUI.getConfig("biliplus_cookie")
+        if stored_cookie:
+            mainGUI.lineEdit_biliplus_cookie.setText(stored_cookie)
+            self.is_biliplus_cookie_valid(mainGUI, stored_cookie)
+
+        def _():
+            new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
+            if new_cookie == "":
+                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                return
+            mainGUI.updateConfig("biliplus_cookie", new_cookie)
+            mainGUI.lineEdit_biliplus_cookie.clearFocus()
+            if self.is_biliplus_cookie_valid(mainGUI, new_cookie):
+                QMessageBox.information(mainGUI, "提示", "Cookie有效！")
+
+        mainGUI.lineEdit_biliplus_cookie.returnPressed.connect(_)
+        mainGUI.pushButton_biliplus_cookie.clicked.connect(_)
+
+    ############################################################
+    def is_biliplus_cookie_valid(self, mainGUI: MainGUI, cookie: str) -> bool:
+        """判断BiliPlus Cookie是否有效
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            cookie (str): Cookie值
+        Returns:
+            bool: Cookie是否有效
+        """
+        # 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
+        main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
+        headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "cookie": f"login=2;access_key={cookie}",
+        }
+        payload = {}
+
+        @retry(
+            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+        )
+        def _() -> None:
+            try:
+                res = requests.post(
+                    main_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
+                )
+            except requests.RequestException as e:
+                logger.warning(f"测试BiliPlus Cookie是否有效失败! 重试中...\n{e}")
+                raise e
+            if res.status_code != 200:
+                logger.warning(
+                    f"测试BiliPlus Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
+                raise requests.HTTPError()
+            if "hoz-container" not in res.text:
+                logger.warning("BiliPlus Cookie检测出现故障，暂时无法检测是否有效...")
+                raise ReferenceError
+            elif 'class="comic-single"' not in res.text:
+                logger.warning("BiliPlus Cookie无效!重试中...")
+                raise requests.HTTPError()
+
+        try:
+            _()
+        except requests.RequestException as e:
+            logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
+            logger.exception(e)
+            QMessageBox.warning(
+                mainGUI,
+                "警告",
+                "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
+            )
+            return False
+        except ReferenceError:
+            QMessageBox.warning(
+                mainGUI, "警告", "BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者"
             )
             return False
         return True
@@ -180,7 +349,7 @@ class SettingUI:
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
-        about_window = MyAbout()
+        about_window = MyAboutUI()
         mainGUI.pushButton_about.clicked.connect(partial(about_window.show))
 
     ############################################################
@@ -249,7 +418,7 @@ class SettingUI:
         )
 
     ############################################################
-    
+
     def init_theme(self, mainGUI: MainGUI) -> None:
         """绑定主题相关设置
 
