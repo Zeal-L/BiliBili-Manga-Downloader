@@ -127,7 +127,7 @@ class DownloadUI(QObject):
 
     ############################################################
     def addTask(self, mainGUI: MainGUI, epi: Episode) -> None:
-        """添加下载任务
+        """添加漫画下载任务
 
         Args:
             epi (Episode): 漫画章节类实例
