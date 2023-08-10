@@ -14,6 +14,7 @@ pillow = "*"
 pypinyin = "*"
 qt-material = "*"
 beautifulsoup4 = "*"
+qrcode = "*"
 
 [dev-packages]
 rich = "*"

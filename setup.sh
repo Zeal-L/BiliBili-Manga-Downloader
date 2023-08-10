@@ -12,10 +12,12 @@ echo -e "\033[34m\n 重新编译UI文件 ... \n\033[0m"
 pipenv run pyside6-rcc src/ui/PySide_src/resource.qrc -o src/ui/PySide_src/resource_rc.py
 pipenv run pyside6-uic src/ui/PySide_src/mainWindow.ui -o src/ui/PySide_src/mainWindow_ui.py
 pipenv run pyside6-uic src/ui/PySide_src/myAbout.ui -o src/ui/PySide_src/myAbout_ui.py
+pipenv run pyside6-uic src/ui/PySide_src/qrCode.ui -o src/ui/PySide_src/qrCode_ui.py
 
 echo -e "\033[34m\n 修复UI文件中的导入问题 ... \n\033[0m"
 sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/mainWindow_ui.py
 sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/myAbout_ui.py
+sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/qrCode_ui.py
 
 echo -e "\033[34m\n 显示项目目录 ... \n\033[0m"
 pipenv run pipenv --where

@@ -2,14 +2,18 @@ from __future__ import annotations
 
 import os
 from functools import partial
+import threading
 from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
+from PySide6.QtGui import QPixmap, QImage
 import requests
 from retrying import retry
 
 
-from src.ui.MyAbout import MyAbout
+from src.ui.MyAboutUI import MyAboutUI
+from src.ui.QrCodeUI import QrCodeUI
 from src.utils import (
     log_path,
     logger,
@@ -18,16 +22,24 @@ from src.utils import (
     TIMEOUT_SMALL,
     check_new_version,
 )
+from src.BIliQrCode import QrCode
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
 
 
-class SettingUI:
+class SettingUI(QObject):
     """设置窗口类，用于管理设置UI"""
 
+    # ?###########################################################
+    # ? 用于多线程更新我的库存
+    qr_res = Signal(dict)
+
     def __init__(self, mainGUI: MainGUI):
+        super().__init__()
+        self.mainGUI = mainGUI
         self.clearUserData = False
+        self.init_qrCode(mainGUI)
         self.init_cookie(mainGUI)
         self.init_biliplus_cookie(mainGUI)
         self.init_savePath(mainGUI)
@@ -38,6 +50,63 @@ class SettingUI:
         self.init_saveMethod(mainGUI)
         self.init_checkUpdate(mainGUI)
         self.init_theme(mainGUI)
+        self.qr_ui = QrCodeUI()
+
+    ############################################################
+    def qrCodeCallBack(self, data: dict) -> None:
+        # 0：扫码登录成功
+        if data["code"] == 0:
+            self.qr_ui.close()
+            self.mainGUI.updateConfig("cookie", data["refresh_token"])
+            self.mainGUI.lineEdit_my_cookie.setText(data["refresh_token"])
+            self.qr_ui.label.setText("## 请使用BiliBili手机客户端扫描二维码登入")
+
+            QMessageBox.information(
+                self.mainGUI,
+                "提示",
+                f"扫码登录成功！\n新Cookie为: {data['refresh_token']}\n已自动保存！",
+            )
+
+        # 86038：二维码已失效
+        elif data["code"] == 86038:
+            self.qr_ui.close()
+            QMessageBox.warning(self.mainGUI, "警告", "二维码已超时失效！请重新获取二维码！")
+
+        # 86090：二维码已扫码未确认
+        elif data["code"] == 86090:
+            self.qr_ui.label.setText("## 扫码成功！请在手机上确认登录！")
+
+    ############################################################
+    def init_qrCode(self, mainGUI: MainGUI) -> None:
+        """绑定二维码按钮
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+
+        def _():
+            qr = QrCode(mainGUI)
+            img = qr.generate()
+            if img is None:
+                return
+
+            self.qr_ui.label_img.setPixmap(
+                QPixmap.fromImage(QImage.fromData(img)).scaled(400, 400)
+            )
+            self.qr_ui.show()
+
+            # 开一个线程去检测二维码是否扫描成功
+            thread = threading.Thread(
+                target=qr.get_cookie,
+                args=(self.qr_res,),
+            )
+            thread.start()
+
+            # 如果用户把二维码窗口关了，就把线程也关了
+            self.qr_ui.closeEvent = lambda _: setattr(qr, "close_flag", True)
+
+        self.qr_res.connect(self.qrCodeCallBack)
+        mainGUI.pushButton_qrcode.clicked.connect(partial(_))
 
     ############################################################
     def init_cookie(self, mainGUI: MainGUI) -> None:
@@ -268,7 +337,7 @@ class SettingUI:
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
-        about_window = MyAbout()
+        about_window = MyAboutUI()
         mainGUI.pushButton_about.clicked.connect(partial(about_window.show))
 
     ############################################################

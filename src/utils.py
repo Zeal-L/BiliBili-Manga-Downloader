@@ -373,15 +373,15 @@ def check_new_version(mainGUI: MainGUI):
         return
 
     if data["tag_name"][1:] != __version__:
-        msgBox = QMessageBox()
-        msgBox.setWindowTitle("更新小助手")
-        msgBox.setText(
+        message_box = QMessageBox()
+        message_box.setWindowTitle("更新小助手")
+        message_box.setText(
             f"您当前使用的版本为 v{__version__}，最新版本为 {data['tag_name']} <br> <a href='{data['html_url']}'>请前往 Github 下载最新版本</a>"
         )
-        msgBox.setTextFormat(Qt.RichText)
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
-        msgBox.exec()
+        message_box.setTextFormat(Qt.RichText)
+        message_box.setIcon(QMessageBox.Information)
+        message_box.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
+        message_box.exec()
 
     else:
         QMessageBox.information(mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了")

@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>imgs/Scan-qr-code.512.png</file>
     <file>imgs/fail_img.jpg</file>
     <file>imgs/blinblin.png</file>
     <file>imgs/BiliBili_favicon.ico</file>

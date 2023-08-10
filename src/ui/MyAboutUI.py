@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QWidget
 from src.ui.PySide_src.myAbout_ui import Ui_My_about
 
 
-class MyAbout(QWidget, Ui_My_about):
+class MyAboutUI(QWidget, Ui_My_about):
     """关于窗口类"""
 
     def __init__(self):

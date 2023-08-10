@@ -37,7 +37,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_my_manga">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="tab_manga_search">
              <attribute name="title">
@@ -608,8 +608,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>28</height>
+                   <width>61</width>
+                   <height>18</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_finished"/>
@@ -689,6 +689,29 @@
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit_my_cookie"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_qrcode">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resource.qrc">
+              <normaloff>:/imgs/Scan-qr-code.512.png</normaloff>:/imgs/Scan-qr-code.512.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_my_cookie">

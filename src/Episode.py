@@ -6,6 +6,7 @@ import re
 import shutil
 import typing
 
+
 import piexif
 import requests
 from PIL import Image
@@ -24,7 +25,7 @@ from src.utils import (
     __copyright__,
     __version__,
     logger,
-    isCheckSumValid
+    isCheckSumValid,
 )
 
 if typing.TYPE_CHECKING:
@@ -301,6 +302,7 @@ class Episode:
                     append_images=temp_imgs[1:],
                     quality=95,
                 )
+
                 # 在pdf文件属性中记录章节标题作者和软件版本以及版权信息
                 with open(self.epi_path_pdf, "rb") as f:
                     pdf = PdfReader(f)
@@ -342,24 +344,30 @@ class Episode:
         def _():
             try:
                 for index, path in enumerate(imgs_path, start=1):
-                    # 在图片文件属性中记录章节标题作者和软件版本以及版权信息
-                    info = {}
-                    info[
-                        piexif.ImageIFD.ImageDescription
-                    ] = f"《{self.comic_name}》 - {self.title}".encode("utf-8")
-                    info[piexif.ImageIFD.Artist] = self.author.encode("utf-8")
-                    info[
-                        piexif.ImageIFD.Software
-                    ] = f"{__app_name__} {__version__}".encode("utf-8")
-                    info[piexif.ImageIFD.Copyright] = __copyright__.encode("utf-8")
-                    exif_bytes = piexif.dump({"0th": info})
+
+                    def jpg_exif():
+                        # 在jpg文件属性中记录章节标题作者和软件版本以及版权信息
+                        exif_data = {
+                            "0th": {
+                                piexif.ImageIFD.ImageDescription: f"《{self.comic_name}》 - {self.title}".encode(
+                                    "utf-8"
+                                ),
+                                piexif.ImageIFD.Artist: self.author.encode("utf-8"),
+                                piexif.ImageIFD.Software: f"{__app_name__} {__version__}".encode(
+                                    "utf-8"
+                                ),
+                                piexif.ImageIFD.Copyright: __copyright__,
+                            }
+                        }
+                        exif_bytes = piexif.dump(exif_data)
+                        piexif.insert(exif_bytes, path)
+
+                    img_format = path.split(".")[-1]
 
                     # 将 exif 数据插入到图像文件中, 如果插入失败则跳过
                     try:
-                        piexif.insert(
-                            exif_bytes,
-                            path,
-                        )
+                        if img_format == "jpg":
+                            jpg_exif()
                     except piexif.InvalidImageDataError as e:
                         logger.warning(f"Failed to insert exif data for {path}: {e}")
                         logger.exception(e)
@@ -368,7 +376,7 @@ class Episode:
                     shutil.copy2(
                         path,
                         os.path.join(
-                            self.epi_path_folder, f"{str(index).zfill(3)}.jpg"
+                            self.epi_path_folder, f"{str(index).zfill(3)}.{img_format}"
                         ),
                     )
 
@@ -480,12 +488,16 @@ class Episode:
 
         # ?###########################################################
         # ? 保存图片
-        path_to_save = os.path.join(self.save_path, f"{self.ord}_{index}.jpg")
+        img_format = img_url.split(".")[-1].split("?")[0].lower()
+        path_to_save = os.path.join(self.save_path, f"{self.ord}_{index}.{img_format}")
 
         @retry(stop_max_attempt_number=5)
         def _() -> None:
             try:
                 with open(path_to_save, "wb") as f:
+                    # image = Image.open(io.BytesIO(img_bytes))
+                    # image.save(path_to_save, format="WEBP", lossless=True)
+
                     f.write(img)
             except OSError as e:
                 logger.error(

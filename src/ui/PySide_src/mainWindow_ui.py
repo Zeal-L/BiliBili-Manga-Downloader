@@ -437,7 +437,7 @@ class Ui_MainWindow(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 61, 18))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -487,6 +487,17 @@ class Ui_MainWindow(object):
         self.lineEdit_my_cookie.setObjectName(u"lineEdit_my_cookie")
 
         self.h_Layout_my_cookie.addWidget(self.lineEdit_my_cookie)
+
+        self.pushButton_qrcode = QPushButton(self.tab_setting)
+        self.pushButton_qrcode.setObjectName(u"pushButton_qrcode")
+        icon1 = QIcon()
+        icon1.addFile(u":/imgs/Scan-qr-code.512.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.pushButton_qrcode.setIcon(icon1)
+        self.pushButton_qrcode.setIconSize(QSize(25, 25))
+        self.pushButton_qrcode.setAutoRepeat(False)
+        self.pushButton_qrcode.setAutoExclusive(False)
+
+        self.h_Layout_my_cookie.addWidget(self.pushButton_qrcode)
 
         self.pushButton_my_cookie = QPushButton(self.tab_setting)
         self.pushButton_my_cookie.setObjectName(u"pushButton_my_cookie")
@@ -736,7 +747,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.tabWidget.setCurrentIndex(0)
-        self.tabWidget_my_manga.setCurrentIndex(1)
+        self.tabWidget_my_manga.setCurrentIndex(0)
         self.tabWidget_download_list.setCurrentIndex(0)
 
 
@@ -782,6 +793,7 @@ class Ui_MainWindow(object):
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_finished), QCoreApplication.translate("MainWindow", u"\u5df2\u5b8c\u6210", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_download), QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u5217\u8868", None))
         self.label_my_cookie.setText(QCoreApplication.translate("MainWindow", u"\u6211\u7684Cookie\uff1a", None))
+        self.pushButton_qrcode.setText("")
         self.pushButton_my_cookie.setText(QCoreApplication.translate("MainWindow", u"\u786e\u8ba4", None))
         self.label_biliplus_cookie.setText(QCoreApplication.translate("MainWindow", u"BiliPlus Cookie\uff1a", None))
         self.pushButton_biliplus_cookie.setText(QCoreApplication.translate("MainWindow", u"\u786e\u8ba4", None))
