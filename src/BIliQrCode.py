@@ -51,8 +51,6 @@ class QrCode:
                 raise requests.HTTPError()
             return res.json()["data"]
 
-        logger.info("正在获取登入二维码...")
-
         try:
             data = _()
             self.code_url = data["url"]
@@ -101,8 +99,6 @@ class QrCode:
                 )
                 raise requests.HTTPError()
             return res.json()["data"]
-
-        logger.info("正在确认二维码登入...")
 
         try:
             data = _()

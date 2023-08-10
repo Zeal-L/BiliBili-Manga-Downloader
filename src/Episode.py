@@ -495,9 +495,6 @@ class Episode:
         def _() -> None:
             try:
                 with open(path_to_save, "wb") as f:
-                    # image = Image.open(io.BytesIO(img_bytes))
-                    # image.save(path_to_save, format="WEBP", lossless=True)
-
                     f.write(img)
             except OSError as e:
                 logger.error(

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
 from PySide6.QtGui import QPixmap, QImage
+from urllib.parse import urlparse, parse_qs, quote
 import requests
 from retrying import retry
 
@@ -22,7 +23,7 @@ from src.utils import (
     TIMEOUT_SMALL,
     check_new_version,
 )
-from src.BIliQrCode import QrCode
+from src.BiliQrCode import QrCode
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -54,17 +55,28 @@ class SettingUI(QObject):
 
     ############################################################
     def qrCodeCallBack(self, data: dict) -> None:
+        # sourcery skip: extract-method
+
+        if data is None:
+            self.qr_ui.close()
+            return
+
         # 0：扫码登录成功
         if data["code"] == 0:
             self.qr_ui.close()
-            self.mainGUI.updateConfig("cookie", data["refresh_token"])
-            self.mainGUI.lineEdit_my_cookie.setText(data["refresh_token"])
+
+            parsed_url = urlparse(data["url"])
+            query_params = parse_qs(parsed_url.query)
+            sessdata = quote(query_params["SESSDATA"][0])
+
+            self.mainGUI.updateConfig("cookie", sessdata)
+            self.mainGUI.lineEdit_my_cookie.setText(sessdata)
             self.qr_ui.label.setText("## 请使用BiliBili手机客户端扫描二维码登入")
 
             QMessageBox.information(
                 self.mainGUI,
                 "提示",
-                f"扫码登录成功！\n新Cookie为: {data['refresh_token']}\n已自动保存！",
+                f"扫码登录成功！\n新Cookie为: {sessdata}\n已自动保存！",
             )
 
         # 86038：二维码已失效
