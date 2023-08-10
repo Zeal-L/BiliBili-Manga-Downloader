@@ -16,13 +16,9 @@
 **由于作者某天实在是受不了B漫网页版的观看体验 ~~(时而混入漫画中的广告，无法便捷快速的放大图片，进度栏作死一样的反复横跳挡视线等等...)~~，再加上作者的仓鼠属性 😛**
 
 **因此 将将将~ 🎉 一个好用的哔哩哔哩漫画下载器就此诞生！**
-<div align=center>
-<img src="https://user-images.githubusercontent.com/72005386/222969436-a31d4d16-2d24-40ba-bb0b-06c883ba7406.png" width=90%>
-<img src="https://user-images.githubusercontent.com/72005386/222970947-25bad523-5fac-4a95-972e-2186b774f535.jpg" width=90%>
-</div>
 
 ## :sparkles: 主要功能 / 特性
-- **（~~白嫖~~）黑科技下载未解锁章节！**
+- **~~(白嫖)~~ 黑科技下载未解锁章节！**
 - **已打包成单个可执行文件，双击即用！**
 - **易操作的图形界面！~~(不用再费劲的部署环境跑命令行)~~**
 - **无需漫画ID，可直接关键词搜索漫画！并附带搜索词高亮！**
@@ -41,18 +37,34 @@
 - **一键清空用户数据，妈妈再也不用担心我删不干净软件了！~~(bushi)~~**
 - **多种主题选择**
 
+## 📸 相关截图
+**使用哔站解析**
+<div align=center>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/39f4e66f-50f1-410b-8761-971eeb9cf30e" width=80%>
+</div>
+
+**使用BiliPlus解析**
+<div align=center>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/4686f08b-2e88-4070-8d90-661c0a4392b6" width=80%>
+</div>
+
+**下载进度界面**
+<div align=center>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/9c99e3c8-4283-4b0d-a5cd-23dab08b78b6" width=80%>
+</div>
+
 ## 📝 使用指南
 - **本软件有两种下载解析方法：**
   - **B站解析**
     - 只能下载免费章节和用户已解锁的章节
     - **首先获得你的Cookie**
-      - B漫手机客户端扫码登入
-      - 手动获取Cookie:
+      - 方法一 - B漫手机客户端扫码登入
+      - 方法二 - 手动获取Cookie:
       1. 以谷歌浏览器为例，打开B漫首页并且登入
       2. 点击 `F12` 打开开发者工具
       3. 点击 `应用` 标签
-      4. 在边栏中找到 `Cookie` ，点击 `https://manga.bilibili.com` ，在右侧的详情中找到  `SESSDATA` ，复制 `值` 即可
-      5. 找到 `SESSDATA` 值，复制"内容"粘贴到程序设置选项中的 `我的Cookie` ，回车确认
+      4. 在边栏中找到 `Cookie` ，点击 `https://manga.bilibili.com`
+      5. 在右侧的详情中找到 `SESSDATA`，复制 `值` 粘贴到程序设置选项中的 `我的Cookie` ，回车确认
       6. 如果提示 `Cookie有效！` 那么就成功了！
       7. 否则请再次确认上述步骤，检查是否正确复制内容不含空格，还有疑问的话欢迎联系作者或提 `Issues`
   - **BiliPlus解析**
@@ -66,7 +78,7 @@
 - **值得注意的是：本软件不支持断点续传和下载任务缓存的功能 ~~(毕竟一章漫画太小了，好像也没什么必要，断了不如重下)~~，所以请确保不要在下载中途关闭！**
   - 如果程序意外中断，可以选择把下了一半的文件都删掉(一般在目标漫画文件夹的根目录下)，重新下载
 - **程序缓存和日志历史文件存在 `C:\Users\AppData\Roaming\BiliBili-Manga-Downloader\` 目录下，可以通过"清空用户数据"功能一键删除**
-- **如果想用"本地库存"功能，需要注意的是：下载好的漫画的文件夹名以及章节名都不能更改，否则将会无法正确读取漫画数据**
+- **如果想用"本地库存"功能，需要注意的是：下载好的漫画章节名以及保存的 `元数据.json` 都不能更改，否则将会无法正确读取漫画数据**
 - **🔥 下面我要隆重的推荐一款搭配本软件使用的漫画浏览器 ~~(可以说就是为了这点儿醋 我才包的这顿饺子)~~**
   - <div align=center><img src="https://user-images.githubusercontent.com/72005386/222974497-18b568e7-5b2e-416f-8d14-22ec68323570.png" width=100%></div>
   - **NeeView** 是一款 Windows 下开源的图片浏览器，其特色是可以像翻书一样同时浏览两张照片，还支持压缩包看图、鼠标手势、触摸操作、多线程和超前查看、支持 PDF / 视频。 原生支持中文
