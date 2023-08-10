@@ -667,15 +667,25 @@ class MangaUI(QObject):
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
 
             # ?###########################################################
+            # ? 初始化储存文件夹
+            save_path = self.epi_list[0].save_path
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+
+            # ?###########################################################
+            # ? 保存元数据
+            if not os.path.exists(os.path.join(save_path, "元数据.json")):
+                comic = Comic(self.present_comic_id, mainGUI)
+                self.save_meta(comic.getComicInfo())
+
+            # ?###########################################################
             # ? 开始下载选中章节
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for i in range(mainGUI.listWidget_chp_detail.count()):
                 item = mainGUI.listWidget_chp_detail.item(i)
                 if item.flags() != Qt.NoItemFlags and item.checkState() == Qt.Checked:
                     comic = Comic(self.present_comic_id, mainGUI)
-                    mainGUI.downloadUI.addTask(
-                        mainGUI, self.epi_list[i], comic.getComicInfo()
-                    )
+                    mainGUI.downloadUI.addTask(mainGUI, self.epi_list[i])
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
             mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
@@ -751,3 +761,33 @@ class MangaUI(QObject):
         elif resolve_type == "biliplus":
             mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
             mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
+
+    ############################################################
+
+    def save_meta(self, data: dict) -> None:
+        """保存元数据
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            data (dict): 漫画元数据
+
+        """
+
+        meta = {
+            "id": data["id"],
+            "title": data["title"],
+            "horizontal_cover": data["horizontal_cover"],
+            "square_cover": data["square_cover"],
+            "vertical_cover": data["vertical_cover"],
+            "author_name": data["author_name"],
+            "styles": data["styles"],
+            "evaluate": data["evaluate"],
+            "renewal_time": data["renewal_time"],
+            "hall_icon_text": data["hall_icon_text"],
+            "tags": [tag["name"] for tag in data["tags"]],
+        }
+
+        with open(
+            os.path.join(data["save_path"], "元数据.json"), "w", encoding="utf-8"
+        ) as f:
+            json.dump(meta, f, indent=4, ensure_ascii=False)

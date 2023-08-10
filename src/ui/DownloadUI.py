@@ -126,51 +126,12 @@ class DownloadUI(QObject):
         mainGUI.verticalLayout_finished.addWidget(widget)
 
     ############################################################
-
-    def save_meta(self, data: dict) -> None:
-        """保存元数据
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-            data (dict): 漫画元数据
-
-        """
-
-        meta = {
-            "id": data["id"],
-            "title": data["title"],
-            "horizontal_cover": data["horizontal_cover"],
-            "square_cover": data["square_cover"],
-            "vertical_cover": data["vertical_cover"],
-            "author_name": data["author_name"],
-            "styles": data["styles"],
-            "evaluate": data["evaluate"],
-            "renewal_time": data["renewal_time"],
-            "hall_icon_text": data["hall_icon_text"],
-            "tags": [tag["name"] for tag in data["tags"]],
-        }
-
-        with open(
-            os.path.join(data["save_path"], "元数据.json"), "w", encoding="utf-8"
-        ) as f:
-            json.dump(meta, f, indent=4, ensure_ascii=False)
-
-    ############################################################
-    def addTask(self, mainGUI: MainGUI, epi: Episode, data: dict) -> None:
+    def addTask(self, mainGUI: MainGUI, epi: Episode) -> None:
         """添加下载任务
 
         Args:
             epi (Episode): 漫画章节类实例
         """
-        # ?###########################################################
-        # ? 初始化储存文件夹
-        if not os.path.exists(epi.save_path):
-            os.makedirs(epi.save_path)
-
-        # ?###########################################################
-        # ? 保存元数据
-        if not os.path.exists(os.path.join(epi.save_path, "元数据.json")):
-            self.save_meta(data)
 
         # ?###########################################################
         # ? 创建任务
