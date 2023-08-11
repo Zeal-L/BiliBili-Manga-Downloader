@@ -1,18 +1,19 @@
 from __future__ import annotations
-import hashlib
 
-import typing
-import requests
 import ctypes
+import hashlib
 import logging
 import os
 import re
-from retrying import retry
-from PySide6.QtWidgets import QMessageBox
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
 import time
+import typing
 from logging.handlers import TimedRotatingFileHandler
+
+import requests
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QMessageBox
+from retrying import retry
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -84,7 +85,9 @@ def isCheckSumValid(etag, content) -> tuple[bool, str]:
     md5 = hashlib.md5(content).hexdigest()
     return etag == md5, md5
 
+
 ############################################################
+
 
 def openFolderAndSelectItems(path: str) -> None:
     """读取一个文件的父目录, 如果可能的话，选择该文件。
@@ -97,42 +100,7 @@ def openFolderAndSelectItems(path: str) -> None:
     """
     path = os.path.normpath(path)
     try:
-        # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
-        # CoInitialize 函数会初始化COM库，为当前线程分配资源。在调用CoInitialize之前，不能使用COM库，
-        # 如果调用了CoInitialize函数，就必须在使用完COM库之后调用CoUninitialize函数来反初始化COM库。
-        CoInitialize = ctypes.windll.ole32.CoInitialize
-        CoInitialize.argtypes = [ctypes.c_void_p]
-        CoInitialize.restype = ctypes.HRESULT
-        CoUninitialize = ctypes.windll.ole32.CoUninitialize
-        CoUninitialize.argtypes = []
-        CoUninitialize.restype = None
-
-        # ILCreateFromPathW 是一个 Windows API 函数，它可以根据给定的文件路径创建一个 Item ID List (PIDL)。
-        # PIDL 是一种 Windows Shell 中使用的数据结构，用来表示文件系统中的对象（文件夹或文件）的位置。
-        # 在这段代码中，使用了 ILCreateFromPath 函数来创建一个 PIDL，并在使用完之后使用 ILFree 函数来释放一个 PIDL 的内存.。这样可以避免内存泄漏
-        ILCreateFromPath = ctypes.windll.shell32.ILCreateFromPathW
-        ILCreateFromPath.argtypes = [ctypes.c_wchar_p]
-        ILCreateFromPath.restype = ctypes.c_void_p
-        ILFree = ctypes.windll.shell32.ILFree
-        ILFree.argtypes = [ctypes.c_void_p]
-        ILFree.restype = None
-
-        # SHOpenFolderAndSelectItems 函数是一个 Windows API 函数，它是在 COM (Component Object Model) 环境中使用的
-        SHOpenFolderAndSelectItems = ctypes.windll.shell32.SHOpenFolderAndSelectItems
-        SHOpenFolderAndSelectItems.argtypes = [
-            ctypes.c_void_p,
-            ctypes.c_uint,
-            ctypes.c_void_p,
-            ctypes.c_ulong,
-        ]
-        SHOpenFolderAndSelectItems.restype = ctypes.HRESULT
-
-        CoInitialize(None)
-        pidl = ILCreateFromPath(path)
-        SHOpenFolderAndSelectItems(pidl, 0, None, 0)
-        ILFree(pidl)
-        CoUninitialize()
-
+        __inner__openFolderAndSelectItems(path)
     except ValueError as e:
         logger.error(f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}")
     except TypeError as e:
@@ -145,6 +113,47 @@ def openFolderAndSelectItems(path: str) -> None:
         logger.error(f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
     except AttributeError as e:
         logger.error(f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+
+
+def __inner__openFolderAndSelectItems(path):
+    # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
+    # CoInitialize 函数会初始化COM库，为当前线程分配资源。在调用CoInitialize之前，不能使用COM库，
+    # 如果调用了CoInitialize函数，就必须在使用完COM库之后调用CoUninitialize函数来反初始化COM库。
+    CoInitialize = ctypes.windll.ole32.CoInitialize
+    CoInitialize.argtypes = [ctypes.c_void_p]
+    CoInitialize.restype = ctypes.HRESULT
+    CoUninitialize = ctypes.windll.ole32.CoUninitialize
+    CoUninitialize.argtypes = []
+    CoUninitialize.restype = None
+
+    # ILCreateFromPathW 是一个 Windows API 函数，它可以根据给定的文件路径创建一个 Item ID List (PIDL)。
+    # PIDL 是一种 Windows Shell 中使用的数据结构，用来表示文件系统中的对象（文件夹或文件）的位置。
+    # 在这段代码中，使用了 ILCreateFromPath 函数来创建一个 PIDL，并在使用完之后使用 ILFree 函数来释放一个 PIDL 的内存.。这样可以避免内存泄漏
+    ILCreateFromPath = ctypes.windll.shell32.ILCreateFromPathW
+    ILCreateFromPath.argtypes = [ctypes.c_wchar_p]
+    ILCreateFromPath.restype = ctypes.c_void_p
+    ILFree = ctypes.windll.shell32.ILFree
+    ILFree.argtypes = [ctypes.c_void_p]
+    ILFree.restype = None
+
+    # SHOpenFolderAndSelectItems 函数是一个 Windows API 函数，它是在 COM (Component Object Model) 环境中使用的
+    SHOpenFolderAndSelectItems = ctypes.windll.shell32.SHOpenFolderAndSelectItems
+    SHOpenFolderAndSelectItems.argtypes = [
+        ctypes.c_void_p,
+        ctypes.c_uint,
+        ctypes.c_void_p,
+        ctypes.c_ulong,
+    ]
+    SHOpenFolderAndSelectItems.restype = ctypes.HRESULT
+
+    CoInitialize(None)
+    pidl = ILCreateFromPath(path)
+    SHOpenFolderAndSelectItems(pidl, 0, None, 0)
+    ILFree(pidl)
+    CoUninitialize()
+
+
+############################################################
 
 
 class DownloadInfo:
@@ -339,14 +348,16 @@ class DownloadInfo:
         return "%02d:%02d:%02d" % (h, m, s)
 
 
-def check_new_version(mainGUI: MainGUI):
+def checkNewVersion(mainGUI: MainGUI):
     """检查新版本, 如果有新版本则弹出提示
 
     Args:
         mainGUI (MainGUI): 主窗口类实例
 
     """
-    url = "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
+    url = (
+        "https://api.github.com/repos/Zeal-L/BiliBili-Manga-Downloader/releases/latest"
+    )
 
     @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
     def _() -> dict:

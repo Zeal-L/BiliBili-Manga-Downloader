@@ -1,16 +1,16 @@
 from __future__ import annotations
+
 import io
 import time
-
 import typing
 
-import requests
 import qrcode
-from retrying import retry
+import requests
 from PySide6.QtCore import SignalInstance
 from PySide6.QtWidgets import QMessageBox
+from retrying import retry
 
-from src.utils import logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI

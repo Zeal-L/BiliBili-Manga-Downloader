@@ -1,18 +1,18 @@
 from __future__ import annotations
 
+import re
 import typing
 
 import requests
 from retrying import RetryError, retry
-import re
 
 from src.Episode import Episode
 from src.utils import (
-    logger,
     MAX_RETRY_SMALL,
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
     isCheckSumValid,
+    logger,
 )
 
 if typing.TYPE_CHECKING:

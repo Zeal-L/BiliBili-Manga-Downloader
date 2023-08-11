@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import os
 import json
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from re import sub
 from typing import TYPE_CHECKING
 
 from pypinyin import lazy_pinyin
-from PySide6.QtCore import QObject, QEvent, QPoint, QSize, Qt, QUrl, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -19,8 +19,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from src.Comic import Comic
 from src.BiliPlus import BiliPlusComic
+from src.Comic import Comic
 from src.searchComic import SearchComic
 from src.utils import logger
 
@@ -740,6 +740,7 @@ class MangaUI(QObject):
 
     ###########################################################
     def resolveEnable(self, mainGUI: MainGUI, resolve_type: str) -> None:
+        # sourcery skip: extract-duplicate-method, switch
         """根据解析状态对按钮进行允许和禁用状态的改变
 
         Args:

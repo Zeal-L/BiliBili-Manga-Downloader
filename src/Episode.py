@@ -6,7 +6,6 @@ import re
 import shutil
 import typing
 
-
 import piexif
 import requests
 from PIL import Image
@@ -24,8 +23,8 @@ from src.utils import (
     __app_name__,
     __copyright__,
     __version__,
-    logger,
     isCheckSumValid,
+    logger,
 )
 
 if typing.TYPE_CHECKING:

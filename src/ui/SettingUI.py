@@ -1,29 +1,28 @@
 from __future__ import annotations
 
 import os
-from functools import partial
 import threading
+from functools import partial
 from typing import TYPE_CHECKING
+from urllib.parse import parse_qs, quote, urlparse
 
-from PySide6.QtCore import QObject, Signal
-from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
-from PySide6.QtGui import QPixmap, QImage
-from urllib.parse import urlparse, parse_qs, quote
 import requests
+from PySide6.QtCore import QObject, Signal
+from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
 from retrying import retry
 
-
+from src.BiliQrCode import QrCode
 from src.ui.MyAboutUI import MyAboutUI
 from src.ui.QrCodeUI import QrCodeUI
 from src.utils import (
-    log_path,
-    logger,
     MAX_RETRY_SMALL,
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
-    check_new_version,
+    checkNewVersion,
+    log_path,
+    logger,
 )
-from src.BiliQrCode import QrCode
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -414,7 +413,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
         mainGUI.pushButton_check_update.clicked.connect(
-            partial(check_new_version, mainGUI)
+            partial(checkNewVersion, mainGUI)
         )
 
     ############################################################

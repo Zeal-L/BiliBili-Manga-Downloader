@@ -1,5 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
+
 from src.ui.PySide_src.myAbout_ui import Ui_My_about
 
 

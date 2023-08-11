@@ -3,15 +3,16 @@ import logging
 import os
 from typing import Any
 
-from src.ui.DownloadUI import DownloadUI
-from src.ui.MangaUI import MangaUI
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QCloseEvent, QFont
-from PySide6.QtWidgets import QMessageBox, QMainWindow
-from src.ui.SettingUI import SettingUI
-from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
+from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
-from src.utils import logger, __version__
+
+from src.ui.DownloadUI import DownloadUI
+from src.ui.MangaUI import MangaUI
+from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
+from src.ui.SettingUI import SettingUI
+from src.utils import __version__, logger
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):

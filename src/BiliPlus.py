@@ -3,12 +3,12 @@ from __future__ import annotations
 import typing
 
 import requests
-from retrying import retry
 from bs4 import BeautifulSoup
+from retrying import retry
 
 from src.Comic import Comic
 from src.Episode import Episode
-from src.utils import logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
 if typing.TYPE_CHECKING:
     from ui.MainGUI import MainGUI

@@ -40,17 +40,17 @@
 ## 📸 相关截图
 **使用哔站解析**
 <div align=center>
-<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/39f4e66f-50f1-410b-8761-971eeb9cf30e" width=80%>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/39f4e66f-50f1-410b-8761-971eeb9cf30e" width=90%>
 </div>
 
 **使用BiliPlus解析**
 <div align=center>
-<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/4686f08b-2e88-4070-8d90-661c0a4392b6" width=80%>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/4686f08b-2e88-4070-8d90-661c0a4392b6" width=90%>
 </div>
 
 **下载进度界面**
 <div align=center>
-<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/9c99e3c8-4283-4b0d-a5cd-23dab08b78b6" width=80%>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/9c99e3c8-4283-4b0d-a5cd-23dab08b78b6" width=90%>
 </div>
 
 ## 📝 使用指南
@@ -144,7 +144,8 @@
 - 新增功能:
   - 二维码登入
   - 利用 [biliplus](https://www.biliplus.com/) 提供的 [ComicWebReader](https://www.biliplus.com/manga/) 在线漫画平台的api来尝试获取未解锁的漫画章节
-- 优化配置: 移除保存文件夹名里的漫画ID信息；元数据现在默认保存，并且以此来初始化我的库存
+- 优化配置:
+  - 移除保存文件夹名里的漫画ID信息；元数据现在默认保存，并且以此来初始化我的库存
   - 老用户需要重新下载一章漫画，然后把以前下载好的移动到新文件夹中
 - 修复bug:
   - 修复个别`png`保存为`jpg`的情况
