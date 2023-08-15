@@ -138,7 +138,7 @@ class DownloadUI(QObject):
         self.all_tasks[task_id] = {
             "rate": 0,
             "future": self.executor.submit(
-                epi.download, mainGUI, self.signal_rate_progress, task_id
+                epi.download, self.signal_rate_progress, task_id
             ),
         }
 

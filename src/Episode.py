@@ -99,7 +99,7 @@ class Episode:
             self.epi_path = self.epi_path_7z
 
     ############################################################
-    def init_imgsList(self, mainGUI: MainGUI) -> bool:
+    def init_imgsList(self) -> bool:
         """初始化章节内所有图片的列表和图片的token
 
         Returns
@@ -137,7 +137,7 @@ class Episode:
         except requests.RequestException as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
@@ -176,7 +176,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}"
             )
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
@@ -185,19 +185,18 @@ class Episode:
 
     ############################################################
     def download(
-        self, mainGUI: MainGUI, signal_rate_progress: SignalInstance, taskID: str
+        self, signal_rate_progress: SignalInstance, taskID: str
     ) -> None:
         """下载章节内所有图片 并合并为PDF
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             rate_progress (SignalInstance): 信号槽，用于更新下载进度条
             taskID (str): 任务ID
         """
 
         # ?###########################################################
         # ? 初始化下载图片需要的参数
-        if not self.init_imgsList(mainGUI):
+        if not self.init_imgsList():
             signal_rate_progress.emit(
                 {
                     "taskID": taskID,
@@ -211,7 +210,7 @@ class Episode:
         for index, img in enumerate(self.imgs_token, start=1):
             img_url = f"{img['url']}?token={img['token']}"
 
-            img_path = self.downloadImg(mainGUI, index, img_url)
+            img_path = self.downloadImg(index, img_url)
             if img_path is None:
                 signal_rate_progress.emit(
                     {
@@ -219,7 +218,7 @@ class Episode:
                         "rate": -1,
                     }
                 )
-                self.clearAfterSave(mainGUI, imgs_path)
+                self.clearAfterSave(imgs_path)
                 return
 
             imgs_path.append(img_path)
@@ -235,20 +234,19 @@ class Episode:
         # ? 保存图片
 
         if self.save_method == "PDF":
-            self.saveToPDF(mainGUI, imgs_path)
+            self.saveToPDF(imgs_path)
         elif self.save_method == "文件夹-图片":
-            self.saveToFolder(mainGUI, imgs_path)
+            self.saveToFolder(imgs_path)
         elif self.save_method == "7z压缩包":
-            self.saveTo7z(mainGUI, imgs_path)
+            self.saveTo7z(imgs_path)
 
-        self.clearAfterSave(mainGUI, imgs_path)
+        self.clearAfterSave(imgs_path)
 
     ############################################################
-    def clearAfterSave(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
+    def clearAfterSave(self, imgs_path: list[str]) -> None:
         """删除临时图片, 偶尔会出现删除失败的情况，故给与重试5次
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             imgs_path (list): 临时图片路径列表
         """
 
@@ -273,16 +271,15 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}"
             )
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
     ############################################################
-    def saveToPDF(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
+    def saveToPDF(self, imgs_path: list[str]) -> None:
         """将图片保存为PDF文件
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             imgs_path (list): 临时图片路径列表
         """
 
@@ -326,16 +323,15 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
     ############################################################
-    def saveToFolder(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
+    def saveToFolder(self, imgs_path: list[str]) -> None:
         """将图片保存到文件夹
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             imgs_path (list): 临时图片路径列表
         """
 
@@ -392,20 +388,19 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
     ############################################################
-    def saveTo7z(self, mainGUI: MainGUI, imgs_path: list[str]) -> None:
+    def saveTo7z(self, imgs_path: list[str]) -> None:
         """将图片保存到7z压缩文件
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             imgs_path (list): 临时图片路径列表
         """
 
-        self.saveToFolder(mainGUI, imgs_path)
+        self.saveToFolder(imgs_path)
 
         @retry(stop_max_attempt_number=5)
         def _():
@@ -430,16 +425,15 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到7z多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到7z多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
     ############################################################
-    def downloadImg(self, mainGUI: MainGUI, index: int, img_url: str) -> str:
+    def downloadImg(self, index: int, img_url: str) -> str:
         """根据 url 和 token 下载图片
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             index (int): 章节中图片的序号
             img_url (str): 图片的合法 url
 
@@ -480,7 +474,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 重复下载图片多次后失败!\n{e}"
             )
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复下载图片多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
@@ -508,7 +502,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 保存图片多次后失败!\n{e}"
             )
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} - {index} - 保存图片多次后失败!\n已暂时跳过此章节, 并删除所有缓存文件！\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
