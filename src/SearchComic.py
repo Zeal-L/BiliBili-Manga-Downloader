@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING
 
 import requests
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
-from src.utils import logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
+from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 

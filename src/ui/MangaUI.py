@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import os
 import json
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from re import sub
 from typing import TYPE_CHECKING
 
 from pypinyin import lazy_pinyin
-from PySide6.QtCore import QObject, QEvent, QPoint, QSize, Qt, QUrl, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -19,10 +19,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from src.Comic import Comic
 from src.BiliPlus import BiliPlusComic
-from src.searchComic import SearchComic
-from src.utils import logger
+from src.Comic import Comic
+from src.SearchComic import SearchComic
+from src.Utils import logger
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -33,16 +33,16 @@ class MangaUI(QObject):
 
     # ?###########################################################
     # ? 用于多线程更新我的库存
-    my_library_add_widget = Signal(dict)
+    signal_my_library_add_widget = Signal(dict)
 
     # ? 用于多线程更新漫画详情
-    my_comic_detail_widget = Signal(dict)
+    signal_my_comic_detail_widget = Signal(dict)
 
     # ? 用于多线程更新封面图
-    my_cover_update_widget = Signal(dict)
+    signal_my_cover_update_widget = Signal(dict)
 
     # ? 用于多线程刷新漫画章节列表
-    my_comic_list_widget = Signal(dict)
+    signal_my_comic_list_widget = Signal(dict)
 
     def __init__(self, mainGUI: MainGUI):
         super().__init__()
@@ -132,15 +132,15 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 漫画封面图更新触发函数绑定
-        self.my_cover_update_widget.connect(self.updateComicCover)
+        self.signal_my_cover_update_widget.connect(self.updateComicCover)
 
         # ?###########################################################
         # ? 漫画解析触发函数绑定
-        self.my_comic_detail_widget.connect(self.updateComicInfo)
+        self.signal_my_comic_detail_widget.connect(self.updateComicInfo)
 
         # ?###########################################################
         # ? 漫画章节列表更新触发函数绑定
-        self.my_comic_list_widget.connect(self.updateComicList)
+        self.signal_my_comic_list_widget.connect(self.updateComicList)
 
     ############################################################
     def init_myLibrary(self, mainGUI: MainGUI) -> None:
@@ -151,7 +151,7 @@ class MangaUI(QObject):
         """
         # 布局对齐
         mainGUI.v_Layout_myLibrary.setAlignment(Qt.AlignTop)
-        self.my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
+        self.signal_my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
         if mainGUI.getConfig("cookie"):
             self.updateMyLibrary(mainGUI)
 
@@ -224,7 +224,7 @@ class MangaUI(QObject):
             future.result() for future in as_completed(futures) if future.result()
         ]:
             temp = "".join(my_library[i]["comic_name"] + "\n" for i in fail_comic)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
@@ -257,7 +257,7 @@ class MangaUI(QObject):
             "comic_path": comic_path,
         }
 
-        self.my_library_add_widget.emit(info)
+        self.signal_my_library_add_widget.emit(info)
         return None
 
     ############################################################
@@ -369,10 +369,10 @@ class MangaUI(QObject):
             resolve_type (str): 更新的解析类型
 
         """
-        mainGUI.resolve_status.emit("正在解析漫画详情...")
+        mainGUI.signal_resolve_status.emit("正在解析漫画详情...")
         data = comic.getComicInfo()
-        mainGUI.resolve_status.emit("解析漫画详情完毕")
-        self.my_comic_detail_widget.emit(
+        mainGUI.signal_resolve_status.emit("解析漫画详情完毕")
+        self.signal_my_comic_detail_widget.emit(
             {
                 "mainGUI": mainGUI,
                 "comic": comic,
@@ -397,7 +397,7 @@ class MangaUI(QObject):
         self.present_comic_id = comic.comic_id
         # ? 获取漫画信息失败直接跳过
         if not data:
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return
@@ -452,7 +452,7 @@ class MangaUI(QObject):
 
         """
         img_byte = comic.getComicCover(data)
-        self.my_cover_update_widget.emit(
+        self.signal_my_cover_update_widget.emit(
             {
                 "mainGUI": mainGUI,
                 "img_byte": img_byte,
@@ -499,13 +499,13 @@ class MangaUI(QObject):
             comic (Comic): 获取的漫画实例
 
         """
-        mainGUI.resolve_status.emit("正在解析漫画章节...")
+        mainGUI.signal_resolve_status.emit("正在解析漫画章节...")
         self.num_selected = 0
         num_unlocked = 0
         if comic:
             self.epi_list = comic.getEpisodesInfo()
-        mainGUI.resolve_status.emit("解析漫画章节完毕")
-        self.my_comic_list_widget.emit(
+        mainGUI.signal_resolve_status.emit("解析漫画章节完毕")
+        self.signal_my_comic_list_widget.emit(
             {
                 "mainGUI": mainGUI,
                 "comic": comic,
@@ -555,7 +555,7 @@ class MangaUI(QObject):
         )
         mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
         self.resolveEnable(mainGUI, resolve_type)
-        mainGUI.resolve_status.emit("")
+        mainGUI.signal_resolve_status.emit("")
 
     ############################################################
     def init_episodesDetails(self, mainGUI: MainGUI) -> None:
@@ -740,6 +740,7 @@ class MangaUI(QObject):
 
     ###########################################################
     def resolveEnable(self, mainGUI: MainGUI, resolve_type: str) -> None:
+        # sourcery skip: extract-duplicate-method, switch
         """根据解析状态对按钮进行允许和禁用状态的改变
 
         Args:

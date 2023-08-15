@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING
 
@@ -9,7 +7,7 @@ from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QWidget
 
 from src.Episode import Episode
-from src.utils import DownloadInfo, openFolderAndSelectItems
+from src.Utils import DownloadInfo, openFolderAndSelectItems
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -20,7 +18,7 @@ class DownloadUI(QObject):
 
     # ?###########################################################
     # ? 信号槽，用于更新下载进度条
-    rate_progress = Signal(dict)
+    signal_rate_progress = Signal(dict)
 
     def __init__(self, mainGUI: MainGUI):
         super().__init__()
@@ -87,7 +85,7 @@ class DownloadUI(QObject):
                 mainGUI.label_total_progress_speed.setText("总下载速度:")
                 mainGUI.label_total_progress_time.setText("剩余时间：")
 
-        self.rate_progress.connect(_)
+        self.signal_rate_progress.connect(_)
 
         # ?###########################################################
         # ? 绑定清空已完成列表按钮
@@ -140,7 +138,7 @@ class DownloadUI(QObject):
         self.all_tasks[task_id] = {
             "rate": 0,
             "future": self.executor.submit(
-                epi.download, mainGUI, self.rate_progress, task_id
+                epi.download, mainGUI, self.signal_rate_progress, task_id
             ),
         }
 

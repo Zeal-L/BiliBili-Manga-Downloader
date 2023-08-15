@@ -4,8 +4,7 @@ import json
 import os
 import re
 import shutil
-import typing
-
+from typing import TYPE_CHECKING
 
 import piexif
 import requests
@@ -15,7 +14,7 @@ from PyPDF2 import PdfReader, PdfWriter
 from PySide6.QtCore import SignalInstance
 from retrying import retry
 
-from src.utils import (
+from src.Utils import (
     MAX_RETRY_LARGE,
     MAX_RETRY_SMALL,
     RETRY_WAIT_EX,
@@ -24,11 +23,11 @@ from src.utils import (
     __app_name__,
     __copyright__,
     __version__,
-    logger,
     isCheckSumValid,
+    logger,
 )
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 
@@ -138,7 +137,7 @@ class Episode:
         except requests.RequestException as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}")
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
@@ -177,7 +176,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}"
             )
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
@@ -186,7 +185,7 @@ class Episode:
 
     ############################################################
     def download(
-        self, mainGUI: MainGUI, rate_progress: SignalInstance, taskID: str
+        self, mainGUI: MainGUI, signal_rate_progress: SignalInstance, taskID: str
     ) -> None:
         """下载章节内所有图片 并合并为PDF
 
@@ -199,7 +198,7 @@ class Episode:
         # ?###########################################################
         # ? 初始化下载图片需要的参数
         if not self.init_imgsList(mainGUI):
-            rate_progress.emit(
+            signal_rate_progress.emit(
                 {
                     "taskID": taskID,
                     "rate": -1,
@@ -214,7 +213,7 @@ class Episode:
 
             img_path = self.downloadImg(mainGUI, index, img_url)
             if img_path is None:
-                rate_progress.emit(
+                signal_rate_progress.emit(
                     {
                         "taskID": taskID,
                         "rate": -1,
@@ -224,7 +223,7 @@ class Episode:
                 return
 
             imgs_path.append(img_path)
-            rate_progress.emit(
+            signal_rate_progress.emit(
                 {
                     "taskID": taskID,
                     "rate": int((index / len(self.imgs_token)) * 100),
@@ -274,7 +273,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}"
             )
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -327,7 +326,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -393,7 +392,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -431,7 +430,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到7z多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到7z多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -481,7 +480,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 重复下载图片多次后失败!\n{e}"
             )
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复下载图片多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
@@ -509,7 +508,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 保存图片多次后失败!\n{e}"
             )
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} - {index} - 保存图片多次后失败!\n已暂时跳过此章节, 并删除所有缓存文件！\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
