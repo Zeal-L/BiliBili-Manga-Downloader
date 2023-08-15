@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing
+from typing import TYPE_CHECKING
 
 import requests
 from bs4 import BeautifulSoup
@@ -8,9 +8,9 @@ from retrying import retry
 
 from src.Comic import Comic
 from src.Episode import Episode
-from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
+from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 
@@ -81,7 +81,7 @@ class BiliPlusComic(Comic):
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if "未登录" in res.text:
-                mainGUI.message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
+                mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
                 return
             if res.status_code != 200:
                 logger.warning(
@@ -110,7 +110,7 @@ class BiliPlusComic(Comic):
                 total_ep = total_ep_element.contents[0].split("/")[1]
                 total_pages = int(int(total_ep) / 200) + 1
                 for pages in range(2, total_pages + 1):
-                    mainGUI.resolve_status.emit(f"正在解析漫画章节({pages}/{total_pages})...")
+                    mainGUI.signal_resolve_status.emit(f"正在解析漫画章节({pages}/{total_pages})...")
                     page_html = _(f"{biliplus_detail_url}&page={pages}")
                     document = BeautifulSoup(page_html, "html.parser")
                     ep_items = document.find_all("div", {"class": "episode-item"})
@@ -123,7 +123,7 @@ class BiliPlusComic(Comic):
         except Exception as e:
             logger.error(f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n{e}")
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -186,7 +186,7 @@ class BiliPlusEpisode(Episode):
                 f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!，跳过!\n{e}"
             )
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
@@ -206,7 +206,7 @@ class BiliPlusEpisode(Episode):
                 logger.error(
                     f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因Cookie有误导致失败!"
                 )
-                mainGUI.message_box.emit(
+                mainGUI.signal_message_box.emit(
                     f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因Cookie有误导致失败!"
                 )
                 return False
@@ -215,7 +215,7 @@ class BiliPlusEpisode(Episode):
                 f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}"
             )
             logger.exception(e)
-            mainGUI.message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False

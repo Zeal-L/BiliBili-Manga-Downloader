@@ -12,7 +12,7 @@ from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
 from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.utils import __version__, logger
+from src.Utils import __version__, logger
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
@@ -20,10 +20,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
     # ? 主要是为了 Episode 类里面的提示框准备的，
     # ? 因为 Episode 类是在另一个线程里面运行的，而只有主线程才能修改 GUI
-    message_box = Signal(str)
+    signal_message_box = Signal(str)
 
     # ? 用于多线程报告程序详情
-    resolve_status = Signal(str)
+    signal_resolve_status = Signal(str)
 
     def __init__(self, app):
         super().__init__()
@@ -31,8 +31,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
-        self.message_box.connect(lambda msg: QMessageBox.warning(None, "警告", msg))
-        self.resolve_status.connect(
+        self.signal_message_box.connect(lambda msg: QMessageBox.warning(None, "警告", msg))
+        self.signal_resolve_status.connect(
             lambda status: self.label_resolve_status.setText(status)
         )
 

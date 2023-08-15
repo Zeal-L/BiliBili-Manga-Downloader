@@ -6,8 +6,8 @@ import logging
 import os
 import re
 import time
-import typing
 from logging.handlers import TimedRotatingFileHandler
+from typing import TYPE_CHECKING
 
 import requests
 from PySide6.QtCore import Qt
@@ -15,7 +15,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"

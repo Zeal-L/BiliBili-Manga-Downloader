@@ -15,7 +15,7 @@ from retrying import retry
 from src.BiliQrCode import QrCode
 from src.ui.MyAboutUI import MyAboutUI
 from src.ui.QrCodeUI import QrCodeUI
-from src.utils import (
+from src.Utils import (
     MAX_RETRY_SMALL,
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
@@ -33,7 +33,7 @@ class SettingUI(QObject):
 
     # ?###########################################################
     # ? 用于多线程更新我的库存
-    qr_res = Signal(dict)
+    signal_qr_res = Signal(dict)
 
     def __init__(self, mainGUI: MainGUI):
         super().__init__()
@@ -109,14 +109,14 @@ class SettingUI(QObject):
             # 开一个线程去检测二维码是否扫描成功
             thread = threading.Thread(
                 target=qr.get_cookie,
-                args=(self.qr_res,),
+                args=(self.signal_qr_res,),
             )
             thread.start()
 
             # 如果用户把二维码窗口关了，就把线程也关了
             self.qr_ui.closeEvent = lambda _: setattr(qr, "close_flag", True)
 
-        self.qr_res.connect(self.qrCodeCallBack)
+        self.signal_qr_res.connect(self.qrCodeCallBack)
         mainGUI.pushButton_qrcode.clicked.connect(partial(_))
 
     ############################################################

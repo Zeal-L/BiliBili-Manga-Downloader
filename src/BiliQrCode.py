@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import io
 import time
-import typing
+from typing import TYPE_CHECKING
 
 import qrcode
 import requests
@@ -10,9 +10,9 @@ from PySide6.QtCore import SignalInstance
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
-from src.utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
+from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 
@@ -50,6 +50,8 @@ class QrCode:
                 )
                 raise requests.HTTPError()
             return res.json()["data"]
+
+        logger.info("正在获取登入二维码...")
 
         try:
             data = _()

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import re
-import typing
+from typing import TYPE_CHECKING
 
 import requests
 from retrying import RetryError, retry
 
 from src.Episode import Episode
-from src.utils import (
+from src.Utils import (
     MAX_RETRY_SMALL,
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
@@ -15,7 +15,7 @@ from src.utils import (
     logger,
 )
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 
@@ -128,7 +128,7 @@ class Comic:
             return img
         except RetryError as e:
             logger.error(f"获取封面图片多次后失败，跳过!\n{e}")
-            self.mainGUI.message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"获取封面图片多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return open(":/imgs/fail_img.jpg")
