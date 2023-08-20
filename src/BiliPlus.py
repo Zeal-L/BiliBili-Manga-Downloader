@@ -25,7 +25,6 @@ class BiliPlusComic(Comic):
         super().__init__(comic_id, mainGUI)
         self.access_key = mainGUI.getConfig("biliplus_cookie")
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "cookie": f"manga_pic_format=jpg-full;login=2;access_key={self.access_key}",
         }
 

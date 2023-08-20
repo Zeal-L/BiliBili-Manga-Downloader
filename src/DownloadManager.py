@@ -27,7 +27,7 @@ class DownloadManager:
         self.signal_message_box = signal_message_box
 
         self.all_tasks = {}
-        self.avg_speed_in_last_five_sec = {}
+        self.avg_speed_in_last_three_sec = {}
 
     ############################################################
 
@@ -78,6 +78,10 @@ class DownloadManager:
 
     def getTotalRate(self) -> float:
         """获取所有任务的平均下载进度"""
+
+        if len(self.all_tasks) == 0:
+            return 100.0
+
         return (
             sum(task["curr_rate"] for task in self.all_tasks.values())
             / len(self.all_tasks)
@@ -92,19 +96,19 @@ class DownloadManager:
         Returns:
             float: 平均下载速度
         """
-        self.avg_speed_in_last_five_sec[time.perf_counter()] = sum(
+        self.avg_speed_in_last_three_sec[time.perf_counter()] = sum(
             task["curr_speed"] for task in self.all_tasks.values()
         )
 
-        # 取5秒内的平均速度，以防止速度突然变化
+        # 取3秒内的平均速度，以防止速度突然变化
         # 比如下载完一个文件 速度突然变为0
         # 或者开始一组新的下载，速度突然变为很大
-        for key in list(self.avg_speed_in_last_five_sec.keys()):
-            if key < time.perf_counter() - 5:
-                self.avg_speed_in_last_five_sec.pop(key)
+        for key in list(self.avg_speed_in_last_three_sec.keys()):
+            if key < time.perf_counter() - 3:
+                self.avg_speed_in_last_three_sec.pop(key)
 
-        return sum(self.avg_speed_in_last_five_sec.values()) / len(
-            self.avg_speed_in_last_five_sec
+        return sum(self.avg_speed_in_last_three_sec.values()) / len(
+            self.avg_speed_in_last_three_sec
         )
 
     ############################################################
@@ -167,6 +171,7 @@ class DownloadManager:
                     "rate": int(rate * 100),
                 }
             )
+        self.clearAfterFinish(curr_id)
 
         # ?###########################################################
         # ? 保存图片
@@ -180,7 +185,6 @@ class DownloadManager:
 
         epi.clearAfterSave(imgs_path)
 
-        self.clearAfterFinish(curr_id)
 
     ############################################################
 
