@@ -1,3 +1,7 @@
+"""
+该模块包含漫画章节类，用于管理漫画章节的详细信息
+"""
+
 from __future__ import annotations
 
 import json
@@ -11,7 +15,6 @@ import requests
 from PIL import Image
 from py7zr import SevenZipFile
 from PyPDF2 import PdfReader, PdfWriter
-from PySide6.QtCore import SignalInstance
 from retrying import retry
 
 from src.Utils import (
@@ -138,7 +141,10 @@ class Episode:
             logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}")
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
-                f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n"
+                f"已暂时跳过此章节!\n"
+                f"请检查网络连接或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
 
@@ -177,73 +183,16 @@ class Episode:
             )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
-                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n"
+                f"已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
 
         return True
 
     ############################################################
-    def download(
-        self, signal_rate_progress: SignalInstance, taskID: str
-    ) -> None:
-        """下载章节内所有图片 并合并为PDF
 
-        Args:
-            rate_progress (SignalInstance): 信号槽，用于更新下载进度条
-            taskID (str): 任务ID
-        """
-
-        # ?###########################################################
-        # ? 初始化下载图片需要的参数
-        if not self.init_imgsList():
-            signal_rate_progress.emit(
-                {
-                    "taskID": taskID,
-                    "rate": -1,
-                }
-            )
-            return
-
-        # ?###########################################################
-        # ? 下载所有图片
-        imgs_path = []
-        for index, img in enumerate(self.imgs_token, start=1):
-            img_url = f"{img['url']}?token={img['token']}"
-
-            img_path = self.downloadImg(index, img_url)
-            if img_path is None:
-                signal_rate_progress.emit(
-                    {
-                        "taskID": taskID,
-                        "rate": -1,
-                    }
-                )
-                self.clearAfterSave(imgs_path)
-                return
-
-            imgs_path.append(img_path)
-            signal_rate_progress.emit(
-                {
-                    "taskID": taskID,
-                    "rate": int((index / len(self.imgs_token)) * 100),
-                    "path": self.epi_path,
-                }
-            )
-
-        # ?###########################################################
-        # ? 保存图片
-
-        if self.save_method == "PDF":
-            self.saveToPDF(imgs_path)
-        elif self.save_method == "文件夹-图片":
-            self.saveToFolder(imgs_path)
-        elif self.save_method == "7z压缩包":
-            self.saveTo7z(imgs_path)
-
-        self.clearAfterSave(imgs_path)
-
-    ############################################################
     def clearAfterSave(self, imgs_path: list[str]) -> None:
         """删除临时图片, 偶尔会出现删除失败的情况，故给与重试5次
 
@@ -339,9 +288,9 @@ class Episode:
         @retry(stop_max_attempt_number=5)
         def _():
             try:
-                for index, path in enumerate(imgs_path, start=1):
+                for index, img_path in enumerate(imgs_path, start=1):
 
-                    def jpg_exif():
+                    def jpg_exif(img_path: str):
                         # 在jpg文件属性中记录章节标题作者和软件版本以及版权信息
                         exif_data = {
                             "0th": {
@@ -356,21 +305,21 @@ class Episode:
                             }
                         }
                         exif_bytes = piexif.dump(exif_data)
-                        piexif.insert(exif_bytes, path)
+                        piexif.insert(exif_bytes, img_path)
 
-                    img_format = path.split(".")[-1]
+                    img_format = img_path.split(".")[-1]
 
                     # 将 exif 数据插入到图像文件中, 如果插入失败则跳过
                     try:
                         if img_format == "jpg":
-                            jpg_exif()
+                            jpg_exif(img_path)
                     except piexif.InvalidImageDataError as e:
-                        logger.warning(f"Failed to insert exif data for {path}: {e}")
+                        logger.warning(f"Failed to insert exif data for {img_path}: {e}")
                         logger.exception(e)
 
                     # 复制图片到文件夹
                     shutil.copy2(
-                        path,
+                        img_path,
                         os.path.join(
                             self.epi_path_folder, f"{str(index).zfill(3)}.{img_format}"
                         ),
@@ -457,13 +406,15 @@ class Episode:
                 raise e
             if res.status_code != 200:
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 获取图片 header 失败! "
+                    f"状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
             isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
             if not isValid:
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5}"
+                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
+                    f"\t{res.headers['Etag']} ≠ {md5}"
                 )
                 raise requests.HTTPError()
             return res.content
@@ -504,7 +455,10 @@ class Episode:
             )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
-                f"《{self.comic_name}》章节：{self.title} - {index} - 保存图片多次后失败!\n已暂时跳过此章节, 并删除所有缓存文件！\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+                f"《{self.comic_name}》章节：{self.title} - {index} - 保存图片多次后失败!\n"
+                f"已暂时跳过此章节, 并删除所有缓存文件！\n"
+                f"请重新尝试或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
 
