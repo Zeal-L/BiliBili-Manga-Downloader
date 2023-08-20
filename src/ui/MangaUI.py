@@ -1,3 +1,7 @@
+"""
+漫画UI类，用于搜索、下载、管理漫画
+"""
+
 from __future__ import annotations
 
 import json
@@ -54,6 +58,8 @@ class MangaUI(QObject):
         self.init_mangaDetails(mainGUI)
         self.init_myLibrary(mainGUI)
         self.init_episodesDetails(mainGUI)
+        self.init_episodesDownloadSelected(mainGUI)
+        self.init_episodesResolve(mainGUI)
         self.executor = ThreadPoolExecutor()
 
     ############################################################
@@ -215,9 +221,9 @@ class MangaUI(QObject):
                     self.updateMyLibrarySingle,
                     mainGUI,
                     comic_id,
-                    my_library[comic_id]["comic_path"],
+                    comic_info["comic_path"],
                 )
-                for comic_id in my_library
+                for comic_id, comic_info in my_library.items()
             )
 
         if fail_comic := [
@@ -558,6 +564,27 @@ class MangaUI(QObject):
         mainGUI.signal_resolve_status.emit("")
 
     ############################################################
+
+    def checkbox_change_callBack(self, mainGUI: MainGUI, item: QListWidgetItem) -> None:
+        """章节详情界面的多选框状态改变时的回调函数
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            item (QListWidgetItem): 被点击的item
+        """
+        # 暂停itemChanged 信号，防止死循环
+        mainGUI.listWidget_chp_detail.itemChanged.disconnect()
+        if item.flags() == Qt.NoItemFlags:
+            return
+        if item.checkState() == Qt.Checked:
+            self.num_selected += 1
+        elif item.checkState() == Qt.Unchecked:
+            self.num_selected -= 1
+        mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+        mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+
+    ############################################################
+
     def init_episodesDetails(self, mainGUI: MainGUI) -> None:
         """绑定章节界面的多选以及右键菜单事件
 
@@ -569,19 +596,7 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 绑定鼠标点击选择信号
-        def checkbox_change(item: QListWidgetItem) -> None:
-            # 暂停itemChanged 信号，防止死循环
-            mainGUI.listWidget_chp_detail.itemChanged.disconnect()
-            if item.flags() == Qt.NoItemFlags:
-                return
-            if item.checkState() == Qt.Checked:
-                self.num_selected += 1
-            elif item.checkState() == Qt.Unchecked:
-                self.num_selected -= 1
-            mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
-
-        mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+        mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def _(item: QListWidgetItem) -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -594,7 +609,7 @@ class MangaUI(QObject):
                 item.setCheckState(Qt.Checked)
                 self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         mainGUI.listWidget_chp_detail.itemPressed.connect(_)
 
@@ -608,7 +623,7 @@ class MangaUI(QObject):
                     item.setCheckState(Qt.Checked)
                     self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def uncheckSelected() -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -617,7 +632,7 @@ class MangaUI(QObject):
                     item.setCheckState(Qt.Unchecked)
                     self.num_selected -= 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def checkAll() -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -627,7 +642,7 @@ class MangaUI(QObject):
                     mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.Checked)
                     self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def uncheckAll() -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -636,7 +651,7 @@ class MangaUI(QObject):
                 if mainGUI.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags:
                     mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.Unchecked)
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def myMenu(pos: QPoint) -> None:
             menu = QMenu()
@@ -648,6 +663,55 @@ class MangaUI(QObject):
 
         mainGUI.listWidget_chp_detail.setContextMenuPolicy(Qt.CustomContextMenu)
         mainGUI.listWidget_chp_detail.customContextMenuRequested.connect(myMenu)
+
+
+    ############################################################
+
+    def init_episodesResolve(self, mainGUI: MainGUI) -> None:
+        """绑定章节界面的解析按钮事件
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
+
+        # ?###########################################################
+        # ? 绑定B站解析按钮事件
+        def _() -> None:
+            if self.present_comic_id == 0:
+                QMessageBox.critical(mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
+                return
+            if not mainGUI.getConfig("cookie"):
+                QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+                return
+            self.resolveEnable(mainGUI, "resolving")
+            comic = Comic(self.present_comic_id, mainGUI)
+            self.updateComicInfoEvent(mainGUI, comic, "bilibili")
+
+        mainGUI.pushButton_resolve_detail.clicked.connect(_)
+
+        # ?###########################################################
+        # ? 绑定BiliPlus解析按钮事件
+        def _() -> None:
+            if self.present_comic_id == 0:
+                QMessageBox.critical(mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
+                return
+            if not mainGUI.getConfig("biliplus_cookie"):
+                QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
+                return
+            self.resolveEnable(mainGUI, "resolving")
+            comic = BiliPlusComic(self.present_comic_id, mainGUI)
+            self.updateComicInfoEvent(mainGUI, comic, "biliplus")
+
+        mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
+
+    ############################################################
+
+    def init_episodesDownloadSelected(self, mainGUI: MainGUI) -> None:
+        """初始化章节详情界面的下载选中章节按钮事件
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+        """
 
         # ?###########################################################
         # ? 绑定下载选中章节事件
@@ -688,7 +752,7 @@ class MangaUI(QObject):
                     mainGUI.downloadUI.addTask(mainGUI, self.epi_list[i])
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
-            mainGUI.listWidget_chp_detail.itemChanged.connect(checkbox_change)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
             # ?###########################################################
             # ? 更新我的库存界面信息 也就是v_Layout_myLibrary里的章节数量信息
@@ -708,37 +772,8 @@ class MangaUI(QObject):
         mainGUI.pushButton_chp_detail_download_selected.clicked.connect(_)
         mainGUI.pushButton_biliplus_detail_download_selected.clicked.connect(_)
 
-        # ?###########################################################
-        # ? 绑定B站解析按钮事件
-        def _() -> None:
-            if self.present_comic_id == 0:
-                QMessageBox.critical(mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
-                return
-            if not mainGUI.getConfig("cookie"):
-                QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
-                return
-            self.resolveEnable(mainGUI, "resolving")
-            comic = Comic(self.present_comic_id, mainGUI)
-            self.updateComicInfoEvent(mainGUI, comic, "bilibili")
-
-        mainGUI.pushButton_resolve_detail.clicked.connect(_)
-
-        # ?###########################################################
-        # ? 绑定BiliPlus解析按钮事件
-        def _() -> None:
-            if self.present_comic_id == 0:
-                QMessageBox.critical(mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
-                return
-            if not mainGUI.getConfig("biliplus_cookie"):
-                QMessageBox.critical(mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
-                return
-            self.resolveEnable(mainGUI, "resolving")
-            comic = BiliPlusComic(self.present_comic_id, mainGUI)
-            self.updateComicInfoEvent(mainGUI, comic, "biliplus")
-
-        mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
-
     ###########################################################
+
     def resolveEnable(self, mainGUI: MainGUI, resolve_type: str) -> None:
         # sourcery skip: extract-duplicate-method, switch
         """根据解析状态对按钮进行允许和禁用状态的改变

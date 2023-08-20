@@ -1,3 +1,7 @@
+"""
+该模块包含QrCodeUI类，它是一个用于显示QR码的窗口
+"""
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 

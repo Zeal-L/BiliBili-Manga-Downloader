@@ -1,3 +1,7 @@
+"""
+该模块包含了关于窗口类MyAboutUI的定义，用于显示关于窗口
+"""
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 

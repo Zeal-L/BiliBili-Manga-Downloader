@@ -1,3 +1,7 @@
+"""
+该模块包含了一些工具函数和类，用于支持BiliBili漫画下载器的其他模块
+"""
+
 from __future__ import annotations
 
 import ctypes
@@ -291,14 +295,16 @@ class DownloadInfo:
         """
         if speed < 0:
             return "0B/s"
-        elif speed < 1024:
-            return "%dB/s" % speed
-        elif speed < 1024 * 1024:
-            return "%.2fKB/s" % (speed / 1024)
-        elif speed < 1024 * 1024 * 1024:
-            return "%.2fMB/s" % (speed / 1024 / 1024)
-        else:
-            return "%.2fGB/s" % (speed / 1024 / 1024 / 1024)
+        if speed < 1024:
+            return f"{speed:.0f}B/s"
+        if speed < 1024 * 1024:
+            return f"{speed / 1024:.2f}KB/s"
+        if speed < 1024 * 1024 * 1024:
+            return f"{speed / 1024 / 1024:.2f}MB/s"
+        if speed < 1024 * 1024 * 1024 * 1024:
+            return f"{speed / 1024 / 1024 / 1024:.2f}GB/s"
+
+        return f"{speed / 1024 / 1024 / 1024 / 1024:.2f}TB/s"
 
     ############################################################
     def getRemainingTimeStr(self, task_id: int) -> str | None:
@@ -344,8 +350,8 @@ class DownloadInfo:
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         if h > 24:
-            return "%d天 %02d:%02d:%02d" % (h // 24, h % 24, m, s)
-        return "%02d:%02d:%02d" % (h, m, s)
+            return f"{h // 24}天 {h % 24:02}:{m:02}:{s:02}"
+        return f"{h:02}:{m:02}:{s:02}"
 
 
 def checkNewVersion(mainGUI: MainGUI):

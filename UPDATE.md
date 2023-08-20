@@ -3,7 +3,7 @@
 ### **[v1.3.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.3.0)** - *2022-08-11*
 - 新增功能:
   - 二维码登入
-  - 利用 [biliplus](https://www.biliplus.com/) 提供的 [ComicWebReader](https://www.biliplus.com/manga/) 在线漫画平台的api来尝试获取未解锁的漫画章节
+  - 利用 [Biliplus](https://www.biliplus.com/) 提供的 [ComicWebReader](https://www.biliplus.com/manga/) 在线漫画平台的api来尝试获取未解锁的漫画章节
 - 优化配置:
   - 移除保存文件夹名里的漫画ID信息；元数据现在默认保存，并且以此来初始化我的库存
   - 老用户需要重新下载一章漫画，然后把以前下载好的移动到新文件夹中

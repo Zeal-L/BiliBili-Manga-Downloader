@@ -1,3 +1,7 @@
+"""
+该模块包含了单本漫画的综合信息类Comic，以及与Comic相关的函数
+"""
+
 from __future__ import annotations
 
 import re
@@ -129,9 +133,11 @@ class Comic:
         except RetryError as e:
             logger.error(f"获取封面图片多次后失败，跳过!\n{e}")
             self.mainGUI.signal_message_box.emit(
-                f"获取封面图片多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+                "获取封面图片多次后失败!\n"
+                "请检查网络连接或者重启软件!\n\n"
+                "更多详细信息请查看日志文件, 或联系开发者！"
             )
-            return open(":/imgs/fail_img.jpg")
+            return open(":/imgs/fail_img.jpg", encoding="utf-8")
 
     ############################################################
     def getEpisodesInfo(self) -> list[Episode]:

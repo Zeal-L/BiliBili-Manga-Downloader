@@ -14,10 +14,28 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         sh setup.sh
-    - name: Analysing the code with pylint
-      run: |
-        pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
+
+    # - name: Analysing the code with pylint
+    #   id: pylint
+    #   run: |
+    #     pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
+
+    - name: Pylinting
+      run: pipenv run python3 linting.py
+      id: linting
+
+    - name: Low score warning
+      if: steps.linting.outputs.score < 9
+      run: echo "Score was too low." && exit 1
+
+    - name: Passed
+      if: steps.linting.outputs.score >= 9
+      run: echo "All passed."
+
+    - name: Show score
+      run: echo "Your score is ${{ steps.linting.outputs.score }}."
