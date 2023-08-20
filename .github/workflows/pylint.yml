@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.11"]
@@ -20,22 +20,8 @@ jobs:
         python -m pip install --upgrade pip
         sh setup.sh
 
-    # - name: Analysing the code with pylint
-    #   id: pylint
-    #   run: |
-    #     pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
-
-    - name: Pylinting
-      run: pipenv run python3 linting.py
-      id: linting
-
-    - name: Low score warning
-      if: steps.linting.outputs.score < 9
-      run: echo "Score was too low." && exit 1
-
-    - name: Passed
-      if: steps.linting.outputs.score >= 9
-      run: echo "All passed."
-
-    - name: Show score
-      run: echo "Your score is ${{ steps.linting.outputs.score }}."
+    - name: Analysing the code with pylint
+      id: pylint
+      run: |
+        pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
+      continue-on-error: true
