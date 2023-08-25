@@ -162,7 +162,6 @@ class DownloadManager:
                 return
 
             rate = index / len(epi.imgs_token)
-            self.updateTaskInfo(curr_id, rate)
 
             imgs_path.append(img_path)
 
@@ -178,6 +177,7 @@ class DownloadManager:
 
                 epi.clearAfterSave(imgs_path)
 
+            self.updateTaskInfo(curr_id, rate)
             self.signal_rate_progress.emit(
                 {
                     "taskID": curr_id,
@@ -187,13 +187,11 @@ class DownloadManager:
 
         self.clearAfterFinish(curr_id)
 
-
     ############################################################
     # ? 为以后的特典下载留的接口
 
     # def createSCTask(self) -> int:
     #     pass
-
 
     # def thread_SCTask(self) -> None:
     #     pass

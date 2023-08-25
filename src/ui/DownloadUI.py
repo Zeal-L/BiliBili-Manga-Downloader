@@ -73,9 +73,8 @@ class DownloadUI(QObject):
                         to_delete.setParent(None)
                         to_delete.deleteLater()
 
-                        # ? 删除任务字典中的条目
-                        if rate == -1:
-                            del self.tasks_info[taskID]
+                # ? 删除任务字典中的条目
+                del self.tasks_info[taskID]
 
             # ? 更新总进度条的进度，速度和剩余时间
             total_progress = self.downloadManager.getTotalRate()
@@ -88,8 +87,6 @@ class DownloadUI(QObject):
                     f"{self.downloadManager.getTotalRemainedTimeStr()}"
                 )
             else:
-                # ? 100% 后删除所有任务字典中的条目
-                self.tasks_info.clear()
                 mainGUI.label_total_progress_speed.setText("总下载速度:")
                 mainGUI.label_total_progress_time.setText("剩余时间：")
 
