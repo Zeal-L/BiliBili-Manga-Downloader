@@ -185,7 +185,6 @@ class DownloadManager:
                 }
             )
 
-        self.clearAfterFinish(curr_id)
 
     ############################################################
     # ? 为以后的特典下载留的接口
@@ -198,13 +197,23 @@ class DownloadManager:
 
     ############################################################
 
-    def clearAfterFinish(self, curr_id) -> None:
+    def clearAfterFinish(self, curr_id: int) -> None:
         """任务完成后的清理工作
 
         Args:
             curr_id (int): 当前任务的ID
         """
         self.all_tasks.pop(curr_id)
+
+    ############################################################
+
+    def clearAll(self) -> None:
+        """任务完成后的清理工作
+
+        Args:
+            curr_id (int): 当前任务的ID
+        """
+        self.all_tasks.clear()
 
     ############################################################
 

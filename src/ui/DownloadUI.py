@@ -89,6 +89,7 @@ class DownloadUI(QObject):
             else:
                 mainGUI.label_total_progress_speed.setText("总下载速度:")
                 mainGUI.label_total_progress_time.setText("剩余时间：")
+                self.downloadManager.clearAll()
 
         self.signal_rate_progress.connect(_)
 
