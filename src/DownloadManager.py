@@ -165,36 +165,38 @@ class DownloadManager:
             self.updateTaskInfo(curr_id, rate)
 
             imgs_path.append(img_path)
+
+            # ?###########################################################
+            # ? 保存图片
+            if rate == 1:
+                if self.save_method == "PDF":
+                    epi.saveToPDF(imgs_path)
+                elif self.save_method == "文件夹-图片":
+                    epi.saveToFolder(imgs_path)
+                elif self.save_method == "7z压缩包":
+                    epi.saveTo7z(imgs_path)
+
+                epi.clearAfterSave(imgs_path)
+
             self.signal_rate_progress.emit(
                 {
                     "taskID": curr_id,
                     "rate": int(rate * 100),
                 }
             )
+
         self.clearAfterFinish(curr_id)
 
-        # ?###########################################################
-        # ? 保存图片
-
-        if self.save_method == "PDF":
-            epi.saveToPDF(imgs_path)
-        elif self.save_method == "文件夹-图片":
-            epi.saveToFolder(imgs_path)
-        elif self.save_method == "7z压缩包":
-            epi.saveTo7z(imgs_path)
-
-        epi.clearAfterSave(imgs_path)
-
 
     ############################################################
+    # ? 为以后的特典下载留的接口
 
-    def createSCTask(self) -> int:
-        pass
+    # def createSCTask(self) -> int:
+    #     pass
 
-    ############################################################
 
-    def thread_SCTask(self) -> None:
-        pass
+    # def thread_SCTask(self) -> None:
+    #     pass
 
     ############################################################
 

@@ -249,6 +249,10 @@ class Episode:
                     quality=95,
                 )
 
+                # 关闭所有图像, 释放内存
+                for img in temp_imgs:
+                    img.close()
+
                 # 在pdf文件属性中记录章节标题作者和软件版本以及版权信息
                 with open(self.epi_path_pdf, "rb") as f:
                     pdf = PdfReader(f)

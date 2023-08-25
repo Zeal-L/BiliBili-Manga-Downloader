@@ -60,6 +60,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         else:
             self.lineEdit_save_path.setText(os.getcwd())
             self.updateConfig("save_path", os.getcwd())
+        logger.info(f"save_method: {self.getConfig('save_method')}")
 
         # ?###########################################################
         # ? 初始化UI绑定事件

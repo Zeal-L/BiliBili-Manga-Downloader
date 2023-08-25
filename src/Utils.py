@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -30,7 +30,7 @@ __copyright__ = "Copyright (C) 2023 Zeal L"
 # 配置全局网络请求的 timeout 以及 max retry
 ############################################################
 
-TIMEOUT_SMALL = 4
+TIMEOUT_SMALL = 5
 TIMEOUT_LARGE = 10
 
 MAX_RETRY_SMALL = 10000

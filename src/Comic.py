@@ -97,11 +97,11 @@ class Comic:
         return self.data
 
     ############################################################
-    def getComicCover(self, data: dict) -> int:
+    def getComicCover(self, data: dict) -> bytes:
         """获取漫画封面图片
 
         Returns:
-            QPixmap: 漫画封面图片
+            bytes: 漫画封面图片
         """
 
         @retry(

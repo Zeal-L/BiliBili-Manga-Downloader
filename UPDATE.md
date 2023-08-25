@@ -1,4 +1,12 @@
 ## ⚰️ 更新记录
+### **[v1.3.1](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.3.1)** - *2022-08-25*
+- 修复bug:
+  - 修复了一个在保存格式为 `pdf` 时导致内存泄漏的bug ([#68][i68])
+- 优化:
+  - 优化下载速度和剩余时间的计算与获取, 现在更加的平稳和准确了
+  - 重构下载任务相关的逻辑，减少耦合性
+
+[i68]: https://github.com/Zeal-L/BiliBili-Manga-Downloader/issues/68
 
 ### **[v1.3.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.3.0)** - *2022-08-11*
 - 新增功能:
