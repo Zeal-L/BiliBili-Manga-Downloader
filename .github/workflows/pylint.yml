@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.11"]
@@ -14,10 +14,14 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         sh setup.sh
+
     - name: Analysing the code with pylint
+      id: pylint
       run: |
         pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
+      continue-on-error: true

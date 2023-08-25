@@ -1,3 +1,7 @@
+"""
+该模块提供了一个用于生成Bilibili扫码登录二维码的类QrCode，以及确认登录和获取cookie的方法
+"""
+
 from __future__ import annotations
 
 import io
@@ -17,6 +21,7 @@ if TYPE_CHECKING:
 
 
 class QrCode:
+    """Bilibili 扫码登录二维码类"""
     def __init__(self, mainGUI: MainGUI) -> None:
         self.mainGUI = mainGUI
         self.generate_url = (

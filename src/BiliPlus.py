@@ -1,3 +1,7 @@
+"""
+该模块包含了BiliPlusComic和BiliPlusEpisode类，用于获取BiliPlus网站上的单本漫画信息和章节信息
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -21,7 +25,6 @@ class BiliPlusComic(Comic):
         super().__init__(comic_id, mainGUI)
         self.access_key = mainGUI.getConfig("biliplus_cookie")
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "cookie": f"manga_pic_format=jpg-full;login=2;access_key={self.access_key}",
         }
 
@@ -38,9 +41,9 @@ class BiliPlusComic(Comic):
             return []
 
         # ?###########################################################
-        # ? 解析章节
-        ep_list = self.data["ep_list"]
-        for episode in reversed(ep_list):
+        # ? 解析 Biliplus 章节
+        biliplus_ep_list = self.data["ep_list"]
+        for episode in reversed(biliplus_ep_list):
             epi = BiliPlusEpisode(
                 episode,
                 self.sessdata,
@@ -53,14 +56,12 @@ class BiliPlusComic(Comic):
             if epi.isDownloaded():
                 self.num_downloaded += 1
 
-        self.retrieveAvailableEpisode(self.episodes, self.comic_id, self.mainGUI)
+        self.retrieveAvailableEpisode(self.episodes, self.comic_id)
 
         return self.episodes
 
     ############################################################
-    def retrieveAvailableEpisode(
-        self, episodes: list[BiliPlusEpisode], comic_id: str, mainGUI: MainGUI
-    ):
+    def retrieveAvailableEpisode(self, episodes: list[BiliPlusEpisode], comic_id: str):
         """从BiliPlus重新获取解锁状态"""
         biliplus_detail_url = (
             f"https://www.biliplus.com/manga/?act=detail_preview&mangaid={comic_id}"
@@ -81,8 +82,8 @@ class BiliPlusComic(Comic):
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if "未登录" in res.text:
-                mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
-                return
+                self.mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
+                return {}
             if res.status_code != 200:
                 logger.warning(
                     f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
@@ -110,7 +111,9 @@ class BiliPlusComic(Comic):
                 total_ep = total_ep_element.contents[0].split("/")[1]
                 total_pages = int(int(total_ep) / 200) + 1
                 for pages in range(2, total_pages + 1):
-                    mainGUI.signal_resolve_status.emit(f"正在解析漫画章节({pages}/{total_pages})...")
+                    self.mainGUI.signal_resolve_status.emit(
+                        f"正在解析漫画章节({pages}/{total_pages})..."
+                    )
                     page_html = _(f"{biliplus_detail_url}&page={pages}")
                     document = BeautifulSoup(page_html, "html.parser")
                     ep_items = document.find_all("div", {"class": "episode-item"})
@@ -120,10 +123,10 @@ class BiliPlusComic(Comic):
             for ep in episodes:
                 if str(ep.id) in ep_available:
                     ep.available = True
-        except Exception as e:
+        except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 f"漫画id:{self.comic_id} 在处理BiliPlus解锁章节数据时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -146,7 +149,7 @@ class BiliPlusEpisode(Episode):
         self.comic_id = comic_id
 
     ############################################################
-    def init_imgsList(self, mainGUI: MainGUI) -> bool:
+    def init_imgsList(self) -> bool:
         """重写用于初始化从BiliPlus获取的章节内所有图片的列表(自带token)
 
         Returns
@@ -174,7 +177,8 @@ class BiliPlusEpisode(Episode):
                 raise e
             if res.status_code != 200:
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} 从BiliPlus获取图片列表失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"《{self.comic_name}》章节：{self.title} 从BiliPlus获取图片列表失败! "
+                    f"状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
             return res.text
@@ -186,8 +190,11 @@ class BiliPlusEpisode(Episode):
                 f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!，跳过!\n{e}"
             )
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
-                f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+            self.mainGUI.signal_message_box.emit(
+                f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!\n"
+                f"已暂时跳过此章节!\n"
+                f"请检查网络连接或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
 
@@ -206,17 +213,18 @@ class BiliPlusEpisode(Episode):
                 logger.error(
                     f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因Cookie有误导致失败!"
                 )
-                mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_message_box.emit(
                     f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因Cookie有误导致失败!"
                 )
                 return False
-        except Exception as e:
+        except requests.RequestException as e:
             logger.error(
                 f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}"
             )
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
-                f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+            self.mainGUI.signal_message_box.emit(
+                f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
             )
             return False
 

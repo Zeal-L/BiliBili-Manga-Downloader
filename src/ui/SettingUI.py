@@ -1,3 +1,7 @@
+"""
+该模块包含SettingUI类，它管理BiliBili Manga Downloader应用程序的设置UI。它允许用户设置 BiliBili 登录 cookie、下载路径、线程数和其他设置
+"""
+
 from __future__ import annotations
 
 import os
@@ -31,14 +35,13 @@ if TYPE_CHECKING:
 class SettingUI(QObject):
     """设置窗口类，用于管理设置UI"""
 
-    # ?###########################################################
     # ? 用于多线程更新我的库存
     signal_qr_res = Signal(dict)
 
     def __init__(self, mainGUI: MainGUI):
         super().__init__()
         self.mainGUI = mainGUI
-        self.clearUserData = False
+        self.clear_user_data = False
         self.init_qrCode(mainGUI)
         self.init_cookie(mainGUI)
         self.init_biliplus_cookie(mainGUI)
@@ -54,6 +57,11 @@ class SettingUI(QObject):
 
     ############################################################
     def qrCodeCallBack(self, data: dict) -> None:
+        """二维码回调函数
+
+        Args:
+            data (dict): 二维码数据
+        """
         # sourcery skip: extract-method
 
         if data is None:
@@ -156,9 +164,6 @@ class SettingUI(QObject):
         """
         detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
         headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
-            "origin": "https://manga.bilibili.com",
-            "referer": "https://manga.bilibili.com/search?from=manga_homepage",
             "cookie": f"SESSDATA={cookie}",
         }
         payload = {"key_word": "test", "page_num": 1, "page_size": 1}
@@ -231,19 +236,15 @@ class SettingUI(QObject):
         # 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
         main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
         headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "cookie": f"login=2;access_key={cookie}",
         }
-        payload = {}
 
         @retry(
             stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
         )
         def _() -> None:
             try:
-                res = requests.post(
-                    main_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
-                )
+                res = requests.post(main_url, headers=headers, timeout=TIMEOUT_SMALL)
             except requests.RequestException as e:
                 logger.warning(f"测试BiliPlus Cookie是否有效失败! 重试中...\n{e}")
                 raise e
@@ -255,7 +256,7 @@ class SettingUI(QObject):
             if "hoz-container" not in res.text:
                 logger.warning("BiliPlus Cookie检测出现故障，暂时无法检测是否有效...")
                 raise ReferenceError
-            elif 'class="comic-single"' not in res.text:
+            if 'class="comic-single"' not in res.text:
                 logger.warning("BiliPlus Cookie无效!重试中...")
                 raise requests.HTTPError()
 
@@ -367,7 +368,7 @@ class SettingUI(QObject):
                 QMessageBox.Yes | QMessageBox.No,
             )
             if res == QMessageBox.Yes:
-                self.clearUserData = True
+                self.clear_user_data = True
 
         mainGUI.pushButton_clear_data.clicked.connect(_)
 

@@ -1,6 +1,11 @@
+"""
+该模块包含了主窗口类，用于管理所有子UI
+"""
+
 import json
 import logging
 import os
+from functools import partial
 from typing import Any
 
 from PySide6.QtCore import Signal
@@ -31,10 +36,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
-        self.signal_message_box.connect(lambda msg: QMessageBox.warning(None, "警告", msg))
-        self.signal_resolve_status.connect(
-            lambda status: self.label_resolve_status.setText(status)
+        self.signal_message_box.connect(
+            lambda msg: QMessageBox.warning(None, "警告", msg)
         )
+        self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
@@ -55,6 +60,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         else:
             self.lineEdit_save_path.setText(os.getcwd())
             self.updateConfig("save_path", os.getcwd())
+        logger.info(f"save_method: {self.getConfig('save_method')}")
 
         # ?###########################################################
         # ? 初始化UI绑定事件
@@ -79,7 +85,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                     os.remove(file_path)
             os.rmdir(path)
 
-        if self.settingUI.clearUserData:
+        if self.settingUI.clear_user_data:
             try:
                 _(self.app_folder)
             except OSError as e:

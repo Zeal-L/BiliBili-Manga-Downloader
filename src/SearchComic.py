@@ -1,3 +1,7 @@
+"""
+该模块包含一个用于根据漫画名搜索漫画信息的类SearchComic
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

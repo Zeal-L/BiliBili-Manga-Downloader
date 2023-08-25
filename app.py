@@ -1,3 +1,7 @@
+"""
+这是一个哔哩哔哩漫画下载器的应用程序，它提供了一个GUI界面，可以让用户下载漫画。这个文件是程序的入口文件，用于启动程序。
+"""
+
 from sys import argv, exit
 from ctypes import windll
 
