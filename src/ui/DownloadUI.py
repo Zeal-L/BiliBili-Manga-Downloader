@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QWidget
 
+from src.DownloadManager import DownloadManager
 from src.Episode import Episode
 from src.Utils import openFolderAndSelectItems
-from src.DownloadManager import DownloadManager
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -26,11 +26,9 @@ class DownloadUI(QObject):
 
     def __init__(self, mainGUI: MainGUI):
         super().__init__()
-
-        self.tasks_info = {}
+        self.tasks_bar = {}
         self.downloadManager = DownloadManager(
             max_workers=mainGUI.getConfig("num_thread"),
-            save_method=mainGUI.getConfig("save_method"),
             signal_rate_progress=self.signal_rate_progress,
             signal_message_box=mainGUI.signal_message_box,
         )
@@ -52,9 +50,10 @@ class DownloadUI(QObject):
         def _(result: dict):
             taskID = result["taskID"]
             rate = result["rate"]
+            path = result["path"]
 
             # ? 更新当前任务的进度条
-            self.tasks_info[taskID]["bar"].setValue(rate)
+            self.tasks_bar[taskID]["bar"].setValue(rate)
 
             # ? 在下载列表UI里删除下载完成的任务
             # ? 如果 rate 等于1 意味着下载出错跳过，删除任务相关信息
@@ -66,15 +65,13 @@ class DownloadUI(QObject):
                         if rate == 100:
                             # ? 取出标题组件用于添加到已完成列表
                             label_title = to_delete.layout().itemAt(0).widget()
-                            self.addFinished(
-                                mainGUI, label_title, self.tasks_info[taskID]["path"]
-                            )
+                            self.addFinished(mainGUI, label_title, path)
                         # ? deleteLater 会有延迟，为了显示效果，先将父控件设为None
                         to_delete.setParent(None)
                         to_delete.deleteLater()
 
                 # ? 删除任务字典中的条目
-                del self.tasks_info[taskID]
+                del self.tasks_bar[taskID]
 
             # ? 更新总进度条的进度，速度和剩余时间
             total_progress = self.downloadManager.getTotalRate()
@@ -152,9 +149,8 @@ class DownloadUI(QObject):
         progress_bar = QProgressBar()
         progress_bar.setTextVisible(True)
 
-        self.tasks_info[task_id] = {
+        self.tasks_bar[task_id] = {
             "bar": progress_bar,
-            "path": epi.epi_path,
         }
 
         h_layout_download_list.addWidget(progress_bar)
