@@ -46,7 +46,6 @@ class BiliPlusComic(Comic):
         for episode in reversed(biliplus_ep_list):
             epi = BiliPlusEpisode(
                 episode,
-                self.sessdata,
                 self.headers,
                 self.comic_id,
                 self.data,
@@ -71,7 +70,7 @@ class BiliPlusComic(Comic):
         @retry(
             stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
         )
-        def _(url: str = biliplus_detail_url) -> dict:
+        def _(url: str) -> dict:
             try:
                 res = requests.post(
                     url,
@@ -92,7 +91,7 @@ class BiliPlusComic(Comic):
             return res.text
 
         try:
-            biliplus_html = _()
+            biliplus_html = _(biliplus_detail_url)
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)
@@ -138,13 +137,12 @@ class BiliPlusEpisode(Episode):
     def __init__(
         self,
         episode: dict,
-        sessData: str,
         headers: str,
         comic_id: str,
         comic_info: dict,
         mainGUI: MainGUI,
     ) -> None:
-        super().__init__(episode, sessData, comic_id, comic_info, mainGUI)
+        super().__init__(episode, comic_id, comic_info, mainGUI)
         self.headers = headers
         self.comic_id = comic_id
 

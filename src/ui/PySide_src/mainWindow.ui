@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1138</width>
+    <width>1152</width>
     <height>699</height>
    </rect>
   </property>
@@ -31,7 +31,7 @@
        <attribute name="title">
         <string>我的漫画</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_19" stretch="0,0">
+       <layout class="QHBoxLayout" name="horizontalLayout_19" stretch="1,1">
         <item>
          <layout class="QVBoxLayout" name="v_lLayout_my_manga" stretch="0,1">
           <item>
@@ -45,7 +45,7 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_17">
               <item>
-               <layout class="QHBoxLayout" name="h_Layout_manga_search" stretch="0,1,0,0,0">
+               <layout class="QHBoxLayout" name="h_Layout_manga_search" stretch="0,0,0,0,0,0,0,0">
                 <item>
                  <widget class="QLabel" name="label_8">
                   <property name="text">
@@ -55,9 +55,15 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="lineEdit_manga_search_name">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
-                    <width>300</width>
+                    <width>16777215</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -68,28 +74,61 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_manga_search_name">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>搜索</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="horizontalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
                  <widget class="QLabel" name="label_manga_search">
                   <property name="text">
                    <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_12">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>漫画ID</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_manga_search_id">
+                  <property name="maxLength">
+                   <number>5</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>漫画的5位数字ID</string>
+                  </property>
+                  <property name="clearButtonEnabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_manga_search_id">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>直达</string>
                   </property>
                  </widget>
                 </item>
@@ -153,7 +192,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>517</width>
+                   <width>524</width>
                    <height>191</height>
                   </rect>
                  </property>
@@ -579,7 +618,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>1068</width>
+                   <width>1082</width>
                    <height>554</height>
                   </rect>
                  </property>
@@ -608,7 +647,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>61</width>
+                   <width>78</width>
                    <height>18</height>
                   </rect>
                  </property>
@@ -658,7 +697,7 @@
        <attribute name="title">
         <string>设置</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,1,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0">
         <item>
          <spacer name="verticalSpacer_4">
           <property name="orientation">
@@ -804,6 +843,106 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>漫画保存格式：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>19</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_save_method">
+            <property name="title">
+             <string/>
+            </property>
+            <layout class="QHBoxLayout" name="h_Layout_groupBox_save_method">
+             <item>
+              <widget class="QRadioButton" name="radioButton_save_method_pdf">
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>PDF</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioButton_save_method_7z">
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>7z压缩包</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioButton_save_method_folder">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>文件夹-图片</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -870,10 +1009,23 @@
               </widget>
              </item>
              <item>
+              <spacer name="horizontalSpacer_10">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
               <widget class="QSlider" name="h_Slider_num_thread">
                <property name="minimumSize">
                 <size>
-                 <width>200</width>
+                 <width>300</width>
                  <height>0</height>
                 </size>
                </property>
@@ -904,73 +1056,26 @@
               </widget>
              </item>
              <item>
+              <spacer name="horizontalSpacer_9">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
               <widget class="QLabel" name="label_num_thread">
                <property name="text">
                 <string>线程数并不是越多越好，请根据自己的网络情况和平均任务大小合理配置（推荐：16）</string>
                </property>
                <property name="wordWrap">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="groupBox_save_method">
-               <property name="title">
-                <string>漫画保存格式：</string>
-               </property>
-               <layout class="QHBoxLayout" name="h_Layout_groupBox_save_method">
-                <item>
-                 <widget class="QRadioButton" name="radioButton_save_method_pdf">
-                  <property name="minimumSize">
-                   <size>
-                    <width>60</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>PDF</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="radioButton_save_method_7z">
-                  <property name="minimumSize">
-                   <size>
-                    <width>60</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>7z压缩包</string>
-                  </property>
-                  <property name="checked">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="radioButton_save_method_folder">
-                  <property name="enabled">
-                   <bool>true</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>60</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>文件夹-图片</string>
-                  </property>
-                  <property name="checked">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
               </widget>
              </item>
              <item>

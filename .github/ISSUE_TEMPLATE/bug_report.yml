@@ -38,7 +38,7 @@ body:
     id: version
     attributes:
       label: 哔哩哔哩漫画下载器版本号
-      placeholder: v1.3.0
+      placeholder: v1.3.2
     validations:
       required: true
   - type: dropdown

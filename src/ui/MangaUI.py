@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 from pypinyin import lazy_pinyin
 from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap, QIntValidator
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -84,7 +84,7 @@ class MangaUI(QObject):
                 mainGUI.lineEdit_manga_search_name.text(), mainGUI.getConfig("cookie")
             ).getResults(mainGUI)
             mainGUI.listWidget_manga_search.clear()
-            mainGUI.label_manga_search.setText(f"找到：{len(self.search_info)}条结果")
+            mainGUI.label_manga_search.setText(f"{len(self.search_info)}条结果")
             for item in self.search_info:
                 # ?###########################################################
                 # ? 替换爬取信息里的html标签
@@ -114,6 +114,25 @@ class MangaUI(QObject):
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
+
+        # ?###########################################################
+        # ? 单击根据漫画id搜索的漫画详情绑定
+        def _() -> None:
+            comic_id = mainGUI.lineEdit_manga_search_id.text().strip()
+            # ? 如果输入框为空，或者不是五位数字，提示用户输入正确的id
+            if len(comic_id) < 5:
+                QMessageBox.critical(mainGUI, "警告", "请输入五位漫画名ID！")
+                return
+            self.present_comic_id = comic_id
+            self.resolveEnable(mainGUI, "resolving")
+            comic = Comic(self.present_comic_id, mainGUI)
+            self.updateComicInfoEvent(mainGUI, comic, "bilibili")
+
+        mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)
+        mainGUI.pushButton_manga_search_id.clicked.connect(_)
+
+        # 漫画id搜索框只能输入数字
+        mainGUI.lineEdit_manga_search_id.setValidator(QIntValidator())
 
         # ?###########################################################
         # ? 双击获取选中漫画详情绑定
@@ -609,7 +628,9 @@ class MangaUI(QObject):
                 item.setCheckState(Qt.Checked)
                 self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(
+                self.checkbox_change_callBack
+            )
 
         mainGUI.listWidget_chp_detail.itemPressed.connect(_)
 
@@ -623,7 +644,9 @@ class MangaUI(QObject):
                     item.setCheckState(Qt.Checked)
                     self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(
+                self.checkbox_change_callBack
+            )
 
         def uncheckSelected() -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -632,7 +655,9 @@ class MangaUI(QObject):
                     item.setCheckState(Qt.Unchecked)
                     self.num_selected -= 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(
+                self.checkbox_change_callBack
+            )
 
         def checkAll() -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -642,7 +667,9 @@ class MangaUI(QObject):
                     mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.Checked)
                     self.num_selected += 1
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(
+                self.checkbox_change_callBack
+            )
 
         def uncheckAll() -> None:
             mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -651,7 +678,9 @@ class MangaUI(QObject):
                 if mainGUI.listWidget_chp_detail.item(i).flags() != Qt.NoItemFlags:
                     mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.Unchecked)
             mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(
+                self.checkbox_change_callBack
+            )
 
         def myMenu(pos: QPoint) -> None:
             menu = QMenu()
@@ -663,7 +692,6 @@ class MangaUI(QObject):
 
         mainGUI.listWidget_chp_detail.setContextMenuPolicy(Qt.CustomContextMenu)
         mainGUI.listWidget_chp_detail.customContextMenuRequested.connect(myMenu)
-
 
     ############################################################
 
@@ -752,7 +780,9 @@ class MangaUI(QObject):
                     mainGUI.downloadUI.addTask(mainGUI, self.epi_list[i])
                     item.setFlags(Qt.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
-            mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
+            mainGUI.listWidget_chp_detail.itemChanged.connect(
+                self.checkbox_change_callBack
+            )
 
             # ?###########################################################
             # ? 更新我的库存界面信息 也就是v_Layout_myLibrary里的章节数量信息

@@ -16,12 +16,10 @@ class DownloadManager:
     def __init__(
         self,
         max_workers: int,
-        save_method: str,
         signal_rate_progress: SignalInstance,
         signal_message_box: SignalInstance,
     ) -> None:
         self.id_count = 0
-        self.save_method = save_method
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.signal_rate_progress = signal_rate_progress
         self.signal_message_box = signal_message_box
@@ -167,25 +165,15 @@ class DownloadManager:
 
             # ?###########################################################
             # ? 保存图片
+            save_path = None
             if rate == 1:
-                if self.save_method == "PDF":
-                    epi.saveToPDF(imgs_path)
-                elif self.save_method == "文件夹-图片":
-                    epi.saveToFolder(imgs_path)
-                elif self.save_method == "7z压缩包":
-                    epi.saveTo7z(imgs_path)
-
+                save_path = epi.save(imgs_path)
                 epi.clearAfterSave(imgs_path)
 
             self.updateTaskInfo(curr_id, rate)
             self.signal_rate_progress.emit(
-                {
-                    "taskID": curr_id,
-                    "rate": int(rate * 100),
-                }
+                {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
-
-        self.clearAfterFinish(curr_id)
 
     ############################################################
     # ? 为以后的特典下载留的接口
@@ -198,13 +186,23 @@ class DownloadManager:
 
     ############################################################
 
-    def clearAfterFinish(self, curr_id) -> None:
+    def clearAfterFinish(self, curr_id: int) -> None:
         """任务完成后的清理工作
 
         Args:
             curr_id (int): 当前任务的ID
         """
         self.all_tasks.pop(curr_id)
+
+    ############################################################
+
+    def clearAll(self) -> None:
+        """任务完成后的清理工作
+
+        Args:
+            curr_id (int): 当前任务的ID
+        """
+        self.all_tasks.clear()
 
     ############################################################
 

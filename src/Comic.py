@@ -29,7 +29,6 @@ class Comic:
     def __init__(self, comic_id: int, mainGUI: MainGUI) -> None:
         self.mainGUI = mainGUI
         self.comic_id = comic_id
-        self.sessdata = mainGUI.getConfig("cookie")
         self.save_path = mainGUI.getConfig("save_path")
         self.num_thread = mainGUI.getConfig("num_thread")
         self.num_downloaded = 0
@@ -40,7 +39,7 @@ class Comic:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}?from=manga_homepage",
-            "cookie": f"SESSDATA={self.sessdata}",
+            "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
         }
         self.payload = {"comic_id": self.comic_id}
 
@@ -53,7 +52,7 @@ class Comic:
         """
 
         @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+            stop_max_delay=MAX_RETRY_SMALL-5000, wait_exponential_multiplier=RETRY_WAIT_EX
         )
         def _() -> dict:
             try:
@@ -61,7 +60,7 @@ class Comic:
                     self.detail_url,
                     headers=self.headers,
                     data=self.payload,
-                    timeout=TIMEOUT_SMALL,
+                    timeout=TIMEOUT_SMALL-3,
                 )
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 获取漫画信息失败! 重试中...\n{e}")
@@ -156,7 +155,7 @@ class Comic:
         ep_list = self.data["ep_list"]
         for episode in reversed(ep_list):
             epi = Episode(
-                episode, self.sessdata, self.comic_id, self.data, self.mainGUI
+                episode, self.comic_id, self.data, self.mainGUI
             )
             self.episodes.append(epi)
             if epi.isDownloaded():

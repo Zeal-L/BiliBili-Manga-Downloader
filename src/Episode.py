@@ -40,7 +40,6 @@ class Episode:
     def __init__(
         self,
         episode: dict,
-        sessData: str,
         comic_id: str,
         comic_info: dict,
         mainGUI: MainGUI,
@@ -86,20 +85,10 @@ class Episode:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}/{self.id}?from=manga_homepage",
-            "cookie": f"SESSDATA={sessData}",
+            "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
         }
         self.save_path = comic_info["save_path"]
-        self.save_method = mainGUI.getConfig("save_method")
-        self.epi_path_pdf = os.path.join(self.save_path, f"{self.title}.pdf")
-        self.epi_path_folder = os.path.join(self.save_path, f"{self.title}")
-        self.epi_path_7z = os.path.join(self.save_path, f"{self.title}.7z")
-
-        if self.save_method == "PDF":
-            self.epi_path = self.epi_path_pdf
-        elif self.save_method == "文件夹-图片":
-            self.epi_path = self.epi_path_folder
-        elif self.save_method == "7z压缩包":
-            self.epi_path = self.epi_path_7z
+        self.epi_path = os.path.join(self.save_path, f"{self.title}")
 
     ############################################################
     def init_imgsList(self) -> bool:
@@ -226,6 +215,30 @@ class Episode:
             )
 
     ############################################################
+
+    def save(self, imgs_path: list[str]) -> str:
+        """保存章节
+
+        Args:
+            imgs_path (list): 临时图片路径列表
+
+        Returns:
+            str: 保存路径
+        """
+        save_method = self.mainGUI.getConfig("save_method")
+        save_path = ""
+        if save_method == "PDF":
+            self.saveToPDF(imgs_path)
+            save_path = f"{self.epi_path}.pdf"
+        elif save_method == "文件夹-图片":
+            self.saveToFolder(imgs_path)
+            save_path = self.epi_path
+        elif save_method == "7z压缩包":
+            self.saveTo7z(imgs_path)
+            save_path = f"{self.epi_path}.7z"
+        return save_path
+
+    ############################################################
     def saveToPDF(self, imgs_path: list[str]) -> None:
         """将图片保存为PDF文件
 
@@ -234,7 +247,7 @@ class Episode:
         """
 
         @retry(stop_max_attempt_number=5)
-        def _():
+        def _() -> None:
             try:
                 # 因为pdf的兼容性, 统一转换为RGB模式
                 temp_imgs = [Image.open(x) for x in imgs_path]
@@ -243,7 +256,7 @@ class Episode:
                         temp_imgs[i] = img.convert("RGB")
 
                 temp_imgs[0].save(
-                    self.epi_path_pdf,
+                    f"{self.epi_path}.pdf",
                     save_all=True,
                     append_images=temp_imgs[1:],
                     quality=95,
@@ -254,7 +267,7 @@ class Episode:
                     img.close()
 
                 # 在pdf文件属性中记录章节标题作者和软件版本以及版权信息
-                with open(self.epi_path_pdf, "rb") as f:
+                with open(f"{self.epi_path}.pdf", "rb") as f:
                     pdf = PdfReader(f)
                     pdf_writer = PdfWriter()
                     pdf_writer.append_pages_from_reader(pdf)
@@ -265,7 +278,7 @@ class Episode:
                             "/Creator": f"{__app_name__} {__version__} {__copyright__}",
                         }
                     )
-                    with open(self.epi_path_pdf, "wb") as f:
+                    with open(f"{self.epi_path}.pdf", "wb") as f:
                         pdf_writer.write(f)
 
             except OSError as e:
@@ -318,14 +331,16 @@ class Episode:
                         if img_format == "jpg":
                             jpg_exif(img_path)
                     except piexif.InvalidImageDataError as e:
-                        logger.warning(f"Failed to insert exif data for {img_path}: {e}")
+                        logger.warning(
+                            f"Failed to insert exif data for {img_path}: {e}"
+                        )
                         logger.exception(e)
 
                     # 复制图片到文件夹
                     shutil.copy2(
                         img_path,
                         os.path.join(
-                            self.epi_path_folder, f"{str(index).zfill(3)}.{img_format}"
+                            self.epi_path, f"{str(index).zfill(3)}.{img_format}"
                         ),
                     )
 
@@ -336,8 +351,8 @@ class Episode:
                 raise e
 
         try:
-            if not os.path.exists(self.epi_path_folder):
-                os.makedirs(self.epi_path_folder)
+            if not os.path.exists(self.epi_path):
+                os.makedirs(self.epi_path)
             _()
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}")
@@ -359,15 +374,15 @@ class Episode:
         @retry(stop_max_attempt_number=5)
         def _():
             try:
-                with SevenZipFile(f"{self.epi_path_7z}", "w") as z:
+                with SevenZipFile(f"{self.epi_path}.7z", "w") as z:
                     # 压缩文件里不要子目录，全部存在根目录
-                    for root, _dirs, files in os.walk(self.epi_path_folder):
+                    for root, _dirs, files in os.walk(self.epi_path):
                         for file in files:
                             z.write(
                                 os.path.join(root, file),
                                 os.path.basename(os.path.join(root, file)),
                             )
-                    shutil.rmtree(self.epi_path_folder)
+                    shutil.rmtree(self.epi_path)
             except OSError as e:
                 logger.error(
                     f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}"
@@ -486,7 +501,7 @@ class Episode:
             bool: True: 已下载; False: 未下载
         """
         return (
-            os.path.exists(self.epi_path_pdf)
-            or os.path.exists(self.epi_path_folder)
-            or os.path.exists(self.epi_path_7z)
+            os.path.exists(self.epi_path)
+            or os.path.exists(f"{self.epi_path}.pdf")
+            or os.path.exists(f"{self.epi_path}.7z")
         )
