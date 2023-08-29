@@ -46,7 +46,6 @@ class BiliPlusComic(Comic):
         for episode in reversed(biliplus_ep_list):
             epi = BiliPlusEpisode(
                 episode,
-                self.sessdata,
                 self.headers,
                 self.comic_id,
                 self.data,
@@ -138,13 +137,12 @@ class BiliPlusEpisode(Episode):
     def __init__(
         self,
         episode: dict,
-        sessData: str,
         headers: str,
         comic_id: str,
         comic_info: dict,
         mainGUI: MainGUI,
     ) -> None:
-        super().__init__(episode, sessData, comic_id, comic_info, mainGUI)
+        super().__init__(episode, comic_id, comic_info, mainGUI)
         self.headers = headers
         self.comic_id = comic_id
 

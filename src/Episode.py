@@ -40,7 +40,6 @@ class Episode:
     def __init__(
         self,
         episode: dict,
-        sessData: str,
         comic_id: str,
         comic_info: dict,
         mainGUI: MainGUI,
@@ -86,7 +85,7 @@ class Episode:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}/{self.id}?from=manga_homepage",
-            "cookie": f"SESSDATA={sessData}",
+            "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
         }
         self.save_path = comic_info["save_path"]
         self.epi_path = os.path.join(self.save_path, f"{self.title}")
@@ -239,7 +238,6 @@ class Episode:
             save_path = f"{self.epi_path}.7z"
         return save_path
 
-
     ############################################################
     def saveToPDF(self, imgs_path: list[str]) -> None:
         """将图片保存为PDF文件
@@ -249,7 +247,7 @@ class Episode:
         """
 
         @retry(stop_max_attempt_number=5)
-        def _():
+        def _() -> None:
             try:
                 # 因为pdf的兼容性, 统一转换为RGB模式
                 temp_imgs = [Image.open(x) for x in imgs_path]

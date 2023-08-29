@@ -1,4 +1,17 @@
 ## ⚰️ 更新记录
+
+### **[v1.3.2](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.3.2)** - *2022-08-30*
+- 新增功能:
+  - 新增漫画ID直搜功能，以支持下载已经下架的漫画 ([#30][i30])
+- 修复bug:
+  - 修复了一个可能会导致下载完成后下载列表显示错误的bug
+  - 修复了一个下载失败后任务未能正确移除的bug
+- 优化设置:
+  - 保存格式现在可以动态修改了
+  - 为了避免总进度条频繁回退，改为包括已经完成的任务
+
+[i30]: https://github.com/Zeal-L/BiliBili-Manga-Downloader/issues/30
+
 ### **[v1.3.1](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.3.1)** - *2022-08-25*
 - 修复bug:
   - 修复了一个在保存格式为 `pdf` 时导致内存泄漏的bug ([#68][i68])

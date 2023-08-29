@@ -47,10 +47,9 @@ class DownloadUI(QObject):
 
         # ?###########################################################
         # ? 任务进度更新的信号槽绑定
-        def _(result: dict):
+        def _(result: dict) -> None:
             taskID = result["taskID"]
             rate = result["rate"]
-            path = result["path"]
 
             # ? 更新当前任务的进度条
             self.tasks_bar[taskID]["bar"].setValue(rate)
@@ -65,7 +64,7 @@ class DownloadUI(QObject):
                         if rate == 100:
                             # ? 取出标题组件用于添加到已完成列表
                             label_title = to_delete.layout().itemAt(0).widget()
-                            self.addFinished(mainGUI, label_title, path)
+                            self.addFinished(mainGUI, label_title, result["path"])
                         # ? deleteLater 会有延迟，为了显示效果，先将父控件设为None
                         to_delete.setParent(None)
                         to_delete.deleteLater()
@@ -92,7 +91,7 @@ class DownloadUI(QObject):
 
         # ?###########################################################
         # ? 绑定清空已完成列表按钮
-        def _():
+        def _() -> None:
             for i in reversed(range(mainGUI.verticalLayout_finished.count())):
                 to_delete = mainGUI.verticalLayout_finished.itemAt(i).widget()
                 to_delete.setParent(None)

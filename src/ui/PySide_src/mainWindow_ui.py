@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1138, 699)
+        MainWindow.resize(1152, 699)
         icon = QIcon()
         icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -62,25 +62,47 @@ class Ui_MainWindow(object):
 
         self.lineEdit_manga_search_name = QLineEdit(self.tab_manga_search)
         self.lineEdit_manga_search_name.setObjectName(u"lineEdit_manga_search_name")
-        self.lineEdit_manga_search_name.setMaximumSize(QSize(300, 16777215))
+        self.lineEdit_manga_search_name.setMinimumSize(QSize(0, 0))
+        self.lineEdit_manga_search_name.setMaximumSize(QSize(16777215, 16777215))
 
         self.h_Layout_manga_search.addWidget(self.lineEdit_manga_search_name)
 
         self.pushButton_manga_search_name = QPushButton(self.tab_manga_search)
         self.pushButton_manga_search_name.setObjectName(u"pushButton_manga_search_name")
+        self.pushButton_manga_search_name.setMaximumSize(QSize(50, 16777215))
 
         self.h_Layout_manga_search.addWidget(self.pushButton_manga_search_name)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.h_Layout_manga_search.addItem(self.horizontalSpacer)
 
         self.label_manga_search = QLabel(self.tab_manga_search)
         self.label_manga_search.setObjectName(u"label_manga_search")
 
         self.h_Layout_manga_search.addWidget(self.label_manga_search)
 
-        self.h_Layout_manga_search.setStretch(1, 1)
+        self.line_12 = QFrame(self.tab_manga_search)
+        self.line_12.setObjectName(u"line_12")
+        self.line_12.setFrameShape(QFrame.VLine)
+        self.line_12.setFrameShadow(QFrame.Sunken)
+
+        self.h_Layout_manga_search.addWidget(self.line_12)
+
+        self.label_5 = QLabel(self.tab_manga_search)
+        self.label_5.setObjectName(u"label_5")
+
+        self.h_Layout_manga_search.addWidget(self.label_5)
+
+        self.lineEdit_manga_search_id = QLineEdit(self.tab_manga_search)
+        self.lineEdit_manga_search_id.setObjectName(u"lineEdit_manga_search_id")
+        self.lineEdit_manga_search_id.setMaxLength(5)
+        self.lineEdit_manga_search_id.setClearButtonEnabled(False)
+
+        self.h_Layout_manga_search.addWidget(self.lineEdit_manga_search_id)
+
+        self.pushButton_manga_search_id = QPushButton(self.tab_manga_search)
+        self.pushButton_manga_search_id.setObjectName(u"pushButton_manga_search_id")
+        self.pushButton_manga_search_id.setMaximumSize(QSize(50, 16777215))
+
+        self.h_Layout_manga_search.addWidget(self.pushButton_manga_search_id)
+
 
         self.verticalLayout_17.addLayout(self.h_Layout_manga_search)
 
@@ -123,7 +145,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 517, 191))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 524, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -354,6 +376,8 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_19.addWidget(self.groupBox_chp_detail)
 
+        self.horizontalLayout_19.setStretch(0, 1)
+        self.horizontalLayout_19.setStretch(1, 1)
         self.tabWidget.addTab(self.tab_my_manga, "")
         self.tab_download = QWidget()
         self.tab_download.setObjectName(u"tab_download")
@@ -415,7 +439,7 @@ class Ui_MainWindow(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1068, 554))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1082, 554))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -437,7 +461,7 @@ class Ui_MainWindow(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 61, 18))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 78, 18))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -787,6 +811,9 @@ class Ui_MainWindow(object):
         self.lineEdit_manga_search_name.setText("")
         self.pushButton_manga_search_name.setText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22", None))
         self.label_manga_search.setText("")
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753bID", None))
+        self.lineEdit_manga_search_id.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u76845\u4f4d\u6570\u5b57ID", None))
+        self.pushButton_manga_search_id.setText(QCoreApplication.translate("MainWindow", u"\u76f4\u8fbe", None))
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWindow", u"\u641c\u7d22\u6f2b\u753b", None))
         self.label_myLibrary_count.setText(QCoreApplication.translate("MainWindow", u"\u5e93\u5b58\uff1a", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"(\u53f3\u952e\u6253\u5f00\u6587\u4ef6\u5939)", None))
