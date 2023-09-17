@@ -10,6 +10,7 @@ import logging
 import os
 import re
 from logging.handlers import TimedRotatingFileHandler
+from sys import platform
 from typing import TYPE_CHECKING
 
 import requests
@@ -42,7 +43,7 @@ RETRY_WAIT_EX = 200
 # 配置日志记录器
 ############################################################
 
-appdata_path = os.getenv("APPDATA")
+appdata_path = os.getenv("APPDATA") if platform == "win32" else os.path.join(os.getenv("HOME"), ".config")
 data_path = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
 if not os.path.exists(data_path):
     os.mkdir(data_path)

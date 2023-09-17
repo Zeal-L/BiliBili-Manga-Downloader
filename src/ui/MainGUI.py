@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from functools import partial
+from sys import platform
 from typing import Any
 
 from PySide6.QtCore import Signal
@@ -45,7 +46,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
         # ?###########################################################
         # ? 获取应用程序数据目录
-        appdata_path = os.getenv("APPDATA")
+        appdata_path = os.getenv("APPDATA") if platform == "win32" else os.path.join(os.getenv("HOME"), ".config")
         self.app_folder = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
         if not os.path.exists(self.app_folder):
             os.mkdir(self.app_folder)
