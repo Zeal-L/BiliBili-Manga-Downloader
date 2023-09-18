@@ -6,7 +6,6 @@ import json
 import logging
 import os
 from functools import partial
-from sys import platform
 from typing import Any
 
 from PySide6.QtCore import Signal
@@ -18,7 +17,7 @@ from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
 from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.Utils import __version__, logger
+from src.Utils import __version__, logger, data_path
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
@@ -45,15 +44,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
         # ?###########################################################
-        # ? 获取应用程序数据目录
-        appdata_path = os.getenv("APPDATA") if platform == "win32" else os.path.join(os.getenv("HOME"), ".config")
-        self.app_folder = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
-        if not os.path.exists(self.app_folder):
-            os.mkdir(self.app_folder)
-
-        # ?###########################################################
         # ? 读取配置文件，以及初始化 save_path
-        self.config_path = os.path.join(self.app_folder, "config.json")
+        self.config_path = os.path.join(data_path, "config.json")
         self.config = {}
 
         if self.getConfig("save_path"):
@@ -88,9 +80,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
         if self.settingUI.clear_user_data:
             try:
-                _(self.app_folder)
+                _(data_path)
             except OSError as e:
-                logger.error(f"清除用户数据失败 - 目录:{self.app_folder}\n{e}")
+                logger.error(f"清除用户数据失败 - 目录:{data_path}\n{e}")
 
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
         logging.shutdown()

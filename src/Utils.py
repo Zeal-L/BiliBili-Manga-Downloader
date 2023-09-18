@@ -18,6 +18,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
+from webbrowser import open as web_open
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -43,7 +44,11 @@ RETRY_WAIT_EX = 200
 # 配置日志记录器
 ############################################################
 
-appdata_path = os.getenv("APPDATA") if platform == "win32" else os.path.join(os.getenv("HOME"), ".config")
+if platform == "win32":
+    appdata_path = os.getenv("APPDATA")
+elif platform == "linux":
+    appdata_path = os.getenv("HOME")
+
 data_path = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
 if not os.path.exists(data_path):
     os.mkdir(data_path)
@@ -104,7 +109,12 @@ def openFolderAndSelectItems(path: str) -> None:
     """
     path = os.path.normpath(path)
     try:
-        __inner__openFolderAndSelectItems(path)
+        if platform == "linux":
+            if os.path.isfile(path):
+                path = os.path.dirname(path)
+            web_open(f"file:///{path}")
+        elif platform == "win32":
+            __inner__openFolderAndSelectItems_windows(path)
     except ValueError as e:
         logger.error(f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}")
     except TypeError as e:
@@ -119,7 +129,7 @@ def openFolderAndSelectItems(path: str) -> None:
         logger.error(f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}")
 
 
-def __inner__openFolderAndSelectItems(path):
+def __inner__openFolderAndSelectItems_windows(path):
     # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
     # CoInitialize 函数会初始化COM库，为当前线程分配资源。在调用CoInitialize之前，不能使用COM库，
     # 如果调用了CoInitialize函数，就必须在使用完COM库之后调用CoUninitialize函数来反初始化COM库。

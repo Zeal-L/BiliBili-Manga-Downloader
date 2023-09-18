@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import json
 import os
+from sys import platform
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from re import sub
 from typing import TYPE_CHECKING
 
+from webbrowser import open as web_open
 from pypinyin import lazy_pinyin
 from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap, QIntValidator
@@ -22,6 +24,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QWidget,
 )
+
 
 from src.BiliPlus import BiliPlusComic
 from src.Comic import Comic
@@ -121,7 +124,7 @@ class MangaUI(QObject):
             comic_id = mainGUI.lineEdit_manga_search_id.text().strip()
             # ? 如果输入框为空，或者不是五位数字，提示用户输入正确的id
             if len(comic_id) < 5:
-                QMessageBox.critical(mainGUI, "警告", "请输入五位漫画名ID！")
+                QMessageBox.critical(mainGUI, "警告", "请输入五位漫画ID！")
                 return
             self.present_comic_id = comic_id
             self.resolveEnable(mainGUI, "resolving")
@@ -333,7 +336,12 @@ class MangaUI(QObject):
         # ? 绑定右键漫画打开文件夹事件
         def myMenu_openFolder(widget: QWidget, comic_path: str, pos: QPoint) -> None:
             menu = QMenu()
-            menu.addAction("打开文件夹", lambda: os.startfile(comic_path))
+            menu.addAction(
+                "打开文件夹",
+                lambda: os.startfile(comic_path)
+                if platform == "win32"
+                else web_open(f"file:///{comic_path}"),
+            )
             menu.exec_(widget.mapToGlobal(pos))
 
         widget.setContextMenuPolicy(Qt.CustomContextMenu)
