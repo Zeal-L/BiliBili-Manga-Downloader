@@ -614,20 +614,14 @@ class MangaUI(QObject):
         )
 
         def _(item: QListWidgetItem) -> None:
-            self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             if item.flags() == Qt.NoItemFlags:
                 return
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)
-                self.num_selected -= 1
             elif item.checkState() == Qt.Unchecked:
                 item.setCheckState(Qt.Checked)
-                self.num_selected += 1
             self.mainGUI.label_chp_detail_num_selected.setText(
                 f"已选中：{self.num_selected}"
-            )
-            self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-                self.checkbox_change_callBack
             )
 
         self.mainGUI.listWidget_chp_detail.itemPressed.connect(_)
