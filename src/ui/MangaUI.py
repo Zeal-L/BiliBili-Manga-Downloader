@@ -627,6 +627,29 @@ class MangaUI(QObject):
         self.mainGUI.listWidget_chp_detail.itemPressed.connect(_)
 
         # ?###########################################################
+        # ? 绑定回车选择信号
+        self.mainGUI.listWidget_chp_detail.itemActivated.connect(_)
+
+        # ?###########################################################
+        # ? 绑定鼠标框选信号
+
+        def _() -> None:
+            if not self.mainGUI.Key_Alt:
+                return
+            selected_items = self.mainGUI.listWidget_chp_detail.selectedItems()
+            for item in selected_items:
+                if item.flags() == Qt.NoItemFlags:
+                    continue
+                if item.checkState() == Qt.Checked and self.mainGUI.Key_Shift:
+                    item.setCheckState(Qt.Unchecked)
+                elif item.checkState() == Qt.Unchecked and not self.mainGUI.Key_Shift:
+                    item.setCheckState(Qt.Checked)
+            self.mainGUI.label_chp_detail_num_selected.setText(
+                f"已选中：{self.num_selected}"
+            )
+        self.mainGUI.listWidget_chp_detail.itemSelectionChanged.connect(_)
+
+        # ?###########################################################
         # ? 绑定右键菜单，让用户可以勾选或者全选等
 
         def checkSelected() -> None:

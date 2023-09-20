@@ -8,8 +8,8 @@ import os
 from functools import partial
 from typing import Any
 
-from PySide6.QtCore import Signal
-from PySide6.QtGui import QCloseEvent, QFont
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
 
@@ -40,6 +40,11 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             lambda msg: QMessageBox.warning(None, "警告", msg)
         )
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
+        
+        # ?###########################################################
+        # ? 初始化功能键状态
+        self.Key_Alt = 0
+        self.Key_Shift = 0
 
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
@@ -87,6 +92,38 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
         logging.shutdown()
         event.accept()
+    
+    ############################################################
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        """覆写QMainWindow的keyPressEvent方法
+
+        Args:
+            event (QKeyEvent): 事件类
+
+        Returns:
+            None
+        """
+        if event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
+            self.Key_Alt = 1
+        elif event.key() == Qt.Key.Key_Shift:
+            self.Key_Shift = 1
+        return super().keyPressEvent(event)
+
+    ############################################################
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        """覆写QMainWindow的keyReleaseEvent方法
+
+        Args:
+            event (QKeyEvent): 事件类
+
+        Returns:
+            None
+        """
+        if event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
+            self.Key_Alt = 0
+        elif event.key() == Qt.Key.Key_Shift:
+            self.Key_Shift = 0
+        return super().keyReleaseEvent(event)
 
     ############################################################
     def getConfig(self, key: str) -> Any:
