@@ -80,7 +80,7 @@ class BiliPlusComic(Comic):
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
-            if "未登录" in res.text:
+            if "未登录" in res.text or 'src="http' not in res.text:
                 self.mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
                 return {}
             if res.status_code != 200:

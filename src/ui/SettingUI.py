@@ -258,7 +258,7 @@ class SettingUI(QObject):
             if "hoz-container" not in res.text:
                 logger.warning("BiliPlus Cookie检测出现故障，暂时无法检测是否有效...")
                 raise ReferenceError
-            if 'class="comic-single"' not in res.text:
+            if 'class="comic-single"' not in res.text or 'src="http' not in res.text:
                 logger.warning("BiliPlus Cookie无效!重试中...")
                 raise requests.HTTPError()
 
