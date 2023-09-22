@@ -586,8 +586,6 @@ class MangaUI(QObject):
         Args:
             item (QListWidgetItem): 被点击的item
         """
-        # 暂停itemChanged 信号，防止死循环
-        self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
         if item.flags() == Qt.NoItemFlags:
             return
         if item.checkState() == Qt.Checked:
@@ -595,9 +593,6 @@ class MangaUI(QObject):
         elif item.checkState() == Qt.Unchecked:
             self.num_selected -= 1
         self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-        self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-            self.checkbox_change_callBack
-        )
 
     ############################################################
 
@@ -620,34 +615,44 @@ class MangaUI(QObject):
                 item.setCheckState(Qt.Unchecked)
             elif item.checkState() == Qt.Unchecked:
                 item.setCheckState(Qt.Checked)
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
 
         self.mainGUI.listWidget_chp_detail.itemPressed.connect(_)
 
         # ?###########################################################
         # ? 绑定回车选择信号
+
+        def _(currentItem: QListWidgetItem) -> None:
+            checked = Qt.Unchecked if currentItem.checkState() == Qt.Checked else Qt.Checked
+            selected_items = self.mainGUI.listWidget_chp_detail.selectedItems()
+            for item in selected_items:
+                item.setCheckState(checked)
         self.mainGUI.listWidget_chp_detail.itemActivated.connect(_)
 
         # ?###########################################################
-        # ? 绑定鼠标框选信号
+        # ? 绑定更改当前选择项信号
+        # 原本想实现按住Ctrl移动方向键进行多个选中，但影响按住Ctrl的鼠标选择，原因不明故注释
+        # def _(current: QListWidgetItem, previous: QListWidgetItem) -> None:
+        #     if not (self.mainGUI.Key_Ctrl or self.mainGUI.Key_Alt):
+        #         return
+        #     if self.mainGUI.Key_Ctrl and not self.mainGUI.Key_Alt:
+        #         current.setSelected(True)
+        #     if self.mainGUI.Key_Ctrl and self.mainGUI.Key_Alt:
+        #         previous.setSelected(False)
+        # self.mainGUI.listWidget_chp_detail.currentItemChanged.connect(_)
 
-        def _() -> None:
-            if not self.mainGUI.Key_Alt:
+        # ?###########################################################
+        # ? 绑定鼠标划过信号
+
+        def _(item: QListWidgetItem) -> None:
+            if item.flags() == Qt.NoItemFlags:
                 return
-            selected_items = self.mainGUI.listWidget_chp_detail.selectedItems()
-            for item in selected_items:
-                if item.flags() == Qt.NoItemFlags:
-                    continue
-                if item.checkState() == Qt.Checked and self.mainGUI.Key_Shift:
-                    item.setCheckState(Qt.Unchecked)
-                elif item.checkState() == Qt.Unchecked and not self.mainGUI.Key_Shift:
-                    item.setCheckState(Qt.Checked)
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
-        self.mainGUI.listWidget_chp_detail.itemSelectionChanged.connect(_)
+            if not (self.mainGUI.Key_Shift or self.mainGUI.Key_Alt):
+                return
+            if self.mainGUI.Key_Shift and self.mainGUI.Key_Alt:
+                item.setCheckState(Qt.Unchecked)
+            elif self.mainGUI.Key_Alt:
+                item.setCheckState(Qt.Checked)
+        self.mainGUI.listWidget_chp_detail.itemEntered.connect(_)
 
         # ?###########################################################
         # ? 绑定右键菜单，让用户可以勾选或者全选等

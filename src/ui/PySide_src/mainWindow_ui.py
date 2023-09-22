@@ -359,6 +359,7 @@ class Ui_MainWindow(object):
 
         self.listWidget_chp_detail = QListWidget(self.groupBox_chp_detail)
         self.listWidget_chp_detail.setObjectName(u"listWidget_chp_detail")
+        self.listWidget_chp_detail.setMouseTracking(True)
         self.listWidget_chp_detail.setAutoFillBackground(True)
         self.listWidget_chp_detail.setDragEnabled(True)
         self.listWidget_chp_detail.setSelectionMode(QAbstractItemView.ExtendedSelection)

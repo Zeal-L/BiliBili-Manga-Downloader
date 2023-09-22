@@ -43,6 +43,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         
         # ?###########################################################
         # ? 初始化功能键状态
+        self.Key_Ctrl = 0
         self.Key_Alt = 0
         self.Key_Shift = 0
 
@@ -103,7 +104,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         Returns:
             None
         """
-        if event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
+        if event.key() == Qt.Key.Key_Control:
+            self.Key_Ctrl = 1
+        elif event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
             self.Key_Alt = 1
         elif event.key() == Qt.Key.Key_Shift:
             self.Key_Shift = 1
@@ -119,6 +122,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         Returns:
             None
         """
+        if event.key() == Qt.Key.Key_Control:
+            self.Key_Ctrl = 0
         if event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
             self.Key_Alt = 0
         elif event.key() == Qt.Key.Key_Shift:
