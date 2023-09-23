@@ -8,8 +8,8 @@ import os
 from functools import partial
 from typing import Any
 
-from PySide6.QtCore import Signal, Qt
-from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent, QFocusEvent
+from PySide6.QtCore import Signal, Qt, QEvent, QObject
+from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
 
@@ -40,14 +40,18 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             lambda msg: QMessageBox.warning(None, "警告", msg)
         )
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
-        
+
         # ?###########################################################
         # ? 初始化功能键状态
         self.CtrlPress = False
         self.AltPress = False
         self.ShiftPress = False
         self.isFocus = True
-        self.setFocusPolicy(Qt.StrongFocus)
+
+        # ?###########################################################
+        # ? 初始化事件过滤器
+        self.mainEventFilter = self.initEventFilter()
+        self.app.installEventFilter(self.mainEventFilter)
 
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
@@ -97,6 +101,26 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         event.accept()
     
     ############################################################
+    def initEventFilter(self) -> QObject:
+        """初始化并返回事件过滤器
+
+        Args:
+            None
+
+        Returns:
+            mainEventFilter (QObject): 主窗口事件过滤器
+        """
+        class MainEventFilter(QObject):
+            def eventFilter(cSelf, obj: QObject, event: QEvent):
+                if event.type() == QEvent.ApplicationDeactivate:
+                    self.isFocus = False
+                    self.CtrlPress, self.AltPress, self.ShiftPress = False, False, False
+                elif event.type() == QEvent.ApplicationActivate:
+                    self.isFocus = True
+                return super().eventFilter(obj, event)
+        return MainEventFilter()
+
+    ############################################################
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """覆写QMainWindow的keyPressEvent方法
 
@@ -131,30 +155,6 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         elif event.key() == Qt.Key.Key_Shift:
             self.ShiftPress = False
         return super().keyReleaseEvent(event)
-
-    ############################################################
-    def focusOutEvent(self, event: QFocusEvent) -> None:
-        """覆写QMainWindow的focusOutEvent方法
-
-        Args:
-            event (QKeyEvent): 事件类
-
-        Returns:
-            None
-        """
-        self.isFocus = False
-        self.CtrlPress, self.AltPress, self.ShiftPress = False, False, False
-
-    def focusInEvent(self, event: QFocusEvent) -> None:
-        """覆写QMainWindow的focusInEvent方法
-
-        Args:
-            event (QKeyEvent): 事件类
-
-        Returns:
-            None
-        """
-        self.isFocus = True
 
     ############################################################
     def getConfig(self, key: str) -> Any:
