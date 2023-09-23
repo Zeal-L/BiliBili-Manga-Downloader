@@ -9,7 +9,7 @@ from functools import partial
 from typing import Any
 
 from PySide6.QtCore import Signal, Qt
-from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
+from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent, QFocusEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
 
@@ -43,9 +43,11 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         
         # ?###########################################################
         # ? 初始化功能键状态
-        self.Key_Ctrl = 0
-        self.Key_Alt = 0
-        self.Key_Shift = 0
+        self.CtrlPress = False
+        self.AltPress = False
+        self.ShiftPress = False
+        self.isFocus = True
+        self.setFocusPolicy(Qt.StrongFocus)
 
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
@@ -105,11 +107,11 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             None
         """
         if event.key() == Qt.Key.Key_Control:
-            self.Key_Ctrl = 1
+            self.CtrlPress = True
         elif event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
-            self.Key_Alt = 1
+            self.AltPress = True
         elif event.key() == Qt.Key.Key_Shift:
-            self.Key_Shift = 1
+            self.ShiftPress = True
         return super().keyPressEvent(event)
 
     ############################################################
@@ -123,12 +125,36 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             None
         """
         if event.key() == Qt.Key.Key_Control:
-            self.Key_Ctrl = 0
+            self.CtrlPress = False
         if event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
-            self.Key_Alt = 0
+            self.AltPress = False
         elif event.key() == Qt.Key.Key_Shift:
-            self.Key_Shift = 0
+            self.ShiftPress = False
         return super().keyReleaseEvent(event)
+
+    ############################################################
+    def focusOutEvent(self, event: QFocusEvent) -> None:
+        """覆写QMainWindow的focusOutEvent方法
+
+        Args:
+            event (QKeyEvent): 事件类
+
+        Returns:
+            None
+        """
+        self.isFocus = False
+        self.CtrlPress, self.AltPress, self.ShiftPress = False, False, False
+
+    def focusInEvent(self, event: QFocusEvent) -> None:
+        """覆写QMainWindow的focusInEvent方法
+
+        Args:
+            event (QKeyEvent): 事件类
+
+        Returns:
+            None
+        """
+        self.isFocus = True
 
     ############################################################
     def getConfig(self, key: str) -> Any:

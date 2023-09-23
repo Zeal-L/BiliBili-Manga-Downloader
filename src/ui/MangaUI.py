@@ -632,11 +632,11 @@ class MangaUI(QObject):
         # ? 绑定更改当前选择项信号
         # 原本想实现按住Ctrl移动方向键进行多个选中，但影响按住Ctrl的鼠标选择，原因不明故注释
         # def _(current: QListWidgetItem, previous: QListWidgetItem) -> None:
-        #     if not (self.mainGUI.Key_Ctrl or self.mainGUI.Key_Alt):
+        #     if not (self.mainGUI.CtrlPress or self.mainGUI.AltPress):
         #         return
-        #     if self.mainGUI.Key_Ctrl and not self.mainGUI.Key_Alt:
+        #     if self.mainGUI.CtrlPress and not self.mainGUI.AltPress:
         #         current.setSelected(True)
-        #     if self.mainGUI.Key_Ctrl and self.mainGUI.Key_Alt:
+        #     if self.mainGUI.CtrlPress and self.mainGUI.AltPress:
         #         previous.setSelected(False)
         # self.mainGUI.listWidget_chp_detail.currentItemChanged.connect(_)
 
@@ -646,11 +646,11 @@ class MangaUI(QObject):
         def _(item: QListWidgetItem) -> None:
             if item.flags() == Qt.NoItemFlags:
                 return
-            if not (self.mainGUI.Key_Shift or self.mainGUI.Key_Alt):
+            if not self.mainGUI.isFocus or not (self.mainGUI.ShiftPress or self.mainGUI.AltPress):
                 return
-            if self.mainGUI.Key_Shift and self.mainGUI.Key_Alt:
+            if self.mainGUI.ShiftPress and self.mainGUI.AltPress:
                 item.setCheckState(Qt.Unchecked)
-            elif self.mainGUI.Key_Alt:
+            elif self.mainGUI.AltPress:
                 item.setCheckState(Qt.Checked)
         self.mainGUI.listWidget_chp_detail.itemEntered.connect(_)
 
