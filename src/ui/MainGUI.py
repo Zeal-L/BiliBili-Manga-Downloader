@@ -6,7 +6,7 @@ import json
 import logging
 import os
 from functools import partial
-from typing import Any
+from typing import Any, Optional
 
 from PySide6.QtCore import Signal, Qt, QEvent, QObject
 from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
@@ -99,7 +99,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
         logging.shutdown()
         event.accept()
-    
+
     ############################################################
     def initEventFilter(self) -> QObject:
         """初始化并返回事件过滤器
@@ -110,15 +110,41 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         Returns:
             mainEventFilter (QObject): 主窗口事件过滤器
         """
+
         class MainEventFilter(QObject):
-            def eventFilter(cSelf, obj: QObject, event: QEvent):
+            """用于过滤主窗口事件的类。
+
+            Args:
+                outer_self (MainGUI): 外部类的实例
+                parent (Optional[QObject], optional): 父对象。默认为 None
+            """
+
+            def __init__(
+                self, outer_self: MainGUI, parent: Optional[QObject] = None
+            ) -> None:
+                self.outer_self = outer_self
+                super().__init__(parent)
+
+            def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+                """重写事件过滤器函数。
+
+                Args:
+                    obj (QObject): 发送事件的对象
+                    event (QEvent): 事件对象
+
+                Returns:
+                    bool: 是否过滤该事件
+                """
                 if event.type() == QEvent.ApplicationDeactivate:
-                    self.isFocus = False
-                    self.CtrlPress = self.AltPress = self.ShiftPress = False
+                    self.outer_self.isFocus = False
+                    self.outer_self.CtrlPress = (
+                        self.outer_self.AltPress
+                    ) = self.outer_self.ShiftPress = False
                 elif event.type() == QEvent.ApplicationActivate:
-                    self.isFocus = True
+                    self.outer_self.isFocus = True
                 return super().eventFilter(obj, event)
-        return MainEventFilter()
+
+        return MainEventFilter(outer_self=self)
 
     ############################################################
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -132,7 +158,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         """
         if event.key() == Qt.Key.Key_Control:
             self.CtrlPress = True
-        elif event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
+        elif event.key() in [Qt.Key.Key_Alt, Qt.Key.Key_Option]:
             self.AltPress = True
         elif event.key() == Qt.Key.Key_Shift:
             self.ShiftPress = True
@@ -150,7 +176,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         """
         if event.key() == Qt.Key.Key_Control:
             self.CtrlPress = False
-        if event.key() == Qt.Key.Key_Alt or event.key() == Qt.Key.Key_Option:
+        if event.key() in [Qt.Key.Key_Alt, Qt.Key.Key_Option]:
             self.AltPress = False
         elif event.key() == Qt.Key.Key_Shift:
             self.ShiftPress = False
