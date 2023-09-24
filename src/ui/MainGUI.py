@@ -102,17 +102,16 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
     ############################################################
     def initEventFilter(self) -> QObject:
-        """初始化并返回事件过滤器
-
-        Args:
-            None
+        """初始化主事件过滤器
+        当前主事件过滤器主要是对QEvent.ApplicationDeactivate与QEvent.ApplicationActivate
+        即焦点的失去与获得进行处理
 
         Returns:
             mainEventFilter (QObject): 主窗口事件过滤器
         """
 
         class MainEventFilter(QObject):
-            """用于过滤主窗口事件的类。
+            """用于过滤主窗口事件的类
 
             Args:
                 outer_self (MainGUI): 外部类的实例
@@ -126,7 +125,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 super().__init__(parent)
 
             def eventFilter(self, obj: QObject, event: QEvent) -> bool:
-                """重写事件过滤器函数。
+                """重写事件过滤器函数
 
                 Args:
                     obj (QObject): 发送事件的对象

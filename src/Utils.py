@@ -14,7 +14,7 @@ from sys import platform
 from typing import TYPE_CHECKING
 
 import requests
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
@@ -97,7 +97,7 @@ def isCheckSumValid(etag, content) -> tuple[bool, str]:
 ############################################################
 
 
-def openFileOrDir(path: str) -> None:
+def openFileOrDir(mainGUI: MainGUI, path: str) -> None:
     """打开指定路径，使用Qt自带的兼容性打开方法
 
     Args:
@@ -105,12 +105,17 @@ def openFileOrDir(path: str) -> None:
     """
     path = os.path.normpath(path)
     if not os.path.exists(path):
-        logger.error(f"打开目录失败 - 目录不存在 - 目录:{path}")
+        content = f"目录不存在 - 打开目录失败 - 目录:\n{path}"
+        logger.error(content)
+        QMessageBox.warning(
+            mainGUI,
+            "打开文件夹失败",
+            content,
+        )
     else:
-        logger.info(f"打开 {path}")
-        QDesktopServices.openUrl(f"file:///{path}")
+        QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
-def openFolderAndSelectItems(path: str) -> None:
+def openFolderAndSelectItems(mainGUI: MainGUI, path: str) -> None:
     """读取一个文件的父目录, 如果可能的话，选择该文件。
 
         我们可以运行`explorer /select,filename`，
@@ -127,18 +132,26 @@ def openFolderAndSelectItems(path: str) -> None:
             if os.path.isfile(path):
                 path = os.path.dirname(path)
             openFileOrDir(path)
+        return
     except ValueError as e:
-        logger.error(f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except TypeError as e:
-        logger.error(f"类型错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"类型错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except RuntimeError as e:
-        logger.error(f"运行时错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"运行时错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except SystemError as e:
-        logger.error(f"系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"系统错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except OSError as e:
-        logger.error(f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except AttributeError as e:
-        logger.error(f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}"
+    logger.error(content)
+    QMessageBox.warning(
+        mainGUI,
+        "打开文件夹失败",
+        content,
+    )
+        
 
 def __inner__openFolderAndSelectItems_windows(path):
     # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库

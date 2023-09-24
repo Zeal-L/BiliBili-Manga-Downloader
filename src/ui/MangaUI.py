@@ -324,7 +324,7 @@ class MangaUI(QObject):
             menu = QMenu()
             menu.addAction(
                 "打开文件夹",
-                lambda: openFileOrDir(comic_path),
+                lambda: openFileOrDir(mainGUI, comic_path),
             )
             menu.exec_(widget.mapToGlobal(pos))
 

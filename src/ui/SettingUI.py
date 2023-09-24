@@ -340,7 +340,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
         mainGUI.pushButton_open_log.clicked.connect(
-            lambda: openFileOrDir(os.path.join(log_path, 'ERROR.log'))
+            lambda: openFileOrDir(mainGUI, os.path.join(log_path, 'ERROR.log'))
         )
 
     ############################################################
