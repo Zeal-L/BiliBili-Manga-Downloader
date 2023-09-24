@@ -6,13 +6,11 @@ from __future__ import annotations
 
 import json
 import os
-from sys import platform
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from re import sub
 from typing import TYPE_CHECKING
 
-from webbrowser import open as web_open
 from pypinyin import lazy_pinyin
 from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap, QIntValidator
@@ -29,7 +27,7 @@ from PySide6.QtWidgets import (
 from src.BiliPlus import BiliPlusComic
 from src.Comic import Comic
 from src.SearchComic import SearchComic
-from src.Utils import logger
+from src.Utils import logger, openFileOrDir
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -326,9 +324,7 @@ class MangaUI(QObject):
             menu = QMenu()
             menu.addAction(
                 "打开文件夹",
-                lambda: os.startfile(comic_path)
-                if platform == "win32"
-                else web_open(f"file:///{comic_path}"),
+                lambda: openFileOrDir(comic_path),
             )
             menu.exec_(widget.mapToGlobal(pos))
 

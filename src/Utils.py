@@ -15,10 +15,9 @@ from typing import TYPE_CHECKING
 
 import requests
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
-from webbrowser import open as web_open
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -98,73 +97,80 @@ def isCheckSumValid(etag, content) -> tuple[bool, str]:
 ############################################################
 
 
-def openFolderAndSelectItems(path: str) -> None:
-    """读取一个文件的父目录, 如果可能的话，选择该文件。
-
-        我们可以运行`explorer /select,filename`，
-        但这并不支持在选择一个已经打开的目录中的文件时重复使用现有的资源管理器窗口。
-        而且也不支持文件路径中包含空格和逗号等等的情况。
-    Args:
-        path (str): 文件或文件夹路径
-    """
+def openFileOrDir(path: str) -> None:
     path = os.path.normpath(path)
-    try:
-        if platform == "linux":
-            if os.path.isfile(path):
-                path = os.path.dirname(path)
-            web_open(f"file:///{path}")
-        elif platform == "win32":
-            __inner__openFolderAndSelectItems_windows(path)
-    except ValueError as e:
-        logger.error(f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}")
-    except TypeError as e:
-        logger.error(f"类型错误 - 打开文件夹失败 - 目录:{path}\n{e}")
-    except RuntimeError as e:
-        logger.error(f"运行时错误 - 打开文件夹失败 - 目录:{path}\n{e}")
-    except SystemError as e:
-        logger.error(f"系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
-    except OSError as e:
-        logger.error(f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
-    except AttributeError as e:
-        logger.error(f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+    if not os.path.exists(path):
+        logger.error(f"打开目录失败 - 目录不存在 - 目录:{path}")
+    else:
+        logger.info(f"打开 {path}")
+        QDesktopServices.openUrl(f"file:///{path}")
 
+# def openFolderAndSelectItems(path: str) -> None:
+#     """读取一个文件的父目录, 如果可能的话，选择该文件。
 
-def __inner__openFolderAndSelectItems_windows(path):
-    # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
-    # CoInitialize 函数会初始化COM库，为当前线程分配资源。在调用CoInitialize之前，不能使用COM库，
-    # 如果调用了CoInitialize函数，就必须在使用完COM库之后调用CoUninitialize函数来反初始化COM库。
-    CoInitialize = ctypes.windll.ole32.CoInitialize
-    CoInitialize.argtypes = [ctypes.c_void_p]
-    CoInitialize.restype = ctypes.HRESULT
-    CoUninitialize = ctypes.windll.ole32.CoUninitialize
-    CoUninitialize.argtypes = []
-    CoUninitialize.restype = None
+#         我们可以运行`explorer /select,filename`，
+#         但这并不支持在选择一个已经打开的目录中的文件时重复使用现有的资源管理器窗口。
+#         而且也不支持文件路径中包含空格和逗号等等的情况。
+#     Args:
+#         path (str): 文件或文件夹路径
+#     """
+#     path = os.path.normpath(path)
+#     try:
+#         if platform == "linux":
+#             if os.path.isfile(path):
+#                 path = os.path.dirname(path)
+#             openFileOrDir(path)
+#         elif platform == "win32":
+#             __inner__openFolderAndSelectItems_windows(path)
+#     except ValueError as e:
+#         logger.error(f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+#     except TypeError as e:
+#         logger.error(f"类型错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+#     except RuntimeError as e:
+#         logger.error(f"运行时错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+#     except SystemError as e:
+#         logger.error(f"系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+#     except OSError as e:
+#         logger.error(f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+#     except AttributeError as e:
+#         logger.error(f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}")
 
-    # ILCreateFromPathW 是一个 Windows API 函数，它可以根据给定的文件路径创建一个 Item ID List (PIDL)。
-    # PIDL 是一种 Windows Shell 中使用的数据结构，用来表示文件系统中的对象（文件夹或文件）的位置。
-    # 在这段代码中，使用了 ILCreateFromPath 函数来创建一个 PIDL，并在使用完之后使用 ILFree 函数来释放一个 PIDL 的内存.。这样可以避免内存泄漏
-    ILCreateFromPath = ctypes.windll.shell32.ILCreateFromPathW
-    ILCreateFromPath.argtypes = [ctypes.c_wchar_p]
-    ILCreateFromPath.restype = ctypes.c_void_p
-    ILFree = ctypes.windll.shell32.ILFree
-    ILFree.argtypes = [ctypes.c_void_p]
-    ILFree.restype = None
+# def __inner__openFolderAndSelectItems_windows(path):
+#     # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
+#     # CoInitialize 函数会初始化COM库，为当前线程分配资源。在调用CoInitialize之前，不能使用COM库，
+#     # 如果调用了CoInitialize函数，就必须在使用完COM库之后调用CoUninitialize函数来反初始化COM库。
+#     CoInitialize = ctypes.windll.ole32.CoInitialize
+#     CoInitialize.argtypes = [ctypes.c_void_p]
+#     CoInitialize.restype = ctypes.HRESULT
+#     CoUninitialize = ctypes.windll.ole32.CoUninitialize
+#     CoUninitialize.argtypes = []
+#     CoUninitialize.restype = None
 
-    # SHOpenFolderAndSelectItems 函数是一个 Windows API 函数，它是在 COM (Component Object Model) 环境中使用的
-    SHOpenFolderAndSelectItems = ctypes.windll.shell32.SHOpenFolderAndSelectItems
-    SHOpenFolderAndSelectItems.argtypes = [
-        ctypes.c_void_p,
-        ctypes.c_uint,
-        ctypes.c_void_p,
-        ctypes.c_ulong,
-    ]
-    SHOpenFolderAndSelectItems.restype = ctypes.HRESULT
+#     # ILCreateFromPathW 是一个 Windows API 函数，它可以根据给定的文件路径创建一个 Item ID List (PIDL)。
+#     # PIDL 是一种 Windows Shell 中使用的数据结构，用来表示文件系统中的对象（文件夹或文件）的位置。
+#     # 在这段代码中，使用了 ILCreateFromPath 函数来创建一个 PIDL，并在使用完之后使用 ILFree 函数来释放一个 PIDL 的内存.。这样可以避免内存泄漏
+#     ILCreateFromPath = ctypes.windll.shell32.ILCreateFromPathW
+#     ILCreateFromPath.argtypes = [ctypes.c_wchar_p]
+#     ILCreateFromPath.restype = ctypes.c_void_p
+#     ILFree = ctypes.windll.shell32.ILFree
+#     ILFree.argtypes = [ctypes.c_void_p]
+#     ILFree.restype = None
 
-    CoInitialize(None)
-    pidl = ILCreateFromPath(path)
-    SHOpenFolderAndSelectItems(pidl, 0, None, 0)
-    ILFree(pidl)
-    CoUninitialize()
+#     # SHOpenFolderAndSelectItems 函数是一个 Windows API 函数，它是在 COM (Component Object Model) 环境中使用的
+#     SHOpenFolderAndSelectItems = ctypes.windll.shell32.SHOpenFolderAndSelectItems
+#     SHOpenFolderAndSelectItems.argtypes = [
+#         ctypes.c_void_p,
+#         ctypes.c_uint,
+#         ctypes.c_void_p,
+#         ctypes.c_ulong,
+#     ]
+#     SHOpenFolderAndSelectItems.restype = ctypes.HRESULT
+
+#     CoInitialize(None)
+#     pidl = ILCreateFromPath(path)
+#     SHOpenFolderAndSelectItems(pidl, 0, None, 0)
+#     ILFree(pidl)
+#     CoUninitialize()
 
 
 ############################################################

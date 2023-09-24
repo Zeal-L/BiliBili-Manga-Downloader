@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt, Signal
@@ -11,7 +12,7 @@ from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QWidget
 
 from src.DownloadManager import DownloadManager
 from src.Episode import Episode
-from src.Utils import openFolderAndSelectItems
+from src.Utils import openFileOrDir
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -118,7 +119,7 @@ class DownloadUI(QObject):
         # ?###########################################################
         # ? 超链接打开保存路径
         label_file_path = QLabel("<a href='file:///'>打开文件夹</a>")
-        label_file_path.linkActivated.connect(lambda: openFolderAndSelectItems(path))
+        label_file_path.linkActivated.connect(lambda: openFileOrDir(os.path.dirname(path)))
         h_layout_download_list.addWidget(label_file_path)
 
         widget = QWidget()

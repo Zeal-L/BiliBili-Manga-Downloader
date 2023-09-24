@@ -7,10 +7,8 @@ from __future__ import annotations
 import os
 import threading
 from functools import partial
-from sys import platform
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, quote, urlparse
-from webbrowser import open as web_open
 
 import requests
 from PySide6.QtCore import QObject, Signal
@@ -26,6 +24,7 @@ from src.Utils import (
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
     checkNewVersion,
+    openFileOrDir,
     log_path,
     logger,
 )
@@ -341,9 +340,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
         mainGUI.pushButton_open_log.clicked.connect(
-            lambda: os.startfile(os.path.join(log_path, "ERROR.log"))
-            if platform == "win32"
-            else web_open(f"file:///{os.path.join(log_path, 'ERROR.log')}")
+            lambda: openFileOrDir(os.path.join(log_path, 'ERROR.log'))
         )
 
     ############################################################
