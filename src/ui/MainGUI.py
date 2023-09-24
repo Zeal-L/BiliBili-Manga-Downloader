@@ -114,7 +114,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             def eventFilter(cSelf, obj: QObject, event: QEvent):
                 if event.type() == QEvent.ApplicationDeactivate:
                     self.isFocus = False
-                    self.CtrlPress, self.AltPress, self.ShiftPress = False, False, False
+                    self.CtrlPress = self.AltPress = self.ShiftPress = False
                 elif event.type() == QEvent.ApplicationActivate:
                     self.isFocus = True
                 return super().eventFilter(obj, event)
