@@ -131,7 +131,7 @@ def openFolderAndSelectItems(mainGUI: MainGUI, path: str) -> None:
         else:
             if os.path.isfile(path):
                 path = os.path.dirname(path)
-            openFileOrDir(path)
+            openFileOrDir(mainGUI, path)
         return
     except ValueError as e:
         content = f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}"
