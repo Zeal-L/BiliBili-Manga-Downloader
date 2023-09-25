@@ -104,7 +104,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
 
-        def _():
+        def _() -> None:
             qr = QrCode(mainGUI)
             img = qr.generate()
             if img is None:
@@ -140,7 +140,7 @@ class SettingUI(QObject):
             mainGUI.lineEdit_my_cookie.setText(stored_cookie)
             self.is_cookie_valid(mainGUI, stored_cookie)
 
-        def _():
+        def _() -> None:
             new_cookie = mainGUI.lineEdit_my_cookie.text()
             if new_cookie == "":
                 QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
@@ -211,7 +211,7 @@ class SettingUI(QObject):
             mainGUI.lineEdit_biliplus_cookie.setText(stored_cookie)
             self.is_biliplus_cookie_valid(mainGUI, stored_cookie)
 
-        def _():
+        def _() -> None:
             new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
             if new_cookie == "":
                 QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
@@ -286,8 +286,8 @@ class SettingUI(QObject):
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
-
-        def _():
+        #? 绑定选择路径按钮的回调函数
+        def _() -> None:
             path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
             if os.path.exists(path):
                 mainGUI.lineEdit_save_path.setText(path)
@@ -298,7 +298,8 @@ class SettingUI(QObject):
 
         mainGUI.pushButton_save_path.clicked.connect(_)
 
-        def _():
+        #? 绑定保存路径文本框的回调函数
+        def _() -> None:
             path = mainGUI.lineEdit_save_path.text()
             if os.path.exists(path):
                 mainGUI.updateConfig("save_path", path)
@@ -326,7 +327,7 @@ class SettingUI(QObject):
             f"同时下载线程数：{mainGUI.getConfig('num_thread')}"
         )
 
-        def _(value):
+        def _(value) -> None:
             mainGUI.label_num_thread_count.setText(f"同时下载线程数：{value}")
             mainGUI.updateConfig("num_thread", value)
 
@@ -361,7 +362,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
 
-        def _():
+        def _() -> None:
             res = QMessageBox.information(
                 mainGUI,
                 "提示",

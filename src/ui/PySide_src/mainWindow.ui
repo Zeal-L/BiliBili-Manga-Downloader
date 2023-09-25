@@ -192,8 +192,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>524</width>
-                   <height>191</height>
+                   <width>63</width>
+                   <height>18</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -650,7 +650,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>78</width>
+                   <width>61</width>
                    <height>18</height>
                   </rect>
                  </property>
@@ -877,6 +877,25 @@
             </property>
             <layout class="QHBoxLayout" name="h_Layout_groupBox_save_method">
              <item>
+              <widget class="QRadioButton" name="radioButton_save_method_folder">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>文件夹-图片</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QRadioButton" name="radioButton_save_method_pdf">
                <property name="minimumSize">
                 <size>
@@ -888,7 +907,7 @@
                 <string>PDF</string>
                </property>
                <property name="checked">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -909,10 +928,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="radioButton_save_method_folder">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
+              <widget class="QRadioButton" name="radioButton_save_method_Zip">
                <property name="minimumSize">
                 <size>
                  <width>60</width>
@@ -920,9 +936,12 @@
                 </size>
                </property>
                <property name="text">
-                <string>文件夹-图片</string>
+                <string>Zip压缩包</string>
                </property>
                <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="autoRepeat">
                 <bool>false</bool>
                </property>
               </widget>
