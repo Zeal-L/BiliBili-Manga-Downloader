@@ -38,7 +38,7 @@ body:
     id: version
     attributes:
       label: 哔哩哔哩漫画下载器版本号
-      placeholder: v1.3.2
+      placeholder: v1.4.0
     validations:
       required: true
   - type: dropdown
@@ -46,10 +46,10 @@ body:
     attributes:
       label: 系统环境
       options:
-        - Windows10
-        - Windows11
-        - 其他 - 请在问题描述里附加
-      description: 目前主要适配Windows10
+        - Windows
+        - Linux
+        - Mac
+      description: 目前主要适配Windows平台
     validations:
       required: true
   - type: textarea

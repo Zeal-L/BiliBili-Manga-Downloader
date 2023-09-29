@@ -545,6 +545,12 @@ class MangaUI(QObject):
         num_unlocked: int = info["num_unlocked"]
 
         # ?###########################################################
+        # ? 删除教学文本框
+        if self.mainGUI.listWidget_chp_detail.maximumHeight() == 0:
+            self.mainGUI.textBrowser_tutorial.deleteLater()
+            self.mainGUI.listWidget_chp_detail.setMaximumHeight(16777215)
+
+        # ?###########################################################
         # ? 更新漫画章节详情
         mainGUI.listWidget_chp_detail.clear()
         for epi in self.epi_list:
@@ -618,10 +624,13 @@ class MangaUI(QObject):
         # ? 绑定回车选择信号
 
         def _(currentItem: QListWidgetItem) -> None:
-            checked = Qt.Unchecked if currentItem.checkState() == Qt.Checked else Qt.Checked
+            checked = (
+                Qt.Unchecked if currentItem.checkState() == Qt.Checked else Qt.Checked
+            )
             selected_items = self.mainGUI.listWidget_chp_detail.selectedItems()
             for item in selected_items:
                 item.setCheckState(checked)
+
         self.mainGUI.listWidget_chp_detail.itemActivated.connect(_)
 
         # ?###########################################################
@@ -642,12 +651,15 @@ class MangaUI(QObject):
         def _(item: QListWidgetItem) -> None:
             if item.flags() == Qt.NoItemFlags:
                 return
-            if not self.mainGUI.isFocus or not (self.mainGUI.ShiftPress or self.mainGUI.AltPress):
+            if not self.mainGUI.isFocus or not (
+                self.mainGUI.ShiftPress or self.mainGUI.AltPress
+            ):
                 return
             if self.mainGUI.ShiftPress and self.mainGUI.AltPress:
                 item.setCheckState(Qt.Unchecked)
             elif self.mainGUI.AltPress:
                 item.setCheckState(Qt.Checked)
+
         self.mainGUI.listWidget_chp_detail.itemEntered.connect(_)
 
         # ?###########################################################
