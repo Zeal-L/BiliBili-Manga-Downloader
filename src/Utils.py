@@ -84,6 +84,34 @@ logger.addHandler(log_handler)
 ############################################################
 
 
+def myStrFilter(s: str) -> str:
+    """过滤字符串中的非法字符
+
+    Args:
+        s (str): 待过滤的字符串
+
+    Returns:
+        str: 过滤后的字符串
+    """
+
+    s = re.sub(r"[\\/]", " ", s)
+    s = re.sub(r":", "：", s)
+    s = re.sub(r"\*", "⭐", s)
+    s = re.sub(r"\?", "？", s)
+    s = re.sub(r'"', "'", s)
+    s = re.sub(r"<", "《", s)
+    s = re.sub(r">", "》", s)
+    s = re.sub(r"\|", "丨", s)
+    s = re.sub(r"\s+$", "", s)
+    s = re.sub(r"^\s+", " ", s)
+    s = re.sub(r"\.", "·", s)
+
+    return s
+
+
+############################################################
+
+
 def isCheckSumValid(etag, content) -> tuple[bool, str]:
     """判断MD5是否有效
 
@@ -114,6 +142,7 @@ def openFileOrDir(mainGUI: MainGUI, path: str) -> None:
         )
     else:
         QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+
 
 def openFolderAndSelectItems(mainGUI: MainGUI, path: str) -> None:
     """读取一个文件的父目录, 如果可能的话，选择该文件。
@@ -151,7 +180,7 @@ def openFolderAndSelectItems(mainGUI: MainGUI, path: str) -> None:
         "打开文件夹失败",
         content,
     )
-        
+
 
 def __inner__openFolderAndSelectItems_windows(path):
     # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
