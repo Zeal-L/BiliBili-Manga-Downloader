@@ -6,10 +6,10 @@ import json
 import logging
 import os
 from functools import partial
-from typing import Any
+from typing import Any, Optional
 
-from PySide6.QtCore import Signal
-from PySide6.QtGui import QCloseEvent, QFont
+from PySide6.QtCore import Signal, Qt, QEvent, QObject
+from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
 
@@ -17,7 +17,7 @@ from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
 from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.Utils import __version__, logger
+from src.Utils import __version__, logger, data_path
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
@@ -41,18 +41,23 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         )
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
+        # ?###########################################################
+        # ? 初始化功能键状态
+        self.CtrlPress = False
+        self.AltPress = False
+        self.ShiftPress = False
+        self.isFocus = True
+
+        # ?###########################################################
+        # ? 初始化事件过滤器
+        self.mainEventFilter = self.initEventFilter()
+        self.app.installEventFilter(self.mainEventFilter)
+
         logger.info("\n\n\t\t\t------------------- 程序启动，初始化主窗口 -------------------\n")
 
         # ?###########################################################
-        # ? 获取应用程序数据目录
-        appdata_path = os.getenv("APPDATA")
-        self.app_folder = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
-        if not os.path.exists(self.app_folder):
-            os.mkdir(self.app_folder)
-
-        # ?###########################################################
         # ? 读取配置文件，以及初始化 save_path
-        self.config_path = os.path.join(self.app_folder, "config.json")
+        self.config_path = os.path.join(data_path, "config.json")
         self.config = {}
 
         if self.getConfig("save_path"):
@@ -87,13 +92,94 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
         if self.settingUI.clear_user_data:
             try:
-                _(self.app_folder)
+                _(data_path)
             except OSError as e:
-                logger.error(f"清除用户数据失败 - 目录:{self.app_folder}\n{e}")
+                logger.error(f"清除用户数据失败 - 目录:{data_path}\n{e}")
 
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
         logging.shutdown()
         event.accept()
+
+    ############################################################
+    def initEventFilter(self) -> QObject:
+        """初始化主事件过滤器
+        当前主事件过滤器主要是对QEvent.ApplicationDeactivate与QEvent.ApplicationActivate
+        即焦点的失去与获得进行处理
+
+        Returns:
+            mainEventFilter (QObject): 主窗口事件过滤器
+        """
+
+        class MainEventFilter(QObject):
+            """用于过滤主窗口事件的类
+
+            Args:
+                outer_self (MainGUI): 外部类的实例
+                parent (Optional[QObject], optional): 父对象。默认为 None
+            """
+
+            def __init__(
+                self, outer_self: MainGUI, parent: Optional[QObject] = None
+            ) -> None:
+                self.outer_self = outer_self
+                super().__init__(parent)
+
+            def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+                """重写事件过滤器函数
+
+                Args:
+                    obj (QObject): 发送事件的对象
+                    event (QEvent): 事件对象
+
+                Returns:
+                    bool: 是否过滤该事件
+                """
+                if event.type() == QEvent.ApplicationDeactivate:
+                    self.outer_self.isFocus = False
+                    self.outer_self.CtrlPress = (
+                        self.outer_self.AltPress
+                    ) = self.outer_self.ShiftPress = False
+                elif event.type() == QEvent.ApplicationActivate:
+                    self.outer_self.isFocus = True
+                return super().eventFilter(obj, event)
+
+        return MainEventFilter(outer_self=self)
+
+    ############################################################
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        """覆写QMainWindow的keyPressEvent方法
+
+        Args:
+            event (QKeyEvent): 事件类
+
+        Returns:
+            None
+        """
+        if event.key() == Qt.Key.Key_Control:
+            self.CtrlPress = True
+        elif event.key() in [Qt.Key.Key_Alt, Qt.Key.Key_Option]:
+            self.AltPress = True
+        elif event.key() == Qt.Key.Key_Shift:
+            self.ShiftPress = True
+        return super().keyPressEvent(event)
+
+    ############################################################
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        """覆写QMainWindow的keyReleaseEvent方法
+
+        Args:
+            event (QKeyEvent): 事件类
+
+        Returns:
+            None
+        """
+        if event.key() == Qt.Key.Key_Control:
+            self.CtrlPress = False
+        if event.key() in [Qt.Key.Key_Alt, Qt.Key.Key_Option]:
+            self.AltPress = False
+        elif event.key() == Qt.Key.Key_Shift:
+            self.ShiftPress = False
+        return super().keyReleaseEvent(event)
 
     ############################################################
     def getConfig(self, key: str) -> Any:

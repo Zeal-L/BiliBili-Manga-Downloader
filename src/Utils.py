@@ -10,11 +10,12 @@ import logging
 import os
 import re
 from logging.handlers import TimedRotatingFileHandler
+from sys import platform
 from typing import TYPE_CHECKING
 
 import requests
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.3.2"
+__version__ = "1.4.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
 
@@ -42,7 +43,11 @@ RETRY_WAIT_EX = 200
 # 配置日志记录器
 ############################################################
 
-appdata_path = os.getenv("APPDATA")
+if platform == "win32":
+    appdata_path = os.getenv("APPDATA")
+elif platform == "linux":
+    appdata_path = os.getenv("HOME")
+
 data_path = os.path.join(appdata_path, "BiliBili-Manga-Downloader")
 if not os.path.exists(data_path):
     os.mkdir(data_path)
@@ -79,6 +84,34 @@ logger.addHandler(log_handler)
 ############################################################
 
 
+def myStrFilter(s: str) -> str:
+    """过滤字符串中的非法字符
+
+    Args:
+        s (str): 待过滤的字符串
+
+    Returns:
+        str: 过滤后的字符串
+    """
+
+    s = re.sub(r"[\\/]", " ", s)
+    s = re.sub(r":", "：", s)
+    s = re.sub(r"\*", "⭐", s)
+    s = re.sub(r"\?", "？", s)
+    s = re.sub(r'"', "'", s)
+    s = re.sub(r"<", "《", s)
+    s = re.sub(r">", "》", s)
+    s = re.sub(r"\|", "丨", s)
+    s = re.sub(r"\s+$", "", s)
+    s = re.sub(r"^\s+", " ", s)
+    s = re.sub(r"\.", "·", s)
+
+    return s
+
+
+############################################################
+
+
 def isCheckSumValid(etag, content) -> tuple[bool, str]:
     """判断MD5是否有效
 
@@ -92,7 +125,26 @@ def isCheckSumValid(etag, content) -> tuple[bool, str]:
 ############################################################
 
 
-def openFolderAndSelectItems(path: str) -> None:
+def openFileOrDir(mainGUI: MainGUI, path: str) -> None:
+    """打开指定路径，使用Qt自带的兼容性打开方法
+
+    Args:
+        path (str): 文件或文件夹路径
+    """
+    path = os.path.normpath(path)
+    if not os.path.exists(path):
+        content = f"目录不存在 - 打开目录失败 - 目录:\n{path}"
+        logger.error(content)
+        QMessageBox.warning(
+            mainGUI,
+            "打开文件夹失败",
+            content,
+        )
+    else:
+        QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+
+
+def openFolderAndSelectItems(mainGUI: MainGUI, path: str) -> None:
     """读取一个文件的父目录, 如果可能的话，选择该文件。
 
         我们可以运行`explorer /select,filename`，
@@ -103,22 +155,34 @@ def openFolderAndSelectItems(path: str) -> None:
     """
     path = os.path.normpath(path)
     try:
-        __inner__openFolderAndSelectItems(path)
+        if platform == "win32":
+            __inner__openFolderAndSelectItems_windows(path)
+        else:
+            if os.path.isfile(path):
+                path = os.path.dirname(path)
+            openFileOrDir(mainGUI, path)
+        return
     except ValueError as e:
-        logger.error(f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"参数错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except TypeError as e:
-        logger.error(f"类型错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"类型错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except RuntimeError as e:
-        logger.error(f"运行时错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"运行时错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except SystemError as e:
-        logger.error(f"系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"系统错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except OSError as e:
-        logger.error(f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"操作系统错误 - 打开文件夹失败 - 目录:{path}\n{e}"
     except AttributeError as e:
-        logger.error(f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}")
+        content = f"属性错误 - 打开文件夹失败 - 目录:{path}\n{e}"
+    logger.error(content)
+    QMessageBox.warning(
+        mainGUI,
+        "打开文件夹失败",
+        content,
+    )
 
 
-def __inner__openFolderAndSelectItems(path):
+def __inner__openFolderAndSelectItems_windows(path):
     # CoInitialize 和 CoUninitialize 是 Windows API 中的函数，用来初始化和反初始化COM(Component Object Model)库
     # CoInitialize 函数会初始化COM库，为当前线程分配资源。在调用CoInitialize之前，不能使用COM库，
     # 如果调用了CoInitialize函数，就必须在使用完COM库之后调用CoUninitialize函数来反初始化COM库。

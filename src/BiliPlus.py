@@ -80,9 +80,8 @@ class BiliPlusComic(Comic):
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
-            if "未登录" in res.text:
-                self.mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
-                return {}
+            if "page=" not in url and ("未登录" in res.text or 'src="http' not in res.text):
+                return ""
             if res.status_code != 200:
                 logger.warning(
                     f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
@@ -92,9 +91,13 @@ class BiliPlusComic(Comic):
 
         try:
             biliplus_html = _(biliplus_detail_url)
+            if "" == biliplus_html:
+                self.mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
+                return
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)
+            return
 
         # ?###########################################################
         # ? 解析BiliPlus解锁章节信息

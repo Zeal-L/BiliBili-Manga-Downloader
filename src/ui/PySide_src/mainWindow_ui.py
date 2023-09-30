@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFram
     QListView, QListWidget, QListWidgetItem, QMainWindow,
     QProgressBar, QPushButton, QRadioButton, QScrollArea,
     QSizePolicy, QSlider, QSpacerItem, QTabWidget,
-    QVBoxLayout, QWidget)
+    QTextBrowser, QVBoxLayout, QWidget)
 import src.ui.PySide_src.resource_rc
 
 class Ui_MainWindow(object):
@@ -357,8 +357,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.widget_biliplus_detail)
 
+        self.textBrowser_tutorial = QTextBrowser(self.groupBox_chp_detail)
+        self.textBrowser_tutorial.setObjectName(u"textBrowser_tutorial")
+        self.textBrowser_tutorial.setTextInteractionFlags(Qt.NoTextInteraction)
+
+        self.verticalLayout_4.addWidget(self.textBrowser_tutorial)
+
         self.listWidget_chp_detail = QListWidget(self.groupBox_chp_detail)
         self.listWidget_chp_detail.setObjectName(u"listWidget_chp_detail")
+        self.listWidget_chp_detail.setMaximumSize(QSize(16777215, 0))
+        self.listWidget_chp_detail.setMouseTracking(True)
         self.listWidget_chp_detail.setAutoFillBackground(True)
         self.listWidget_chp_detail.setDragEnabled(True)
         self.listWidget_chp_detail.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -461,7 +469,7 @@ class Ui_MainWindow(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 78, 18))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 61, 18))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -598,10 +606,18 @@ class Ui_MainWindow(object):
         self.groupBox_save_method.setObjectName(u"groupBox_save_method")
         self.h_Layout_groupBox_save_method = QHBoxLayout(self.groupBox_save_method)
         self.h_Layout_groupBox_save_method.setObjectName(u"h_Layout_groupBox_save_method")
+        self.radioButton_save_method_folder = QRadioButton(self.groupBox_save_method)
+        self.radioButton_save_method_folder.setObjectName(u"radioButton_save_method_folder")
+        self.radioButton_save_method_folder.setEnabled(True)
+        self.radioButton_save_method_folder.setMinimumSize(QSize(60, 0))
+        self.radioButton_save_method_folder.setChecked(True)
+
+        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_folder)
+
         self.radioButton_save_method_pdf = QRadioButton(self.groupBox_save_method)
         self.radioButton_save_method_pdf.setObjectName(u"radioButton_save_method_pdf")
         self.radioButton_save_method_pdf.setMinimumSize(QSize(60, 0))
-        self.radioButton_save_method_pdf.setChecked(True)
+        self.radioButton_save_method_pdf.setChecked(False)
 
         self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_pdf)
 
@@ -612,13 +628,13 @@ class Ui_MainWindow(object):
 
         self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_7z)
 
-        self.radioButton_save_method_folder = QRadioButton(self.groupBox_save_method)
-        self.radioButton_save_method_folder.setObjectName(u"radioButton_save_method_folder")
-        self.radioButton_save_method_folder.setEnabled(True)
-        self.radioButton_save_method_folder.setMinimumSize(QSize(60, 0))
-        self.radioButton_save_method_folder.setChecked(False)
+        self.radioButton_save_method_Zip = QRadioButton(self.groupBox_save_method)
+        self.radioButton_save_method_Zip.setObjectName(u"radioButton_save_method_Zip")
+        self.radioButton_save_method_Zip.setMinimumSize(QSize(60, 0))
+        self.radioButton_save_method_Zip.setChecked(False)
+        self.radioButton_save_method_Zip.setAutoRepeat(False)
 
-        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_folder)
+        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_Zip)
 
 
         self.horizontalLayout_3.addWidget(self.groupBox_save_method)
@@ -826,7 +842,7 @@ class Ui_MainWindow(object):
         self.label_manga_style.setText("")
         self.label_manga_isFinish.setText("")
         self.label_manga_outline.setText("")
-        self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u8be6\u60c5 (\u53f3\u952e\u786e\u8ba4\u9f20\u6807\u6846\u9009\u5185\u5bb9)", None))
+        self.groupBox_chp_detail.setTitle(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u8be6\u60c5", None))
         self.label_chp_detail_total_chp.setText(QCoreApplication.translate("MainWindow", u"\u603b\u7ae0\u6570\uff1a", None))
         self.label_chp_detail_num_unlocked.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u89e3\u9501\uff1a", None))
         self.label_chp_detail_num_downloaded.setText(QCoreApplication.translate("MainWindow", u"\u5df2\u4e0b\u8f7d\uff1a", None))
@@ -837,6 +853,35 @@ class Ui_MainWindow(object):
         self.label_resolve_status.setText("")
         self.label_biliplus_empty.setText("")
         self.pushButton_biliplus_detail_download_selected.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7dBiliPlus\u9009\u4e2d\u7ae0\u8282", None))
+        self.textBrowser_tutorial.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#0055ff;\"> </span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:14pt; font-weight:700; color:#0055ff;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margi"
+                        "n-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#0055ff;\">\u2764\u6b22\u8fce\u4f7f\u7528\u672c\u4e0b\u8f7d\u5668(*\uff40\u2200\u00b4*)\u30ce</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700; color:#000000;\">\u7b2c\u4e00\u6b21\u4f7f\u7528\u8bf7\u5148\u5728\u4e0a\u65b9\u7684\u8bbe\u7f6e\u9875\u9762\u5185\u626b\u7801\u767b\u5165B\u7ad9\u5e10\u53f7</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700; color:#000000;\">\u5e76\u4e14\u914d\u7f6e\u597d\u60a8\u9700\u8981\u7684"
+                        "\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\u4e0e\u683c\u5f0f</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:700; color:#000000;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u672a\u89e3\u9501\u7684\u7ae0\u8282\u53ef\u4ee5\u5c1d\u8bd5\u4f7f\u7528BiliPlus\u89e3\u6790\uff0c\u53ef\u80fd\u4f1a\u7ed9\u60a8\u5e26\u6765\u60ca\u559c</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; marg"
+                        "in-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#aa55ff;\">\u2b50\u7ae0\u8282\u9009\u62e9\u5c0f\u6280\u5de7(#^.^#)</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:14pt; font-weight:700; color:#aa55ff;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u4e00\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4f\u9f20\u6807\u5de6\u952e\u62d6\u52a8\u53ef\u6279\u91cf\u6846\u9009\u7ae0\u8282\uff0c\u7136\u540e\u9f20\u6807\u53f3\u952e\u786e\u8ba4\u64cd\u4f5c</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u4e8c"
+                        "\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4fAlt\u540e\u9f20\u6807\u5212\u8fc7\u7ae0\u8282\u540d\u5feb\u901f\u9009\u4e2d\uff0cShift+Alt\u5feb\u901f\u53d6\u6d88\u9009\u4e2d</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u4e09\uff1a</span><span style=\" font-size:10pt;\">\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u56de\u8f66\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u56db\uff1a</span><span style=\" font-size:10pt;\">Ctrl+A\u5168\u9009\u540e\u56de\u8f66\u786e\u8ba4</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inde"
+                        "nt:0px; font-size:10pt;\"><br /></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWindow", u"\u603b\u8fdb\u5ea6", None))
         self.label_total_progress_speed.setText(QCoreApplication.translate("MainWindow", u"\u603b\u4e0b\u8f7d\u901f\u5ea6:", None))
@@ -854,9 +899,10 @@ class Ui_MainWindow(object):
         self.pushButton_save_path.setText(QCoreApplication.translate("MainWindow", u"\u6d4f\u89c8...", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fdd\u5b58\u683c\u5f0f\uff1a", None))
         self.groupBox_save_method.setTitle("")
+        self.radioButton_save_method_folder.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u5939-\u56fe\u7247", None))
         self.radioButton_save_method_pdf.setText(QCoreApplication.translate("MainWindow", u"PDF", None))
         self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWindow", u"7z\u538b\u7f29\u5305", None))
-        self.radioButton_save_method_folder.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u5939-\u56fe\u7247", None))
+        self.radioButton_save_method_Zip.setText(QCoreApplication.translate("MainWindow", u"Zip\u538b\u7f29\u5305", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))

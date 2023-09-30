@@ -17,6 +17,7 @@ from src.Utils import (
     TIMEOUT_SMALL,
     isCheckSumValid,
     logger,
+    myStrFilter,
 )
 
 if TYPE_CHECKING:
@@ -52,7 +53,8 @@ class Comic:
         """
 
         @retry(
-            stop_max_delay=MAX_RETRY_SMALL-5000, wait_exponential_multiplier=RETRY_WAIT_EX
+            stop_max_delay=MAX_RETRY_SMALL - 5000,
+            wait_exponential_multiplier=RETRY_WAIT_EX,
         )
         def _() -> dict:
             try:
@@ -60,7 +62,7 @@ class Comic:
                     self.detail_url,
                     headers=self.headers,
                     data=self.payload,
-                    timeout=TIMEOUT_SMALL-3,
+                    timeout=TIMEOUT_SMALL - 3,
                 )
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 获取漫画信息失败! 重试中...\n{e}")
@@ -81,13 +83,12 @@ class Comic:
 
         # ?###########################################################
         # ? 解析漫画信息
+        self.data["title"] = myStrFilter(self.data["title"])
         self.data["author_name"] = "，".join(self.data["author_name"])
         self.data["author_name"] = (
             self.data["author_name"].replace("作者:", "").replace("出品:", "")
         )
-        self.data["author_name"] = re.sub(
-            r'[\\/:*?"<>|]', " ", self.data["author_name"]
-        )
+        self.data["author_name"] = myStrFilter(self.data["author_name"])
         self.data["styles"] = "，".join(self.data["styles"])
         self.data[
             "save_path"
@@ -132,9 +133,7 @@ class Comic:
         except RetryError as e:
             logger.error(f"获取封面图片多次后失败，跳过!\n{e}")
             self.mainGUI.signal_message_box.emit(
-                "获取封面图片多次后失败!\n"
-                "请检查网络连接或者重启软件!\n\n"
-                "更多详细信息请查看日志文件, 或联系开发者！"
+                "获取封面图片多次后失败!\n" "请检查网络连接或者重启软件!\n\n" "更多详细信息请查看日志文件, 或联系开发者！"
             )
             return open(":/imgs/fail_img.jpg", encoding="utf-8")
 
@@ -154,9 +153,7 @@ class Comic:
         # ? 解析章节
         ep_list = self.data["ep_list"]
         for episode in reversed(ep_list):
-            epi = Episode(
-                episode, self.comic_id, self.data, self.mainGUI
-            )
+            epi = Episode(episode, self.comic_id, self.data, self.mainGUI)
             self.episodes.append(epi)
             if epi.isDownloaded():
                 self.num_downloaded += 1

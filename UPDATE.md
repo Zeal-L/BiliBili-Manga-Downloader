@@ -1,5 +1,20 @@
 ## ⚰️ 更新记录
 
+### **[v1.4.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.4.0)** - *2022-09-30*
+- 新增功能:
+  - 现在支持 `Linux` 平台了！
+  - 新增多种快速选择章节的方式
+  - 在程序启动时添加教程文本
+  - 新增 `Zip` 保存格式
+- 修复bug:
+  - 修复 `BiliPlus` 验证 `Cookie` 通过但是实际下载不了的问题
+  - 修复章节选中计数器异常问题 ([#80][i80])
+- 优化设置:
+  - 实现打开不存在路径时的提示框
+  - 优化漫画名和章节名中非法字符的替换逻辑
+
+[i80]: https://github.com/Zeal-L/BiliBili-Manga-Downloader/issues/80
+
 ### **[v1.3.2](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.3.2)** - *2022-08-30*
 - 新增功能:
   - 新增漫画ID直搜功能，以支持下载已经下架的漫画 ([#30][i30])

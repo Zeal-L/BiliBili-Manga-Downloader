@@ -2,11 +2,12 @@
 
 ![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub top language](https://img.shields.io/github/languages/top/Zeal-L/BiliBili-Manga-Downloader)
-![GitHub Lines of code](https://img.shields.io/tokei/lines/github/Zeal-L/BiliBili-Manga-Downloader)
+![platform](https://img.shields.io/badge/platform-Windows_|_Linux-blue)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub - License](https://img.shields.io/github/license/Zeal-L/BiliBili-Manga-Downloader)
+<!-- ![GitHub Lines of code](https://img.shields.io/tokei/lines/github/Zeal-L/BiliBili-Manga-Downloader) -->
 
-![platform](https://img.shields.io/badge/platform-windows10-blue)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/zeal-l/BiliBili-Manga-Downloader)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub all releases - Download](https://img.shields.io/github/downloads/Zeal-L/BiliBili-Manga-Downloader/total)
@@ -19,6 +20,7 @@
 
 ## ✨ 主要功能 / 特性
 - **黑科技下载未解锁章节！**
+- **提供多种可选的保存格式**
 - **支持已购被下架漫画下载**
 - **已打包成单个可执行文件，双击即用！**
 - **易操作的图形界面！~~(不用再费劲的部署环境跑命令行)~~**
@@ -26,11 +28,7 @@
 - **可配置的多线程下载，速度拉满！**
 - **实现了应对网络波动等情况的异常重试，以及应用了指数级退让来避免在短时间大量重试被拉黑名单**
 - **丰富的漫画详情信息，本地漫画管理功能，一键检查更新！**
-- **通过正则匹配过滤重复的章节名称内容，以及过滤非法字符！**
-- **提供多种可选的保存格式：**
-  - PDF
-  - 7z压缩包
-  - 文件夹-图片形式
+- **通过正则匹配过滤重复的章节名称内容，以及置换非法字符！**
 - **贴心的在保存文件属性中附加了漫画名，章节名以及作者信息，以免单章传播时不知道来源**
 - **可视化的多任务下载进度条以及下载速度和剩余时间预计信息！**
 - **漫画保存地址和用户Cookie等用户设置的本地缓存，不需要每次重启软件就重新输入！**
@@ -74,7 +72,7 @@
     - **特别提示: 毕竟是要提供 Cookie 给第三方网站托管，因此可能会有潜在的安全风险。敏感人群请不要使用自己主账号的 Cookie**
     - `BiliPlus` 的 `Cookie` 获取方法跟上述一致，在 [ComicWebReader](https://www.biliplus.com/manga/) 登入后在开发者工具中找到 `access_key` 粘贴到程序设置选项中的 `BiliPlus Cookie` 即可
 
-- **兼容性：目前只在64位的 Winodw 10 上测试通过，不过 windows 11 应该也能运行，发现问题的欢迎提Issues**
+- **兼容性：支持Windows与Linux平台，MacOs需要自行编译，发现问题的欢迎提Issues**
 - **搜索 / 选择章节 / 下载 的功能介绍我想已经不言而喻了，这就是图形化界面的好处！**
 - **值得注意的是：本软件不支持断点续传和下载任务缓存的功能 ~~(毕竟一章漫画太小了，好像也没什么必要，断了不如重下)~~，所以请确保不要在下载中途关闭！**
 - **程序缓存和日志历史文件存在 `C:\Users\AppData\Roaming\BiliBili-Manga-Downloader\` 目录下，可以通过"清空用户数据"功能一键删除**
@@ -134,11 +132,12 @@
   2. 执行 `cd .. && rm -rf BiliBili-Manga-Downloader/`
 
 ## 🔨 PR 格式
-- 遵循项目已有代码的 python doc 格式
+- 请PR到 `develop` 分支
+- 遵循项目已有代码的 `python doc` 格式
 - 明确的注释信息
 - 正确的函数类型声明
-- 在可能出错的IO/网络申请等部分都加上retry装饰器
-- 在需要的地方写入logger日志，格式参考已有代码
+- 在可能出错的IO/网络申请等部分都加上 `retry` 装饰器
+- 在需要的地方写入 `logger` 日志，格式参考已有代码
 - 更改 / 新增 的功能说明，理由
 - 是否 更改 / 新增 依赖项
 

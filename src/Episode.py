@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 from typing import TYPE_CHECKING
+from zipfile import ZipFile
 
 import piexif
 import requests
@@ -28,6 +29,7 @@ from src.Utils import (
     __version__,
     isCheckSumValid,
     logger,
+    myStrFilter,
 )
 
 if TYPE_CHECKING:
@@ -55,12 +57,8 @@ class Episode:
 
         # ?###########################################################
         # ? 修复标题中的特殊字符
-        episode["short_title"] = re.sub(r'[\\/:*?"<>|]', " ", episode["short_title"])
-        episode["short_title"] = re.sub(r"\s+$", "", episode["short_title"])
-        episode["short_title"] = re.sub(r"\.", "·", episode["short_title"])
-        episode["title"] = re.sub(r'[\\/:*?"<>|]', " ", episode["title"])
-        episode["title"] = re.sub(r"\s+$", "", episode["title"])
-        episode["title"] = re.sub(r"\.", "·", episode["title"])
+        episode["short_title"] = myStrFilter(episode["short_title"])
+        episode["title"] = myStrFilter(episode["title"])
 
         # ?###########################################################
         # ? 修复重复标题
@@ -236,6 +234,9 @@ class Episode:
         elif save_method == "7z压缩包":
             self.saveTo7z(imgs_path)
             save_path = f"{self.epi_path}.7z"
+        elif save_method == "Zip压缩包":
+            self.saveToZip(imgs_path)
+            save_path = f"{self.epi_path}.zip"
         return save_path
 
     ############################################################
@@ -303,7 +304,7 @@ class Episode:
         """
 
         @retry(stop_max_attempt_number=5)
-        def _():
+        def _() -> None:
             try:
                 for index, img_path in enumerate(imgs_path, start=1):
 
@@ -372,7 +373,7 @@ class Episode:
         self.saveToFolder(imgs_path)
 
         @retry(stop_max_attempt_number=5)
-        def _():
+        def _() -> None:
             try:
                 with SevenZipFile(f"{self.epi_path}.7z", "w") as z:
                     # 压缩文件里不要子目录，全部存在根目录
@@ -399,6 +400,45 @@ class Episode:
             )
 
     ############################################################
+
+    def saveToZip(self, imgs_path: list[str]) -> None:
+        """将图片保存到Zip压缩文件
+
+        Args:
+            imgs_path (list): 临时图片路径列表
+        """
+
+        self.saveToFolder(imgs_path)
+
+        @retry(stop_max_attempt_number=5)
+        def _() -> None:
+            try:
+                with ZipFile(f"{self.epi_path}.zip", "w") as z:
+                    # 压缩文件里不要子目录，全部存在根目录
+                    for root, _dirs, files in os.walk(self.epi_path):
+                        for file in files:
+                            z.write(
+                                os.path.join(root, file),
+                                os.path.basename(os.path.join(root, file)),
+                            )
+                    shutil.rmtree(self.epi_path)
+            except OSError as e:
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}"
+                )
+                raise e
+
+        try:
+            _()
+        except OSError as e:
+            logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Zip多次后失败!\n{e}")
+            logger.exception(e)
+            self.mainGUI.signal_message_box.emit(
+                f"《{self.comic_name}》章节：{self.title} 保存图片到Zip多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+            )
+
+    ############################################################
+
     def downloadImg(self, index: int, img_url: str) -> str:
         """根据 url 和 token 下载图片
 
@@ -504,4 +544,5 @@ class Episode:
             os.path.exists(self.epi_path)
             or os.path.exists(f"{self.epi_path}.pdf")
             or os.path.exists(f"{self.epi_path}.7z")
+            or os.path.exists(f"{self.epi_path}.zip")
         )
