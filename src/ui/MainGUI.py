@@ -124,16 +124,20 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 self.outer_self = outer_self
                 super().__init__(parent)
 
-            def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+            def eventFilter(self, *args, **kwargs) -> bool:
                 """重写事件过滤器函数
 
                 Args:
-                    obj (QObject): 发送事件的对象
-                    event (QEvent): 事件对象
+                    *args: 位置参数
+                    **kwargs: 关键字参数
 
                 Returns:
                     bool: 是否过滤该事件
                 """
+                # 检查args[1]的类型是否为QEvent，如果不是则不处理
+                if not isinstance(args[1], QEvent):
+                    return super().eventFilter(*args, **kwargs)
+                event: QEvent = args[1]
                 if event.type() == QEvent.ApplicationDeactivate:
                     self.outer_self.isFocus = False
                     self.outer_self.CtrlPress = (
@@ -141,7 +145,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                     ) = self.outer_self.ShiftPress = False
                 elif event.type() == QEvent.ApplicationActivate:
                     self.outer_self.isFocus = True
-                return super().eventFilter(obj, event)
+                return super().eventFilter(*args, **kwargs)
 
         return MainEventFilter(outer_self=self)
 
