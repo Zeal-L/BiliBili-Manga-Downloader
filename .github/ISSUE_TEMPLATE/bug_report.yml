@@ -46,7 +46,8 @@ body:
     attributes:
       label: 系统环境
       options:
-        - Windows
+        - Windows10
+        - Windows11
         - Linux
         - Mac
       description: 目前主要适配Windows平台
