@@ -12,7 +12,7 @@ from retrying import retry
 
 from src.Comic import Comic
 from src.Episode import Episode
-from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
+from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger, __app_name__, __version__
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -25,6 +25,7 @@ class BiliPlusComic(Comic):
         super().__init__(comic_id, mainGUI)
         self.access_key = mainGUI.getConfig("biliplus_cookie")
         self.headers = {
+            "User-Agent": f"{__app_name__} {__version__}",
             "cookie": f"manga_pic_format=jpg-full;login=2;access_key={self.access_key}",
         }
 
@@ -92,8 +93,7 @@ class BiliPlusComic(Comic):
         try:
             biliplus_html = _(biliplus_detail_url)
             if "" == biliplus_html:
-                self.mainGUI.signal_message_box.emit("请先在设置界面填写正确的BiliPlus Cookie！")
-                return
+                self.mainGUI.signal_message_box.emit("BiliPlus无法解析任何章节，可能是您的BiliPlus Cookie无效，或者此漫画未在该网站有过缓存记录！")
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)
@@ -212,10 +212,10 @@ class BiliPlusEpisode(Episode):
             self.imgs_token = biliplus_imgs_token
             if not biliplus_imgs_token:
                 logger.error(
-                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因Cookie有误导致失败!"
+                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因获取的Token无效导致失败!"
                 )
                 self.mainGUI.signal_message_box.emit(
-                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因Cookie有误导致失败!"
+                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因获取的Token无效导致失败!"
                 )
                 return False
         except requests.RequestException as e:
