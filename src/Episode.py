@@ -76,6 +76,8 @@ class Episode:
         # ? 修复短标题中的数字
         if re.search(r"^[0-9\-]+话", self.title):
             self.title = re.sub(r"^([0-9\-]+)", r"第\1", self.title)
+        elif re.search(r"^[0-9\-]+\.[0-9\-]+", self.title):
+            self.title = re.sub(r"^([0-9\-]+\.[0-9\-]+)", r"第\1话", self.title)
         elif re.search(r"^[0-9\-]+", self.title):
             self.title = re.sub(r"^([0-9\-]+)", r"第\1话", self.title)
 
