@@ -2,7 +2,7 @@
 
 <!-- ![GitHub top language](https://img.shields.io/github/languages/top/Zeal-L/BiliBili-Manga-Downloader) -->
 
-![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/Zeal-L/BiliBili-Manga-Downloader)
+![GitHub Python version](https://img.shields.io/badge/python-v3.12-blue)
 ![platform](https://img.shields.io/badge/platform-Windows_|_Linux-blue)
 ![Scc Count Badge](https://sloc.xyz/github/Zeal-L/BiliBili-Manga-Downloader/)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Zeal-L/BiliBili-Manga-Downloader)
@@ -121,21 +121,21 @@
 ## 🏗️ 本地构建 / 编译
 
 - **首先确保你安装了 Python 3.12 和 git**
-- **本项目使用了 pipenv 依靠虚拟环境进行依赖项管理，所以不必担心影响自己的本地环境**
+- **本项目使用了 poetry 依靠虚拟环境进行依赖项管理，所以不必担心影响自己的本地环境**
 - **作者已经贴心的帮后来者们准备好了两个集成脚本~**
 - **接下来的操作都在项目的根目录运行命令行指令**
 - **构建项目**
   1. 执行 `git clone https://github.com/Zeal-L/BiliBili-Manga-Downloader.git`
   2. 执行 `cd BiliBili-Manga-Downloader/`
   3. 执行 `sh setup.sh` 等待项目构建完成
-  4. 执行 `pipenv shell` 进入虚拟环境
+  4. 执行 `poetry shell` 进入虚拟环境
   5. 执行 `python3 app.py` 即可运行程序
 - **打包编译**
   1. 执行 `sh build.sh` 等待项目打包完成
   2. 这一步可能会花费一定时间，中途需要手动确认安全漏洞检查
   3. 打包好的程序会被移动到项目的根目录 "哔哩哔哩漫画下载器.exe"
 - **彻底清除项目 ~~(删库跑路)~~**
-  1. 执行 `pipenv --rm`
+  1. 执行 `poetry env remove python3`
   2. 执行 `cd .. && rm -rf BiliBili-Manga-Downloader/`
 
 ## 🔨 PR 格式
