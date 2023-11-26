@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.12"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -23,5 +23,5 @@ jobs:
     - name: Analysing the code with pylint
       id: pylint
       run: |
-        pipenv run pylint $(git ls-files '*.py' | grep -v "PySide_src")
+        poetry run pylint $(git ls-files '*.py' | grep -v "PySide_src")
       continue-on-error: true
