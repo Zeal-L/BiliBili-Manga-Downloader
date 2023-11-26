@@ -1,5 +1,19 @@
 ## ⚰️ 更新记录
 
+## ⚰️ 更新记录
+### **[v1.4.1](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.4.1)** - *2022-11-26*
+- 新增功能:
+  - 现在在 Windows 环境支持下方的系统任务栏显示下载进度了
+- 修复bug:
+  - 修复了一个下载完成后可能会导致进度条没有正确被清除的bug
+  - 修复了一个导致下载速度错误显示，越来越大的bug
+- 优化设置:
+  - 取消启动时扫描本地漫画，加快启动速度
+  - 优化下载速度统计逻辑，现在更加平稳和准确了
+- 开发相关:
+  - 改用 `poetry` 作为包管理器
+  - 升级 `Python` 到 `3.12` 版本
+
 ### **[v1.4.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.4.0)** - *2022-09-30*
 - 新增功能:
   - 现在支持 `Linux` 平台了！

@@ -42,7 +42,7 @@ class DownloadManager:
             "size": epi.size,
             "curr_rate": 0.0,
             "last_rate": 0.0,
-            "last_time": time.perf_counter(),
+            "last_time": time.time(),
             "curr_speed": 0.1,
             "avg_speed": 0.1,
             "future": self.executor.submit(
@@ -62,7 +62,7 @@ class DownloadManager:
             rate (float): 下载进度百分比
         """
         task: dict = self.all_tasks[curr_id]
-        curr_time = time.perf_counter()
+        curr_time = time.time()
 
         task["curr_speed"] = (
             task["size"] * rate - task["size"] * task["last_rate"]
@@ -94,15 +94,14 @@ class DownloadManager:
         Returns:
             float: 平均下载速度
         """
-        self.avg_speed_in_last_three_sec[time.perf_counter()] = sum(
+        self.avg_speed_in_last_three_sec[time.time()] = sum(
             task["curr_speed"] for task in self.all_tasks.values()
         )
-
         # 取3秒内的平均速度，以防止速度突然变化
         # 比如下载完一个文件 速度突然变为0
         # 或者开始一组新的下载，速度突然变为很大
         for key in list(self.avg_speed_in_last_three_sec.keys()):
-            if key < time.perf_counter() - 3:
+            if key < time.time() - 3:
                 self.avg_speed_in_last_three_sec.pop(key)
 
         return sum(self.avg_speed_in_last_three_sec.values()) / len(
@@ -130,7 +129,8 @@ class DownloadManager:
         total_size_left = sum(
             task["size"] * (1 - task["curr_rate"]) for task in self.all_tasks.values()
         )
-        return self.formatTime(total_size_left / self.getTotalSpeed())
+        total_speed = self.getTotalSpeed()
+        return self.formatTime(total_size_left / total_speed if total_speed != 0 else 1)
 
     ############################################################
 
@@ -174,6 +174,8 @@ class DownloadManager:
             self.signal_rate_progress.emit(
                 {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
+
+        self.clearAfterFinish(curr_id)
 
     ############################################################
     # ? 为以后的特典下载留的接口
@@ -225,7 +227,7 @@ class DownloadManager:
         """格式化每秒速度大小
 
         Args:
-            size (int): 每秒速度大小
+            speed (float): 每秒速度大小 (字节)
 
         Returns:
             str: 格式化后的每秒速度大小, 例如: 1.23MB/s

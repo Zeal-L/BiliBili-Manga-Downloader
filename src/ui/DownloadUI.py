@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from sys import platform
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt, Signal
@@ -11,7 +12,13 @@ from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QWidget
 
 from src.DownloadManager import DownloadManager
 from src.Episode import Episode
-from src.Utils import openFolderAndSelectItems
+from src.Utils import (
+    TBPF_NOPROGRESS,
+    TBPF_NORMAL,
+    EasyProgressBar,
+    __main_window_title__,
+    openFolderAndSelectItems,
+)
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -32,6 +39,9 @@ class DownloadUI(QObject):
             signal_rate_progress=self.signal_rate_progress,
             signal_message_box=mainGUI.signal_message_box,
         )
+        if platform == "win32":
+            self.sysProgressbar = EasyProgressBar()
+            self.sysProgressbarIsInit = False
 
         self.init_DownloadUI(mainGUI)
 
@@ -72,9 +82,16 @@ class DownloadUI(QObject):
                 # ? 删除任务字典中的条目
                 del self.tasks_bar[taskID]
 
+            # ? 更新当前任务数
+            mainGUI.label_tasks_count.setText(f"任务数：{len(self.tasks_bar)}")
             # ? 更新总进度条的进度，速度和剩余时间
             total_progress = self.downloadManager.getTotalRate()
             mainGUI.progressBar_total_progress.setValue(total_progress)
+            # ? 更新系统任务栏进度条
+            if platform == "win32":
+                self.sysProgressbar.set_mode(TBPF_NORMAL)
+                self.sysProgressbar.set_progress(int(total_progress), 100)
+
             if total_progress != 100:
                 mainGUI.label_total_progress_speed.setText(
                     f"{self.downloadManager.getTotalSpeedStr()}"
@@ -83,8 +100,12 @@ class DownloadUI(QObject):
                     f"{self.downloadManager.getTotalRemainedTimeStr()}"
                 )
             else:
-                mainGUI.label_total_progress_speed.setText("总下载速度:")
+                mainGUI.label_total_progress_speed.setText("总下载速度：")
                 mainGUI.label_total_progress_time.setText("剩余时间：")
+                # ? 初始化系统任务栏进度条
+                if platform == "win32":
+                    self.sysProgressbar.set_progress(0, 100)
+                    self.sysProgressbar.set_mode(TBPF_NOPROGRESS)
                 self.downloadManager.clearAll()
 
         self.signal_rate_progress.connect(_)
@@ -138,6 +159,9 @@ class DownloadUI(QObject):
         # ?###########################################################
         # ? 创建任务
         task_id = self.downloadManager.createEpisodeTask(epi)
+        if platform == "win32" and not self.sysProgressbarIsInit:
+            self.sysProgressbar.init()
+            self.sysProgressbarIsInit = True
 
         # ?###########################################################
         # ? 添加任务组件到正在下载列表

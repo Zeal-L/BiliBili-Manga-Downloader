@@ -9,13 +9,14 @@ import hashlib
 import logging
 import os
 import re
+from ctypes import CDLL, c_int
 from logging.handlers import TimedRotatingFileHandler
 from sys import platform
 from typing import TYPE_CHECKING
 
 import requests
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QIcon, QDesktopServices
+from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
@@ -23,9 +24,10 @@ if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023 Zeal L"
+__main_window_title__ = f"哔哩哔哩漫画下载器 v{__version__}"
 
 ############################################################
 # 配置全局网络请求的 timeout 以及 max retry
@@ -271,3 +273,52 @@ def checkNewVersion(mainGUI: MainGUI):
 
     else:
         QMessageBox.information(mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了")
+
+
+############################################################
+
+DLL_PATH = "./src/assets/easy-taskbar-progress.dll"
+
+TBPF_NOPROGRESS = 0x0  # 没有加载条
+TBPF_INDETERMINATE = 0x1  # 正在加载中
+TBPF_NORMAL = 0x2  # 正常，显示加载进度
+TBPF_ERROR = 0x4  # 错误，显示为红色的加载条
+TBPF_PAUSED = 0x8  # 中断，显示为黄色的加载条
+
+
+class EasyProgressBar:
+    def __init__(self, dll_path: str = DLL_PATH) -> None:
+        """Windows progress bar."""
+        if platform == "win32":
+            self._dll = CDLL(dll_path)
+        else:
+            raise NotImplementedError("Only Windows is supported")
+        self._is_init = False
+
+    def init(self) -> int:
+        """Initialize the progress bar."""
+        ret = self._dll.init()
+        self._is_init = True
+        return ret
+
+    def init_with_hwnd(self, hwnd: int) -> int:
+        """Initialize the progress bar with hwnd."""
+        ret = self._dll.init_with_hwnd(c_int(hwnd))
+        self._is_init = True
+        return ret
+
+    def set_mode(self, mode: int) -> int:
+        """Set the progress bar mode."""
+        if not self._is_init:
+            raise RuntimeError("ProgressBar is not initialized")
+        return self._dll.set_mode(c_int(mode))
+
+    def set_progress(self, progress: int, total: int) -> int:
+        """Set the progress bar progress and total."""
+        if not self._is_init:
+            raise RuntimeError("ProgressBar is not initialized")
+        return self._dll.set_value(c_int(progress), c_int(total))
+
+    def end(self) -> int:
+        """End the progress bar."""
+        return self._dll.end()

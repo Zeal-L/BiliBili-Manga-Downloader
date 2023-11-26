@@ -8,7 +8,7 @@ import os
 from functools import partial
 from typing import Any, Optional
 
-from PySide6.QtCore import Signal, Qt, QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
@@ -17,7 +17,7 @@ from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
 from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.Utils import __version__, logger, data_path
+from src.Utils import __version__, data_path, logger
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
@@ -134,8 +134,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 Returns:
                     bool: 是否过滤该事件
                 """
-                # 检查args[1]的类型是否为QEvent，如果不是则不处理
-                if not isinstance(args[1], QEvent):
+                # 检查args的类型，False则不过滤该事件
+                if not isinstance(args[0], QObject) or not isinstance(args[1], QEvent):
                     return super().eventFilter(*args, **kwargs)
                 event: QEvent = args[1]
                 if event.type() == QEvent.ApplicationDeactivate:

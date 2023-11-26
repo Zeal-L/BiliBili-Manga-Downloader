@@ -24,9 +24,9 @@ from src.Utils import (
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
     checkNewVersion,
-    openFileOrDir,
     log_path,
     logger,
+    openFileOrDir,
 )
 
 if TYPE_CHECKING:
@@ -286,7 +286,8 @@ class SettingUI(QObject):
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
-        #? 绑定选择路径按钮的回调函数
+
+        # ? 绑定选择路径按钮的回调函数
         def _() -> None:
             path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
             if os.path.exists(path):
@@ -298,7 +299,7 @@ class SettingUI(QObject):
 
         mainGUI.pushButton_save_path.clicked.connect(_)
 
-        #? 绑定保存路径文本框的回调函数
+        # ? 绑定保存路径文本框的回调函数
         def _() -> None:
             path = mainGUI.lineEdit_save_path.text()
             if os.path.exists(path):
@@ -341,7 +342,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
         mainGUI.pushButton_open_log.clicked.connect(
-            lambda: openFileOrDir(mainGUI, os.path.join(log_path, 'ERROR.log'))
+            lambda: openFileOrDir(mainGUI, os.path.join(log_path, "ERROR.log"))
         )
 
     ############################################################

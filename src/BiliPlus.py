@@ -12,7 +12,14 @@ from retrying import retry
 
 from src.Comic import Comic
 from src.Episode import Episode
-from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger, __app_name__, __version__
+from src.Utils import (
+    MAX_RETRY_SMALL,
+    RETRY_WAIT_EX,
+    TIMEOUT_SMALL,
+    __app_name__,
+    __version__,
+    logger,
+)
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -81,7 +88,9 @@ class BiliPlusComic(Comic):
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
-            if "page=" not in url and ("未登录" in res.text or 'src="http' not in res.text):
+            if "page=" not in url and (
+                "未登录" in res.text or 'src="http' not in res.text
+            ):
                 return ""
             if res.status_code != 200:
                 logger.warning(
@@ -93,7 +102,9 @@ class BiliPlusComic(Comic):
         try:
             biliplus_html = _(biliplus_detail_url)
             if "" == biliplus_html:
-                self.mainGUI.signal_message_box.emit("BiliPlus无法解析任何章节，可能是您的BiliPlus Cookie无效，或者此漫画未在该网站有过缓存记录！")
+                self.mainGUI.signal_message_box.emit(
+                    "BiliPlus无法解析任何章节，可能是您的BiliPlus Cookie无效，或者此漫画未在该网站有过缓存记录！"
+                )
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)

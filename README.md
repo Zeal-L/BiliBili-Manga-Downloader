@@ -1,24 +1,26 @@
 # 🎉 哔哩哔哩漫画下载器 💖
 
+<!-- ![GitHub top language](https://img.shields.io/github/languages/top/Zeal-L/BiliBili-Manga-Downloader) -->
+
 ![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/Zeal-L/BiliBili-Manga-Downloader)
-![GitHub top language](https://img.shields.io/github/languages/top/Zeal-L/BiliBili-Manga-Downloader)
 ![platform](https://img.shields.io/badge/platform-Windows_|_Linux-blue)
+![Scc Count Badge](https://sloc.xyz/github/Zeal-L/BiliBili-Manga-Downloader/)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub - License](https://img.shields.io/github/license/Zeal-L/BiliBili-Manga-Downloader)
-<!-- ![GitHub Lines of code](https://img.shields.io/tokei/lines/github/Zeal-L/BiliBili-Manga-Downloader) -->
 
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/zeal-l/BiliBili-Manga-Downloader)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub all releases - Download](https://img.shields.io/github/downloads/Zeal-L/BiliBili-Manga-Downloader/total)
 
-
 ## 💬 简介
+
 **由于作者某天实在是受不了B漫网页版的观看体验 ~~(时而混入漫画中的广告，无法便捷快速的放大图片，进度栏作死一样的反复横跳挡视线等等...)~~，再加上作者的仓鼠属性 😛**
 
 **因此 将将将~ 🎉 一个好用的哔哩哔哩漫画下载器就此诞生！**
 
 ## ✨ 主要功能 / 特性
+
 - **黑科技下载未解锁章节！**
 - **提供多种可选的保存格式**
 - **支持已购被下架漫画下载**
@@ -37,6 +39,7 @@
 - **多种主题选择**
 
 ## 📸 相关截图
+
 **使用哔站解析**
 <div align=center>
 <img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/39f4e66f-50f1-410b-8761-971eeb9cf30e" width=90%>
@@ -53,6 +56,8 @@
 </div>
 
 ## 📝 使用指南
+- **下载地址**: [**Releases**](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases)
+
 - **本软件有两种下载解析方法：**
   - **B站解析**
     - 只能下载免费章节和用户已解锁的章节
@@ -79,8 +84,8 @@
 - **如果想用"本地库存"功能，需要注意的是：下载好的漫画章节名以及保存的 `元数据.json` 都不能更改，否则将会无法正确读取漫画数据**
 - **已购被下架的漫画虽然不能通过关键词搜索到，但是可以通过漫画ID直接访问，如果你购买过那么就可以成功下载**
 
-
 ## 💕 友情推荐
+
 **🔥 下面我要隆重的推荐一款搭配本软件使用的本地漫画浏览器 ~~(可以说就是为了这点儿醋 我才包的这顿饺子)~~**
 
 <div align=center><img src="https://user-images.githubusercontent.com/72005386/222974497-18b568e7-5b2e-416f-8d14-22ec68323570.png" width=100%></div>
@@ -96,6 +101,7 @@
 - 唯一的缺点好像就是对条漫不太支持，也有可能是我没找到选项，有知道的小伙伴可以联系我，谢啦~
 
 ## 💡 TODO List ~~(在可见的未来...)~~
+
 - 更多开发进度详情请看 [**项目清单表**](https://github.com/users/Zeal-L/projects/2/views/1)
 - **PS: 也欢迎小伙伴们多多的在Issues里提意见，不管是Bug还是操作逻辑，界面优化等等作者统统笑纳~**
   - 🟦 缓存更多资源，减少网络请求
@@ -113,7 +119,8 @@
   - ✅ ~~给打包好的程序添加版本号版权等属性信息~~
 
 ## 🏗️ 本地构建 / 编译
-- **首先确保你安装了 Python >= 3.11 和 git**
+
+- **首先确保你安装了 Python 3.12 和 git**
 - **本项目使用了 pipenv 依靠虚拟环境进行依赖项管理，所以不必担心影响自己的本地环境**
 - **作者已经贴心的帮后来者们准备好了两个集成脚本~**
 - **接下来的操作都在项目的根目录运行命令行指令**
@@ -126,12 +133,13 @@
 - **打包编译**
   1. 执行 `sh build.sh` 等待项目打包完成
   2. 这一步可能会花费一定时间，中途需要手动确认安全漏洞检查
-  2. 打包好的程序会被移动到项目的根目录 "哔哩哔哩漫画下载器.exe"
+  3. 打包好的程序会被移动到项目的根目录 "哔哩哔哩漫画下载器.exe"
 - **彻底清除项目 ~~(删库跑路)~~**
-  1. 执行 `pipenv --rm `
+  1. 执行 `pipenv --rm`
   2. 执行 `cd .. && rm -rf BiliBili-Manga-Downloader/`
 
 ## 🔨 PR 格式
+
 - 请PR到 `develop` 分支
 - 遵循项目已有代码的 `python doc` 格式
 - 明确的注释信息
@@ -148,27 +156,31 @@
 [**详细日志**](UPDATE.md)
 
 ## 🍻 联系方式
+
 欢迎进群讨论程序，漫画，资源分享, 提交问题等等
+
 - Q群号：244029317
 
 ## 🙈 PS
+
 **做项目不易，求星星！求赞助！如果本项目对你有帮助，请作者喝杯☕吧~**
 
 <img src="https://user-images.githubusercontent.com/72005386/223096480-8d57ceef-0b33-4653-86bf-55e6094fcb9b.jpg" width=20%> <img src="https://user-images.githubusercontent.com/72005386/223096520-e5d95ac8-044d-4644-8500-3770e5ad81f8.jpg" width=18.5%>
 
 ## 🔒️ 许可协议
+
 - 本项目在遵循 [**GNU Affero General Public License v3.0**](https://www.gnu.org/licenses/agpl-3.0.en.html) 许可协议下进行发布
 - 若对代码进行了修改，请务必遵循许可协议的规定进行发布
 - **特别提醒，未经合法授权，擅自使用本项目的内容可能涉及侵权行为，我们保留追究相应法律责任的权利**
 
 ## ⚠️ 免责申明
+
 - **本软件提供的所有内容，仅可用作学习交流使用，未经版权方以及原作者授权，禁止用于商业目的以及其他用途。请在下载24小时内删除。为尊重版权，请前往资源的原始发布网站观看，支持原创，谢谢**
 - 本软件只提供漫画解析，不提供任何个人信息上传、存储到服务器的功能
 - 本软件解析得到的所有内容均来自哔哩哔哩漫画官方上传、分享，其版权均归原作者以及哔哩哔哩漫画所有。内容提供者、上传者应对其提供、上传的内容承担全部责任
 - 因使用本软件产生的版权问题，软件作者概不负责
 - 我们强烈建议您详细阅读并遵守许可协议的规定，以保障您与他人的权益和合法使用
+
 ## 🌟 Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Zeal-L/BiliBili-Manga-Downloader&type=Date)](https://star-history.com/#Zeal-L/BiliBili-Manga-Downloader)
-
-

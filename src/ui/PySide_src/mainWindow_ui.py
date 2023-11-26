@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.2
+## Created by: Qt User Interface Compiler version 6.6.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -123,10 +123,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.label_myLibrary_count)
 
-        self.label = QLabel(self.tab_myLibrary)
-        self.label.setObjectName(u"label")
+        self.label_myLibrary_tip = QLabel(self.tab_myLibrary)
+        self.label_myLibrary_tip.setObjectName(u"label_myLibrary_tip")
 
-        self.horizontalLayout.addWidget(self.label)
+        self.horizontalLayout.addWidget(self.label_myLibrary_tip)
 
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -145,7 +145,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 524, 191))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -414,6 +414,18 @@ class Ui_MainWindow(object):
 
         self.h_Layout_total_progress.addWidget(self.line_7)
 
+        self.label_tasks_count = QLabel(self.tab_download)
+        self.label_tasks_count.setObjectName(u"label_tasks_count")
+
+        self.h_Layout_total_progress.addWidget(self.label_tasks_count)
+
+        self.line_13 = QFrame(self.tab_download)
+        self.line_13.setObjectName(u"line_13")
+        self.line_13.setFrameShape(QFrame.VLine)
+        self.line_13.setFrameShadow(QFrame.Sunken)
+
+        self.h_Layout_total_progress.addWidget(self.line_13)
+
         self.label_total_progress_speed = QLabel(self.tab_download)
         self.label_total_progress_speed.setObjectName(u"label_total_progress_speed")
 
@@ -430,6 +442,13 @@ class Ui_MainWindow(object):
         self.label_total_progress_time.setObjectName(u"label_total_progress_time")
 
         self.h_Layout_total_progress.addWidget(self.label_total_progress_time)
+
+        self.line_14 = QFrame(self.tab_download)
+        self.line_14.setObjectName(u"line_14")
+        self.line_14.setFrameShape(QFrame.VLine)
+        self.line_14.setFrameShadow(QFrame.Sunken)
+
+        self.h_Layout_total_progress.addWidget(self.line_14)
 
 
         self.verticalLayout_2.addLayout(self.h_Layout_total_progress)
@@ -469,7 +488,7 @@ class Ui_MainWindow(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 61, 18))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 98, 28))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -831,9 +850,9 @@ class Ui_MainWindow(object):
         self.lineEdit_manga_search_id.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u76845\u4f4d\u6570\u5b57ID", None))
         self.pushButton_manga_search_id.setText(QCoreApplication.translate("MainWindow", u"\u76f4\u8fbe", None))
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_manga_search), QCoreApplication.translate("MainWindow", u"\u641c\u7d22\u6f2b\u753b", None))
-        self.label_myLibrary_count.setText(QCoreApplication.translate("MainWindow", u"\u5e93\u5b58\uff1a", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"(\u53f3\u952e\u6253\u5f00\u6587\u4ef6\u5939)", None))
-        self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWindow", u"\u68c0\u67e5\u66f4\u65b0", None))
+        self.label_myLibrary_count.setText(QCoreApplication.translate("MainWindow", u"\u5c1a\u672a\u521d\u59cb\u5316", None))
+        self.label_myLibrary_tip.setText("")
+        self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWindow", u"\u626b\u63cf\u6f2b\u753b", None))
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myLibrary), QCoreApplication.translate("MainWindow", u"\u672c\u5730\u5e93\u5b58", None))
         self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fe1\u606f", None))
         self.label_manga_image.setText("")
@@ -884,7 +903,8 @@ class Ui_MainWindow(object):
                         "nt:0px; font-size:10pt;\"><br /></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWindow", u"\u603b\u8fdb\u5ea6", None))
-        self.label_total_progress_speed.setText(QCoreApplication.translate("MainWindow", u"\u603b\u4e0b\u8f7d\u901f\u5ea6:", None))
+        self.label_tasks_count.setText(QCoreApplication.translate("MainWindow", u"\u4efb\u52a1\u6570\uff1a", None))
+        self.label_total_progress_speed.setText(QCoreApplication.translate("MainWindow", u"\u603b\u4e0b\u8f7d\u901f\u5ea6\uff1a", None))
         self.label_total_progress_time.setText(QCoreApplication.translate("MainWindow", u"\u5269\u4f59\u65f6\u95f4\uff1a", None))
         self.tabWidget_download_list.setTabText(self.tabWidget_download_list.indexOf(self.tab_processing), QCoreApplication.translate("MainWindow", u"\u8fdb\u884c\u4e2d", None))
         self.pushButton_clear_tasks.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u7406\u5df2\u5b8c\u6210\u4efb\u52a1", None))

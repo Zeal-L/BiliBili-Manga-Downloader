@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 from pypinyin import lazy_pinyin
 from PySide6.QtCore import QEvent, QObject, QPoint, QSize, Qt, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QImage, QPixmap, QIntValidator
+from PySide6.QtGui import QColor, QDesktopServices, QImage, QIntValidator, QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -22,7 +22,6 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QWidget,
 )
-
 
 from src.BiliPlus import BiliPlusComic
 from src.Comic import Comic
@@ -169,14 +168,14 @@ class MangaUI(QObject):
         # 布局对齐
         self.mainGUI.v_Layout_myLibrary.setAlignment(Qt.AlignTop)
         self.signal_my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
-        if self.mainGUI.getConfig("cookie"):
-            self.updateMyLibrary()
 
         def _() -> None:
             if not self.mainGUI.getConfig("cookie"):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
             if self.updateMyLibrary():
+                self.mainGUI.pushButton_myLibrary_update.setText("检查更新")
+                self.mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
                 QMessageBox.information(self.mainGUI, "通知", "更新完成！")
 
         self.mainGUI.pushButton_myLibrary_update.clicked.connect(_)

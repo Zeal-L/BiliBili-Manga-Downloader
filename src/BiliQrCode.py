@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 class QrCode:
     """Bilibili 扫码登录二维码类"""
+
     def __init__(self, mainGUI: MainGUI) -> None:
         self.mainGUI = mainGUI
         self.generate_url = (
