@@ -19,6 +19,7 @@ pypinyin = "^0.49.0"
 qt-material = "^2.14"
 beautifulsoup4 = "^4.12.2"
 qrcode = "^7.4.2"
+iso8601 = "^2.1.0"
 
 [[tool.poetry.source]]
 name = "mirrors"
