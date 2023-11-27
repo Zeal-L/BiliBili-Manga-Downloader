@@ -54,6 +54,7 @@ class Episode:
         self.size = episode["size"]
         self.imgs_token = None
         self.author = comic_info["author_name"]
+        self.save_method = mainGUI.getConfig("save_method")
 
         # ?###########################################################
         # ? 修复标题中的特殊字符
@@ -223,18 +224,18 @@ class Episode:
         Returns:
             str: 保存路径
         """
-        save_method = self.mainGUI.getConfig("save_method")
+
         save_path = ""
-        if save_method == "PDF":
+        if self.save_method == "PDF":
             self.saveToPDF(imgs_path)
             save_path = f"{self.epi_path}.pdf"
-        elif save_method == "文件夹-图片":
+        elif self.save_method == "文件夹-图片":
             self.saveToFolder(imgs_path)
             save_path = self.epi_path
-        elif save_method == "7z压缩包":
+        elif self.save_method == "7z压缩包":
             self.saveTo7z(imgs_path)
             save_path = f"{self.epi_path}.7z"
-        elif save_method == "Zip压缩包":
+        elif self.save_method == "Zip压缩包":
             self.saveToZip(imgs_path)
             save_path = f"{self.epi_path}.zip"
         return save_path
