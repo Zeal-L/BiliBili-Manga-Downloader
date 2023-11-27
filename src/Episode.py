@@ -242,7 +242,7 @@ class Episode:
         elif self.save_method == "Zip压缩包":
             self.saveToZip(imgs_path)
             save_path = f"{self.epi_path}.zip"
-        elif save_method == "Cbz压缩包":
+        elif self.save_method == "Cbz压缩包":
             self.saveToCbz(imgs_path)
             save_path = f"{self.epi_path}.cbz"
         return save_path
