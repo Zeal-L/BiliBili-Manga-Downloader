@@ -1006,6 +1006,25 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QRadioButton" name="radioButton_save_method_Cbz">
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Cbz压缩包</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
