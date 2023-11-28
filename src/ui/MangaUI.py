@@ -173,15 +173,12 @@ class MangaUI(QObject):
             if not self.mainGUI.getConfig("cookie"):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
-            if self.updateMyLibrary():
-                self.mainGUI.pushButton_myLibrary_update.setText("检查更新")
-                self.mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
-                QMessageBox.information(self.mainGUI, "通知", "更新完成！")
+            self.updateMyLibrary()
 
         self.mainGUI.pushButton_myLibrary_update.clicked.connect(_)
 
     ############################################################
-    # 以下三个函数是为了更新我的库存，是一个整体
+    # 以下四个函数是为了更新我的库存，是一个整体
     # 拆开的原因主要是为了绕开多线程访问 mainGUI 报错的情况，如下
     # QObject::setParent: Cannot set parent, new parent is in a different thread
     ############################################################
@@ -208,11 +205,13 @@ class MangaUI(QObject):
                     with open(
                         os.path.join(path, item, "元数据.json"), "r", encoding="utf-8"
                     ) as f:
+                        comic_path = os.path.join(path, item)
                         data = json.load(f)
                         my_library[data["id"]] = {
                             "comic_name": data["title"],
-                            "comic_path": os.path.join(path, item),
+                            "comic_path": comic_path,
                         }
+                        self.mainGUI.comic_path_dict[data["id"]] = comic_path
         else:
             self.mainGUI.lineEdit_save_path.setText(os.getcwd())
             self.mainGUI.updateConfig("save_path", os.getcwd())
@@ -222,27 +221,41 @@ class MangaUI(QObject):
         # ?###########################################################
         # ? 用多线程添加漫画，避免卡顿
         futures = []
-        with ThreadPoolExecutor(max_workers=16) as executor:
-            futures.extend(
-                executor.submit(
-                    self.updateMyLibrarySingle,
-                    self.mainGUI,
-                    comic_id,
-                    comic_info["comic_path"],
-                )
-                for comic_id, comic_info in my_library.items()
+        futures.extend(
+            self.executor.submit(
+                self.updateMyLibrarySingle,
+                self.mainGUI,
+                comic_id,
+                comic_info["comic_path"],
             )
+            for comic_id, comic_info in my_library.items()
+        )
+        self.mainGUI.pushButton_myLibrary_update.setEnabled(False)
+        self.mainGUI.label_myLibrary_tip.setText("更新信息中...")
+        self.executor.submit(
+            self.updateMyLibraryCallback,
+            self.mainGUI,
+            futures,
+            my_library,
+        )
 
+    ############################################################
+    def updateMyLibraryCallback(
+        self, mainGUI: MainGUI, futures: list, my_library: dict
+    ) -> None:
         if fail_comic := [
-            future.result() for future in as_completed(futures) if future.result()
+            future.result() for future in as_completed(futures, 10000) if future.result()
         ]:
             temp = "".join(my_library[i]["comic_name"] + "\n" for i in fail_comic)
-            self.mainGUI.signal_message_box.emit(
+            mainGUI.signal_message_box.emit(
                 f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
             )
-            return False
+        else:
+            mainGUI.signal_information_box.emit("更新完成！")
 
-        return True
+        mainGUI.pushButton_myLibrary_update.setEnabled(True)
+        mainGUI.pushButton_myLibrary_update.setText("检查更新")
+        mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
 
     ############################################################
     def updateMyLibrarySingle(

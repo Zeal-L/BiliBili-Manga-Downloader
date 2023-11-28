@@ -57,7 +57,7 @@ class Episode:
         self.author = comic_info["author_name"]
         self.save_method = mainGUI.getConfig("save_method")
 
-        if mainGUI.getConfig("save_method") == "Cbz压缩包":
+        if self.save_method == "Cbz压缩包":
             self.comicinfoxml = ComicInfoXML(comic_info, episode)
 
         # ?###########################################################
@@ -85,7 +85,7 @@ class Episode:
             self.title = re.sub(r"^([0-9\-]+)", r"第\1话", self.title)
 
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}/{self.id}?from=manga_homepage",
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",

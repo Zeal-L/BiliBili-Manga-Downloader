@@ -24,7 +24,7 @@ class SearchComic:
         self.sessdata = sessdata
         self.detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": "https://manga.bilibili.com/search?from=manga_homepage",
             "cookie": f"SESSDATA={sessdata}",

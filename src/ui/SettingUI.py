@@ -20,7 +20,7 @@ from src.BiliQrCode import QrCode
 from src.ui.MyAboutUI import MyAboutUI
 from src.ui.QrCodeUI import QrCodeUI
 from src.Utils import (
-    MAX_RETRY_SMALL,
+    MAX_RETRY_TINY,
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
     checkNewVersion,
@@ -138,7 +138,10 @@ class SettingUI(QObject):
         stored_cookie = mainGUI.getConfig("cookie")
         if stored_cookie:
             mainGUI.lineEdit_my_cookie.setText(stored_cookie)
-            self.is_cookie_valid(mainGUI, stored_cookie)
+            threading.Thread(
+                target=self.is_cookie_valid,
+                args=(mainGUI, stored_cookie),
+            ).start()
 
         def _() -> None:
             new_cookie = mainGUI.lineEdit_my_cookie.text()
@@ -170,7 +173,7 @@ class SettingUI(QObject):
         payload = {"key_word": "test", "page_num": 1, "page_size": 1}
 
         @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+            stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX
         )
         def _() -> None:
             try:
@@ -191,9 +194,7 @@ class SettingUI(QObject):
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)
-            QMessageBox.warning(
-                mainGUI,
-                "警告",
+            mainGUI.signal_message_box.emit(
                 "重复测试Cookie是否有效多次后失败!\n请核对输入的Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
             return False
@@ -209,7 +210,6 @@ class SettingUI(QObject):
         stored_cookie = mainGUI.getConfig("biliplus_cookie")
         if stored_cookie:
             mainGUI.lineEdit_biliplus_cookie.setText(stored_cookie)
-            self.is_biliplus_cookie_valid(mainGUI, stored_cookie)
 
         def _() -> None:
             new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
@@ -241,7 +241,7 @@ class SettingUI(QObject):
         }
 
         @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+            stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX
         )
         def _() -> None:
             try:
@@ -266,15 +266,13 @@ class SettingUI(QObject):
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)
-            QMessageBox.warning(
-                mainGUI,
-                "警告",
+            mainGUI.signal_message_box.emit(
                 "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
             return False
         except ReferenceError:
-            QMessageBox.warning(
-                mainGUI, "警告", "BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者"
+            mainGUI.signal_message_box.emit(
+                "BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者"
             )
             return False
         return True

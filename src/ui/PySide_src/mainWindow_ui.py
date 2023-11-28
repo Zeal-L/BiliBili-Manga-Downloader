@@ -655,6 +655,14 @@ class Ui_MainWindow(object):
 
         self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_Zip)
 
+        self.radioButton_save_method_Cbz = QRadioButton(self.groupBox_save_method)
+        self.radioButton_save_method_Cbz.setObjectName(u"radioButton_save_method_Cbz")
+        self.radioButton_save_method_Cbz.setMinimumSize(QSize(60, 0))
+        self.radioButton_save_method_Cbz.setChecked(False)
+        self.radioButton_save_method_Cbz.setAutoRepeat(False)
+
+        self.h_Layout_groupBox_save_method.addWidget(self.radioButton_save_method_Cbz)
+
 
         self.horizontalLayout_3.addWidget(self.groupBox_save_method)
 
@@ -923,6 +931,7 @@ class Ui_MainWindow(object):
         self.radioButton_save_method_pdf.setText(QCoreApplication.translate("MainWindow", u"PDF", None))
         self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWindow", u"7z\u538b\u7f29\u5305", None))
         self.radioButton_save_method_Zip.setText(QCoreApplication.translate("MainWindow", u"Zip\u538b\u7f29\u5305", None))
+        self.radioButton_save_method_Cbz.setText(QCoreApplication.translate("MainWindow", u"Cbz\u538b\u7f29\u5305", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))

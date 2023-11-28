@@ -36,6 +36,7 @@ __main_window_title__ = f"哔哩哔哩漫画下载器 v{__version__}"
 TIMEOUT_SMALL = 5
 TIMEOUT_LARGE = 10
 
+MAX_RETRY_TINY = 4000
 MAX_RETRY_SMALL = 10000
 MAX_RETRY_LARGE = 20000
 

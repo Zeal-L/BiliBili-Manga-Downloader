@@ -26,6 +26,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
     # ? 主要是为了 Episode 类里面的提示框准备的，
     # ? 因为 Episode 类是在另一个线程里面运行的，而只有主线程才能修改 GUI
     signal_message_box = Signal(str)
+    signal_information_box = Signal(str)
 
     # ? 用于多线程报告程序详情
     signal_resolve_status = Signal(str)
@@ -38,6 +39,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setFont(QFont("Microsoft YaHei", 10))
         self.signal_message_box.connect(
             lambda msg: QMessageBox.warning(None, "警告", msg)
+        )
+        self.signal_information_box.connect(
+            lambda msg: QMessageBox.information(None, "通知", msg)
         )
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
@@ -66,6 +70,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             self.lineEdit_save_path.setText(os.getcwd())
             self.updateConfig("save_path", os.getcwd())
         logger.info(f"save_method: {self.getConfig('save_method')}")
+
+        # ?###########################################################
+        # ? 初始化 comic_path_dict，方便读取漫画目录
+        self.comic_path_dict = {}
 
         # ?###########################################################
         # ? 初始化UI绑定事件
@@ -134,18 +142,18 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 Returns:
                     bool: 是否过滤该事件
                 """
-                # 检查args的类型，False则不过滤该事件
-                if not isinstance(args[0], QObject) or not isinstance(args[1], QEvent):
+                try:
+                    event: QEvent = args[1]
+                    if event.type() == QEvent.ApplicationDeactivate:
+                        self.outer_self.isFocus = False
+                        self.outer_self.CtrlPress = (
+                            self.outer_self.AltPress
+                        ) = self.outer_self.ShiftPress = False
+                    elif event.type() == QEvent.ApplicationActivate:
+                        self.outer_self.isFocus = True
                     return super().eventFilter(*args, **kwargs)
-                event: QEvent = args[1]
-                if event.type() == QEvent.ApplicationDeactivate:
-                    self.outer_self.isFocus = False
-                    self.outer_self.CtrlPress = (
-                        self.outer_self.AltPress
-                    ) = self.outer_self.ShiftPress = False
-                elif event.type() == QEvent.ApplicationActivate:
-                    self.outer_self.isFocus = True
-                return super().eventFilter(*args, **kwargs)
+                except Exception as e:
+                    logger.error(f"主窗口事件过滤器出错！\n{e}")
 
         return MainEventFilter(outer_self=self)
 

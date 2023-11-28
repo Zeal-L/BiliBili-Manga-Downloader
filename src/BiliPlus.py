@@ -32,7 +32,7 @@ class BiliPlusComic(Comic):
         super().__init__(comic_id, mainGUI)
         self.access_key = mainGUI.getConfig("biliplus_cookie")
         self.headers = {
-            "User-Agent": f"{__app_name__} {__version__}",
+            "User-Agent": f"{__app_name__}/{__version__}",
             "cookie": f"manga_pic_format=jpg-full;login=2;access_key={self.access_key}",
         }
 
@@ -78,7 +78,7 @@ class BiliPlusComic(Comic):
         @retry(
             stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
         )
-        def _(url: str) -> dict:
+        def _(url: str) -> str | None:
             try:
                 res = requests.post(
                     url,
@@ -91,7 +91,7 @@ class BiliPlusComic(Comic):
             if "page=" not in url and (
                 "未登录" in res.text or 'src="http' not in res.text
             ):
-                return ""
+                return
             if res.status_code != 200:
                 logger.warning(
                     f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
@@ -101,10 +101,13 @@ class BiliPlusComic(Comic):
 
         try:
             biliplus_html = _(biliplus_detail_url)
-            if "" == biliplus_html:
+            if None == biliplus_html:
                 self.mainGUI.signal_message_box.emit(
-                    "BiliPlus无法解析任何章节，可能是您的BiliPlus Cookie无效，或者此漫画未在该网站有过缓存记录！"
+                    "BiliPlus无法解析任何章节，可能有如下两种可能\n"
+                    "1、您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie\n"
+                    "2、在该网站无此漫画的缓存记录，请登陆该网站为此漫画获取未缓存索引"
                 )
+                return
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)

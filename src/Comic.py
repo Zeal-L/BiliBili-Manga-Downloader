@@ -36,7 +36,7 @@ class Comic:
         self.data = None
         self.detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web"
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}?from=manga_homepage",
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
@@ -89,9 +89,14 @@ class Comic:
         )
         self.data["author_name"] = myStrFilter(self.data["author_name"])
         self.data["styles"] = "，".join(self.data["styles"])
-        self.data[
-            "save_path"
-        ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']}"
+        if self.comic_id in self.mainGUI.comic_path_dict:
+            self.data[
+                "save_path"
+            ] = self.mainGUI.comic_path_dict[self.comic_id]
+        else:
+            self.data[
+                "save_path"
+            ] = f"{self.save_path}/{self.data['title']}"
 
         return self.data
 
