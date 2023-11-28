@@ -163,8 +163,24 @@ class MangaUI(QObject):
 
     ############################################################
     def init_myLibrary(self) -> None:
-        """绑定更新我的库存事件"""
+        """初始化我的库存"""
 
+        # ?###########################################################
+        # ? 初始化我的库存漫画元数据
+        path = self.mainGUI.getConfig("save_path")
+
+        if os.path.exists(path):
+            self.mainGUI.my_library = self.get_meta_dict(path)
+        else:
+            self.mainGUI.lineEdit_save_path.setText(os.getcwd())
+            self.mainGUI.updateConfig("save_path", os.getcwd())
+
+        self.mainGUI.label_myLibrary_count.setText(
+            f"我的库存：{len(self.mainGUI.my_library)}部"
+        )
+
+        # ?###########################################################
+        # ? 绑定更新我的库存事件
         # 布局对齐
         self.mainGUI.v_Layout_myLibrary.setAlignment(Qt.AlignTop)
         self.signal_my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
@@ -195,31 +211,8 @@ class MangaUI(QObject):
             to_delete.deleteLater()
 
         # ?###########################################################
-        # ? 读取本地库存
-        my_library = {}
-        path = self.mainGUI.getConfig("save_path")
-
-        if os.path.exists(path):
-            for item in os.listdir(path):
-                if os.path.exists(os.path.join(path, item, "元数据.json")):
-                    with open(
-                        os.path.join(path, item, "元数据.json"), "r", encoding="utf-8"
-                    ) as f:
-                        comic_path = os.path.join(path, item)
-                        data = json.load(f)
-                        my_library[data["id"]] = {
-                            "comic_name": data["title"],
-                            "comic_path": comic_path,
-                        }
-                        self.mainGUI.comic_path_dict[data["id"]] = comic_path
-        else:
-            self.mainGUI.lineEdit_save_path.setText(os.getcwd())
-            self.mainGUI.updateConfig("save_path", os.getcwd())
-
-        self.mainGUI.label_myLibrary_count.setText(f"我的库存：{len(my_library)}部")
-
-        # ?###########################################################
-        # ? 用多线程添加漫画，避免卡顿
+        # ? 用多线程解析漫画，并添加漫画到列表
+        my_library = self.mainGUI.my_library
         futures = []
         futures.extend(
             self.executor.submit(
@@ -233,18 +226,18 @@ class MangaUI(QObject):
         self.mainGUI.pushButton_myLibrary_update.setEnabled(False)
         self.mainGUI.label_myLibrary_tip.setText("更新信息中...")
         self.executor.submit(
-            self.updateMyLibraryCallback,
+            self.updateMyLibraryWatcher,
             self.mainGUI,
             futures,
             my_library,
         )
 
     ############################################################
-    def updateMyLibraryCallback(
+    def updateMyLibraryWatcher(
         self, mainGUI: MainGUI, futures: list, my_library: dict
     ) -> None:
         if fail_comic := [
-            future.result() for future in as_completed(futures, 10000) if future.result()
+            future.result() for future in as_completed(futures) if future.result()
         ]:
             temp = "".join(my_library[i]["comic_name"] + "\n" for i in fail_comic)
             mainGUI.signal_message_box.emit(
@@ -903,3 +896,31 @@ class MangaUI(QObject):
             os.path.join(data["save_path"], "元数据.json"), "w", encoding="utf-8"
         ) as f:
             json.dump(meta, f, indent=4, ensure_ascii=False)
+
+    ############################################################
+
+    def get_meta_dict(self, path: str) -> dict:
+        """读取指定库存目录下所有子漫画文件夹的元数据并返回
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            data (dict): 漫画元数据
+
+        """
+        meta_dict = {}
+        try:
+            for item in os.listdir(path):
+                if os.path.exists(os.path.join(path, item, "元数据.json")):
+                    with open(
+                        os.path.join(path, item, "元数据.json"), "r", encoding="utf-8"
+                    ) as f:
+                        comic_path = os.path.join(path, item)
+                        data = json.load(f)
+                        meta_dict[data["id"]] = {
+                            "comic_name": data["title"],
+                            "comic_path": comic_path,
+                        }
+        except Exception as e:
+            logger.error(f"读取元数据时发生错误\n {e}")
+        return meta_dict
+

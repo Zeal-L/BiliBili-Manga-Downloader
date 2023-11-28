@@ -72,8 +72,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         logger.info(f"save_method: {self.getConfig('save_method')}")
 
         # ?###########################################################
-        # ? 初始化 comic_path_dict，方便读取漫画目录
-        self.comic_path_dict = {}
+        # ? 初始化 my_library，方便读取本地漫画元数据
+        self.my_library = {}
 
         # ?###########################################################
         # ? 初始化UI绑定事件

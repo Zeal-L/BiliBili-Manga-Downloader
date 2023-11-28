@@ -89,10 +89,10 @@ class Comic:
         )
         self.data["author_name"] = myStrFilter(self.data["author_name"])
         self.data["styles"] = "，".join(self.data["styles"])
-        if self.comic_id in self.mainGUI.comic_path_dict:
+        if self.comic_id in self.mainGUI.my_library:
             self.data[
                 "save_path"
-            ] = self.mainGUI.comic_path_dict[self.comic_id]
+            ] = self.mainGUI.my_library[self.comic_id].get("comic_path")
         else:
             self.data[
                 "save_path"

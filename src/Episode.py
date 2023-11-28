@@ -4,9 +4,10 @@
 
 from __future__ import annotations
 
-import json
 import os
 import re
+import glob
+import json
 import shutil
 from typing import TYPE_CHECKING
 from zipfile import ZipFile
@@ -587,9 +588,5 @@ class Episode:
         Returns:
             bool: True: 已下载; False: 未下载
         """
-        return (
-            os.path.exists(self.epi_path)
-            or os.path.exists(f"{self.epi_path}.pdf")
-            or os.path.exists(f"{self.epi_path}.7z")
-            or os.path.exists(f"{self.epi_path}.zip")
-        )
+        file_list = glob.glob(f"{self.epi_path}*")
+        return len(file_list) > 0
