@@ -212,7 +212,6 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 用多线程解析漫画，并添加漫画到列表
-        my_library = self.mainGUI.my_library
         futures = []
         futures.extend(
             self.executor.submit(
@@ -221,7 +220,7 @@ class MangaUI(QObject):
                 comic_id,
                 comic_info["comic_path"],
             )
-            for comic_id, comic_info in my_library.items()
+            for comic_id, comic_info in self.mainGUI.my_library.items()
         )
         self.mainGUI.pushButton_myLibrary_update.setEnabled(False)
         self.mainGUI.label_myLibrary_tip.setText("更新信息中...")
@@ -229,17 +228,22 @@ class MangaUI(QObject):
             self.updateMyLibraryWatcher,
             self.mainGUI,
             futures,
-            my_library,
         )
 
     ############################################################
     def updateMyLibraryWatcher(
-        self, mainGUI: MainGUI, futures: list, my_library: dict
+        self, mainGUI: MainGUI, futures: list
     ) -> None:
+        """监控我的库存是否更新完毕，并处理后续步骤
+
+        Args:
+            mainGUI (MainGUI): 主窗口类实例
+            futures (list): 解析漫画的线程列表
+        """
         if fail_comic := [
             future.result() for future in as_completed(futures) if future.result()
         ]:
-            temp = "".join(my_library[i]["comic_name"] + "\n" for i in fail_comic)
+            temp = "".join(mainGUI.my_library[i]["comic_name"] + "\n" for i in fail_comic)
             mainGUI.signal_message_box.emit(
                 f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
             )
@@ -903,10 +907,10 @@ class MangaUI(QObject):
         """读取指定库存目录下所有子漫画文件夹的元数据并返回
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
-            data (dict): 漫画元数据
+            path (str): 库存目录路径
 
         """
+
         meta_dict = {}
         try:
             for item in os.listdir(path):
