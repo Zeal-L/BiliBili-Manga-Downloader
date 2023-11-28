@@ -167,17 +167,7 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 初始化我的库存漫画元数据
-        path = self.mainGUI.getConfig("save_path")
-
-        if os.path.exists(path):
-            self.mainGUI.my_library = self.get_meta_dict(path)
-        else:
-            self.mainGUI.lineEdit_save_path.setText(os.getcwd())
-            self.mainGUI.updateConfig("save_path", os.getcwd())
-
-        self.mainGUI.label_myLibrary_count.setText(
-            f"我的库存：{len(self.mainGUI.my_library)}部"
-        )
+        self.readMyLibrary()
 
         # ?###########################################################
         # ? 绑定更新我的库存事件
@@ -192,6 +182,21 @@ class MangaUI(QObject):
             self.updateMyLibrary()
 
         self.mainGUI.pushButton_myLibrary_update.clicked.connect(_)
+
+    def readMyLibrary(self) -> None:
+        """读取我的库存漫画元数据"""
+
+        path = self.mainGUI.getConfig("save_path")
+
+        if os.path.exists(path):
+            self.mainGUI.my_library = self.get_meta_dict(path)
+        else:
+            self.mainGUI.lineEdit_save_path.setText(os.getcwd())
+            self.mainGUI.updateConfig("save_path", os.getcwd())
+
+        self.mainGUI.label_myLibrary_count.setText(
+            f"我的库存：{len(self.mainGUI.my_library)}部"
+        )
 
     ############################################################
     # 以下四个函数是为了更新我的库存，是一个整体
@@ -212,6 +217,7 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 用多线程解析漫画，并添加漫画到列表
+        self.readMyLibrary()
         futures = []
         futures.extend(
             self.executor.submit(
