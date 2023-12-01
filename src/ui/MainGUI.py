@@ -38,10 +38,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
         self.signal_message_box.connect(
-            lambda msg: QMessageBox.warning(None, "警告", msg)
+            lambda msg: QMessageBox.warning(self, "警告", msg)
         )
         self.signal_information_box.connect(
-            lambda msg: QMessageBox.information(None, "通知", msg)
+            lambda msg: QMessageBox.information(self, "通知", msg)
         )
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
@@ -105,6 +105,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 logger.error(f"清除用户数据失败 - 目录:{data_path}\n{e}")
 
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
+
+        self.downloadUI.downloadManager.executor.shutdown(wait=False)
+        self.mangaUI.executor.shutdown(wait=False)
         logging.shutdown()
         event.accept()
 
@@ -154,6 +157,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                     return super().eventFilter(*args, **kwargs)
                 except Exception as e:
                     logger.error(f"主窗口事件过滤器出错！\n{e}")
+                    return False
 
         return MainEventFilter(outer_self=self)
 

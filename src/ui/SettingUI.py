@@ -139,7 +139,7 @@ class SettingUI(QObject):
         if stored_cookie:
             mainGUI.lineEdit_my_cookie.setText(stored_cookie)
             threading.Thread(
-                target=self.is_cookie_valid,
+                target=self.check_cookie_valid,
                 args=(mainGUI, stored_cookie),
             ).start()
 
@@ -150,21 +150,25 @@ class SettingUI(QObject):
                 return
             mainGUI.updateConfig("cookie", new_cookie)
             mainGUI.lineEdit_my_cookie.clearFocus()
-            if self.is_cookie_valid(mainGUI, new_cookie):
-                QMessageBox.information(mainGUI, "提示", "Cookie有效！")
+            mainGUI.pushButton_my_cookie.setEnabled(False)
+            self.check_cookie_valid(mainGUI, new_cookie)
+            threading.Thread(
+                target=self.check_cookie_valid,
+                args=(mainGUI, stored_cookie, True),
+            ).start()
+
 
         mainGUI.lineEdit_my_cookie.returnPressed.connect(_)
         mainGUI.pushButton_my_cookie.clicked.connect(_)
 
     ############################################################
-    def is_cookie_valid(self, mainGUI: MainGUI, cookie: str) -> bool:
+    def check_cookie_valid(self, mainGUI: MainGUI, cookie: str, notice: bool = False):
         """判断Cookie是否有效
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
             cookie (str): Cookie值
-        Returns:
-            bool: Cookie是否有效
+            notice (bool): Cookie值有效是否提示
         """
         detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
         headers = {
@@ -197,8 +201,11 @@ class SettingUI(QObject):
             mainGUI.signal_message_box.emit(
                 "重复测试Cookie是否有效多次后失败!\n请核对输入的Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
-            return False
-        return True
+        if notice:
+            mainGUI.signal_information_box.emit(
+                "Cookie有效！"
+            )
+        mainGUI.pushButton_my_cookie.setEnabled(True)
 
     ############################################################
     def init_biliplus_cookie(self, mainGUI: MainGUI) -> None:
@@ -218,21 +225,23 @@ class SettingUI(QObject):
                 return
             mainGUI.updateConfig("biliplus_cookie", new_cookie)
             mainGUI.lineEdit_biliplus_cookie.clearFocus()
-            if self.is_biliplus_cookie_valid(mainGUI, new_cookie):
-                QMessageBox.information(mainGUI, "提示", "Cookie有效！")
+            mainGUI.pushButton_biliplus_cookie.setEnabled(False)
+            threading.Thread(
+                target=self.check_biliplus_cookie_valid,
+                args=(mainGUI, stored_cookie, True),
+            ).start()
 
         mainGUI.lineEdit_biliplus_cookie.returnPressed.connect(_)
         mainGUI.pushButton_biliplus_cookie.clicked.connect(_)
 
     ############################################################
-    def is_biliplus_cookie_valid(self, mainGUI: MainGUI, cookie: str) -> bool:
+    def check_biliplus_cookie_valid(self, mainGUI: MainGUI, cookie: str, notice: bool = False) -> None:
         """判断BiliPlus Cookie是否有效
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
             cookie (str): Cookie值
-        Returns:
-            bool: Cookie是否有效
+            notice (bool): Cookie值有效是否提示
         """
         # 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
         main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
@@ -269,13 +278,15 @@ class SettingUI(QObject):
             mainGUI.signal_message_box.emit(
                 "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
-            return False
         except ReferenceError:
             mainGUI.signal_message_box.emit(
-                "BiliPlus Cookie检测功能出现故障!\n暂时无法检测是否有效!\n请自行判断或联系开发者"
+                "BiliPlus访问异常!\n暂时无法检测是否有效!\n请自行判断BiliPlus可访问状态或联系开发者"
             )
-            return False
-        return True
+        if notice:
+            mainGUI.signal_information_box.emit(
+                "BiliPlus Cookie有效！"
+            )
+        mainGUI.pushButton_biliplus_cookie.setEnabled(True)
 
     ############################################################
     def init_savePath(self, mainGUI: MainGUI) -> None:
