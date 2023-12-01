@@ -540,7 +540,12 @@ class MangaUI(QObject):
         for epi in self.epi_list:
             title = epi.title
             check_state = Qt.CheckState.Unchecked
-            flags = Qt.ItemFlag.ItemIsEnabled
+            flags = (
+                 Qt.ItemFlag.ItemIsSelectable
+                |Qt.ItemFlag.ItemIsDragEnabled
+                |Qt.ItemFlag.ItemIsUserCheckable
+                |Qt.ItemFlag.ItemIsEnabled
+            )
             background = QColor(0, 0, 0, 0)
             
             if epi.isDownloaded():
@@ -596,6 +601,7 @@ class MangaUI(QObject):
             temp.setToolTip(episode.get("title"))
             temp.setFlags(episode.get("flags"))
             temp.setCheckState(episode.get("checkState"))
+            print(temp.background())
             temp.setBackground(episode.get("background"))
             temp.setSizeHint(QSize(160, 20))
             temp.setTextAlignment(Qt.AlignmentFlag.AlignLeft)
