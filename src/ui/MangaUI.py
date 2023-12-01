@@ -246,6 +246,7 @@ class MangaUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
             futures (list): 解析漫画的线程列表
         """
+
         if fail_comic := [
             future.result() for future in as_completed(futures) if future.result()
         ]:
@@ -271,6 +272,7 @@ class MangaUI(QObject):
             comic_id (int): 漫画ID
             comic_path (str): 漫画保存路径
         """
+
         comic = Comic(comic_id, mainGUI)
         data = comic.getComicInfo()
         # ? 获取漫画信息失败直接跳过
@@ -296,6 +298,7 @@ class MangaUI(QObject):
         Args:
             info (dict): 漫画信息
         """
+
         mainGUI: MainGUI = info["mainGUI"]
         data: dict = info["data"]
         comic: Comic = info["comic"]
@@ -382,6 +385,7 @@ class MangaUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
             resolve_type (str): 更新的解析类型
         """
+
         if mainGUI.label_resolve_status.text() == "":
             # 用多线程更新漫画信息，避免卡顿
             self.executor.submit(
@@ -402,6 +406,7 @@ class MangaUI(QObject):
             resolve_type (str): 更新的解析类型
 
         """
+
         mainGUI.signal_resolve_status.emit("正在解析漫画详情...")
         data = comic.getComicInfo()
         self.signal_my_comic_detail_widget.emit(
@@ -482,6 +487,7 @@ class MangaUI(QObject):
             data (dict): 漫画实例的数据
 
         """
+
         img_byte = comic.getComicCover(data)
         self.signal_my_cover_update_widget.emit(
             {
@@ -497,6 +503,7 @@ class MangaUI(QObject):
             info (dict): 执行更新封面后返回的数据
 
         """
+
         img_byte: bytes = info["img_byte"]
 
         # 重写图片大小改变事件，使图片不会变形
@@ -581,6 +588,7 @@ class MangaUI(QObject):
             info (dict): 执行更新漫画详情后返回的数据
 
         """
+
         comic: Comic = info["comic"]
         resolve_type: str = info["resolve_type"]
         num_unlocked: int = info["num_unlocked"]
@@ -601,7 +609,6 @@ class MangaUI(QObject):
             temp.setToolTip(episode.get("title"))
             temp.setFlags(episode.get("flags"))
             temp.setCheckState(episode.get("checkState"))
-            print(temp.background())
             temp.setBackground(episode.get("background"))
             temp.setSizeHint(QSize(160, 20))
             temp.setTextAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -626,6 +633,7 @@ class MangaUI(QObject):
         Args:
             item (QListWidgetItem): 被点击的item
         """
+
         if item.flags() == Qt.ItemFlag.NoItemFlags:
             return
         if item.checkState() == Qt.CheckState.Checked:
