@@ -58,13 +58,13 @@ class MangaUI(QObject):
         self.epi_list = []
         self.present_comic_id = 0
         self.mainGUI = mainGUI
+        self.executor = ThreadPoolExecutor()
         self.init_mangaSearch()
         self.init_mangaDetails()
         self.init_myLibrary()
         self.init_episodesDetails()
         self.init_episodesDownloadSelected()
         self.init_episodesResolve()
-        self.executor = ThreadPoolExecutor()
 
     ############################################################
 
@@ -121,9 +121,9 @@ class MangaUI(QObject):
                 QMessageBox.critical(self.mainGUI, "警告", "请输入五位漫画ID！")
                 return
             self.present_comic_id = comic_id
-            self.resolveEnable(self.mainGUI, "resolving")
+            self.resolveEnable("resolving")
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(self.mainGUI, comic, "bilibili")
+            self.updateComicInfoEvent(comic, "bilibili")
 
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)
         self.mainGUI.pushButton_manga_search_id.clicked.connect(_)
@@ -136,9 +136,9 @@ class MangaUI(QObject):
         def _(item: QListWidgetItem) -> None:
             index = self.mainGUI.listWidget_manga_search.indexFromItem(item).row()
             self.present_comic_id = self.search_info[index]["id"]
-            self.resolveEnable(self.mainGUI, "resolving")
+            self.resolveEnable("resolving")
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(self.mainGUI, comic, "bilibili")
+            self.updateComicInfoEvent(comic, "bilibili")
 
         self.mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
 
@@ -170,8 +170,16 @@ class MangaUI(QObject):
         """初始化我的库存"""
 
         # ?###########################################################
-        # ? 初始化我的库存漫画元数据
+        # ? 检测cookie有效性并初始化我的库存漫画元数据
+        stored_cookie = self.mainGUI.getConfig("cookie")
+        def _() -> None:
+            self.mainGUI.lineEdit_my_cookie.setEnabled(False)
+            self.mainGUI.pushButton_my_cookie.setEnabled(False)
+            if self.mainGUI.settingUI.check_cookie_valid(stored_cookie):
+                self.updateMyLibrary()
         self.readMyLibrary()
+        if stored_cookie:
+            self.executor.submit(_)
 
         # ?###########################################################
         # ? 绑定更新我的库存事件
@@ -183,9 +191,16 @@ class MangaUI(QObject):
             if not self.mainGUI.getConfig("cookie"):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
-            self.updateMyLibrary()
+            self.readMyLibrary()
+            self.updateMyLibrary(notice=True)
 
         self.mainGUI.pushButton_myLibrary_update.clicked.connect(_)
+
+    ############################################################
+    # 以下五个函数是为了更新我的库存，是一个整体
+    # 拆开的原因主要是为了绕开多线程访问 mainGUI 报错的情况，如下
+    # QObject::setParent: Cannot set parent, new parent is in a different thread
+    ############################################################
 
     def readMyLibrary(self) -> None:
         """读取我的库存漫画元数据"""
@@ -203,13 +218,12 @@ class MangaUI(QObject):
         )
 
     ############################################################
-    # 以下四个函数是为了更新我的库存，是一个整体
-    # 拆开的原因主要是为了绕开多线程访问 mainGUI 报错的情况，如下
-    # QObject::setParent: Cannot set parent, new parent is in a different thread
-    ############################################################
+    def updateMyLibrary(self, notice: bool = False) -> bool:
+        """扫描本地并且更新我的库存
 
-    def updateMyLibrary(self) -> bool:
-        """扫描本地并且更新我的库存"""
+        Args:
+            notice (bool): 更新完毕是否弹窗提示
+        """
 
         # ?###########################################################
         # ? 清理v_Layout_myLibrary里的所有控件
@@ -221,12 +235,10 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 用多线程解析漫画，并添加漫画到列表
-        self.readMyLibrary()
         futures = []
         futures.extend(
             self.executor.submit(
                 self.updateMyLibrarySingle,
-                self.mainGUI,
                 comic_id,
                 comic_info["comic_path"],
             )
@@ -236,48 +248,47 @@ class MangaUI(QObject):
         self.mainGUI.label_myLibrary_tip.setText("更新信息中...")
         self.executor.submit(
             self.updateMyLibraryWatcher,
-            self.mainGUI,
             futures,
+            notice,
         )
 
     ############################################################
     def updateMyLibraryWatcher(
-        self, mainGUI: MainGUI, futures: list
+        self, futures: list, notice: bool
     ) -> None:
         """监控我的库存是否更新完毕，并处理后续步骤
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             futures (list): 解析漫画的线程列表
+            notice (bool): 更新完毕是否弹窗提示
         """
 
         if fail_comic := [
             future.result() for future in as_completed(futures) if future.result()
         ]:
-            temp = "".join(mainGUI.my_library[i]["comic_name"] + "\n" for i in fail_comic)
-            mainGUI.signal_message_box.emit(
+            temp = "".join(self.mainGUI.my_library[i]["comic_name"] + "\n" for i in fail_comic)
+            self.mainGUI.signal_message_box.emit(
                 f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
             )
-        else:
-            mainGUI.signal_information_box.emit("更新完成！")
+        elif notice:
+            self.mainGUI.signal_information_box.emit("更新完成！")
 
-        mainGUI.pushButton_myLibrary_update.setEnabled(True)
-        mainGUI.pushButton_myLibrary_update.setText("检查更新")
-        mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
+        self.mainGUI.pushButton_myLibrary_update.setEnabled(True)
+        self.mainGUI.pushButton_myLibrary_update.setText("检查更新")
+        self.mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
 
     ############################################################
     def updateMyLibrarySingle(
-        self, mainGUI: MainGUI, comic_id: int, comic_path: str
+        self, comic_id: int, comic_path: str
     ) -> int | None:
         """添加单个漫画到我的库存
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             comic_id (int): 漫画ID
             comic_path (str): 漫画保存路径
         """
 
-        comic = Comic(comic_id, mainGUI)
+        comic = Comic(comic_id, self.mainGUI)
         data = comic.getComicInfo()
         # ? 获取漫画信息失败直接跳过
         if not data:
@@ -285,7 +296,6 @@ class MangaUI(QObject):
         epi_list = comic.getEpisodesInfo()
 
         info = {
-            "mainGUI": mainGUI,
             "data": data,
             "comic": comic,
             "epi_list": epi_list,
@@ -303,7 +313,6 @@ class MangaUI(QObject):
             info (dict): 漫画信息
         """
 
-        mainGUI: MainGUI = info["mainGUI"]
         data: dict = info["data"]
         comic: Comic = info["comic"]
         epi_list: list = info["epi_list"]
@@ -327,8 +336,8 @@ class MangaUI(QObject):
         # ? 绑定列表内漫画被点击事件：当前点击变色，剩余恢复
         def _(_event: QEvent, widget: QWidget, comic: Comic) -> None:
             self.present_comic_id = comic.comic_id
-            for i in range(mainGUI.v_Layout_myLibrary.count()):
-                temp = mainGUI.v_Layout_myLibrary.itemAt(i).widget()
+            for i in range(self.mainGUI.v_Layout_myLibrary.count()):
+                temp = self.mainGUI.v_Layout_myLibrary.itemAt(i).widget()
                 temp.setStyleSheet("font-size: 10pt;")
             widget.setStyleSheet(
                 "background-color:rgb(200, 200, 255); font-size: 10pt;"
@@ -336,7 +345,7 @@ class MangaUI(QObject):
 
         widget.mousePressEvent = partial(_, widget=widget, comic=comic)
         widget.mouseDoubleClickEvent = partial(
-            self.updateComicInfoEvent, mainGUI, comic, "bilibili"
+            self.updateComicInfoEvent, comic, "bilibili"
         )
         widget.setLayout(h_layout_my_library)
 
@@ -346,7 +355,7 @@ class MangaUI(QObject):
             menu = QMenu()
             menu.addAction(
                 "打开文件夹",
-                lambda: openFileOrDir(mainGUI, comic_path),
+                lambda: openFileOrDir(self.mainGUI, comic_path),
             )
             menu.exec_(widget.mapToGlobal(pos))
 
@@ -356,22 +365,22 @@ class MangaUI(QObject):
         )
 
         # ? 按照标题的拼音顺序插入我的库存列表
-        if mainGUI.v_Layout_myLibrary.count() == 0:
-            mainGUI.v_Layout_myLibrary.addWidget(widget)
+        if self.mainGUI.v_Layout_myLibrary.count() == 0:
+            self.mainGUI.v_Layout_myLibrary.addWidget(widget)
         else:
-            for i in range(mainGUI.v_Layout_myLibrary.count()):
+            for i in range(self.mainGUI.v_Layout_myLibrary.count()):
                 left: str = (
-                    mainGUI.v_Layout_myLibrary.itemAt(i)
+                    self.mainGUI.v_Layout_myLibrary.itemAt(i)
                     .widget()
                     .findChild(QLabel)
                     .text()
                 )
                 left_title: str = left[left.find(">") + 1 : left.rfind("<")]
-                if i == mainGUI.v_Layout_myLibrary.count() - 1:
-                    mainGUI.v_Layout_myLibrary.addWidget(widget)
+                if i == self.mainGUI.v_Layout_myLibrary.count() - 1:
+                    self.mainGUI.v_Layout_myLibrary.addWidget(widget)
                     break
                 if lazy_pinyin(data["title"]) <= lazy_pinyin(left_title):
-                    mainGUI.v_Layout_myLibrary.insertWidget(i, widget)
+                    self.mainGUI.v_Layout_myLibrary.insertWidget(i, widget)
                     break
 
     ############################################################
@@ -380,42 +389,39 @@ class MangaUI(QObject):
 
     ############################################################
     def updateComicInfoEvent(
-        self, mainGUI: MainGUI, comic: Comic, resolve_type: str, _event: QEvent = None
+        self, comic: Comic, resolve_type: str, _event: QEvent = None
     ) -> None:
         """更新漫画信息详情界面
 
         Args:
             comic (Comic): 漫画类实例
-            mainGUI (MainGUI): 主窗口类实例
             resolve_type (str): 更新的解析类型
         """
 
-        if mainGUI.label_resolve_status.text() == "":
+        if self.mainGUI.label_resolve_status.text() == "":
             # 用多线程更新漫画信息，避免卡顿
             self.executor.submit(
                 self.getComicInfo,
-                mainGUI,
                 comic,
                 resolve_type,
             )
 
 
     ############################################################
-    def getComicInfo(self, mainGUI: MainGUI, comic: Comic, resolve_type: str) -> None:
+    def getComicInfo(self, comic: Comic, resolve_type: str) -> None:
         """更新封面的执行函数
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             comic (Comic): 获取的漫画实例
             resolve_type (str): 更新的解析类型
 
         """
 
-        mainGUI.signal_resolve_status.emit("正在解析漫画详情...")
+        self.mainGUI.signal_resolve_status.emit("正在解析漫画详情...")
         data = comic.getComicInfo()
         self.signal_my_comic_detail_widget.emit(
             {
-                "mainGUI": mainGUI,
+                "mainGUI": self.mainGUI,
                 "comic": comic,
                 "data": data,
                 "resolve_type": resolve_type,
@@ -430,7 +436,6 @@ class MangaUI(QObject):
             info (dict): 执行更新漫画信息详情后返回的数据
         """
 
-        mainGUI: MainGUI = info["mainGUI"]
         comic: Comic = info["comic"]
         data: dict = info["data"]
         resolve_type: str = info["resolve_type"]
@@ -438,23 +443,23 @@ class MangaUI(QObject):
         self.present_comic_id = comic.comic_id
         # ? 获取漫画信息失败直接跳过
         if not data:
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return
-        mainGUI.label_manga_title.setText(
+        self.mainGUI.label_manga_title.setText(
             "<span style='color:blue;font-weight:bold'>标题：</span>" + data["title"]
         )
-        mainGUI.label_manga_author.setText(
+        self.mainGUI.label_manga_author.setText(
             "<span style='color:blue;font-weight:bold'>作者：</span>" + data["author_name"]
         )
-        mainGUI.label_manga_style.setText(
+        self.mainGUI.label_manga_style.setText(
             f"<span style='color:blue;font-weight:bold'>标签：</span>{data['styles'] or '无'}"
         )
-        mainGUI.label_manga_isFinish.setText(
+        self.mainGUI.label_manga_isFinish.setText(
             f"<span style='color:blue;font-weight:bold'>状态：</span>{'已完结' if data['is_finish'] else '连载中'}"
         )
-        mainGUI.label_manga_outline.setText(
+        self.mainGUI.label_manga_outline.setText(
             f"<span style='color:blue;font-weight:bold'>概要：</span>{data['evaluate'] or '无'}"
         )
 
@@ -465,12 +470,12 @@ class MangaUI(QObject):
         # ?###########################################################
         # ? 封面的绑定双击和悬停事件
 
-        mainGUI.label_manga_image.mouseDoubleClickEvent = (
+        self.mainGUI.label_manga_image.mouseDoubleClickEvent = (
             lambda _event: QDesktopServices.openUrl(
                 QUrl(f"https://manga.bilibili.com/detail/mc{data['id']}")
             )
         )
-        mainGUI.label_manga_image.setToolTip(
+        self.mainGUI.label_manga_image.setToolTip(
             f"双击打开漫画详情页\nhttps://manga.bilibili.com/detail/mc{data['id']}"
         )
 
@@ -614,7 +619,7 @@ class MangaUI(QObject):
             f"已下载：{comic.getNumDownloaded()}"
         )
         self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-        self.resolveEnable(self.mainGUI, resolve_type)
+        self.resolveEnable(resolve_type)
         self.mainGUI.signal_resolve_status.emit("")
 
     ############################################################
@@ -811,9 +816,9 @@ class MangaUI(QObject):
             if not self.mainGUI.getConfig("cookie"):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
-            self.resolveEnable(self.mainGUI, "resolving")
+            self.resolveEnable("resolving")
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(self.mainGUI, comic, "bilibili")
+            self.updateComicInfoEvent(comic, "bilibili")
 
         self.mainGUI.pushButton_resolve_detail.clicked.connect(_)
 
@@ -826,9 +831,9 @@ class MangaUI(QObject):
             if not self.mainGUI.getConfig("biliplus_cookie"):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
                 return
-            self.resolveEnable(self.mainGUI, "resolving")
+            self.resolveEnable("resolving")
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(self.mainGUI, comic, "biliplus")
+            self.updateComicInfoEvent(comic, "biliplus")
 
         self.mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
 
@@ -904,28 +909,27 @@ class MangaUI(QObject):
 
     ###########################################################
 
-    def resolveEnable(self, mainGUI: MainGUI, resolve_type: str) -> None:
+    def resolveEnable(self, resolve_type: str) -> None:
         """根据解析状态对按钮进行允许和禁用状态的改变
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             resolve_type (str): 解析状态
         """
         if resolve_type == "resolving":
-            mainGUI.pushButton_resolve_detail.setEnabled(False)
-            mainGUI.pushButton_biliplus_resolve_detail.setEnabled(False)
-            mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
-            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
+            self.mainGUI.pushButton_resolve_detail.setEnabled(False)
+            self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(False)
+            self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
+            self.mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
         else:
-            mainGUI.pushButton_resolve_detail.setEnabled(True)
-            mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
+            self.mainGUI.pushButton_resolve_detail.setEnabled(True)
+            self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
 
         if resolve_type == "bilibili":
-            mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
-            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
+            self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
+            self.mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
         elif resolve_type == "biliplus":
-            mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
-            mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
+            self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
+            self.mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
 
     ############################################################
 
@@ -933,7 +937,6 @@ class MangaUI(QObject):
         """保存元数据
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             data (dict): 漫画元数据
 
         """

@@ -77,8 +77,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
         # ?###########################################################
         # ? 初始化UI绑定事件
-        self.mangaUI = MangaUI(self)
         self.settingUI = SettingUI(self)
+        self.mangaUI = MangaUI(self)
         self.downloadUI = DownloadUI(self)
 
     ############################################################

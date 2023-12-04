@@ -43,17 +43,17 @@ class SettingUI(QObject):
         super().__init__()
         self.mainGUI = mainGUI
         self.clear_user_data = False
-        self.init_qrCode(mainGUI)
-        self.init_cookie(mainGUI)
-        self.init_biliplus_cookie(mainGUI)
-        self.init_savePath(mainGUI)
-        self.init_num_thread(mainGUI)
-        self.init_openLog(mainGUI)
-        self.init_about(mainGUI)
-        self.init_clearUserData(mainGUI)
-        self.init_saveMethod(mainGUI)
-        self.init_checkUpdate(mainGUI)
-        self.init_theme(mainGUI)
+        self.init_qrCode()
+        self.init_cookie()
+        self.init_biliplus_cookie()
+        self.init_savePath()
+        self.init_num_thread()
+        self.init_openLog()
+        self.init_about()
+        self.init_clearUserData()
+        self.init_saveMethod()
+        self.init_checkUpdate()
+        self.init_theme()
         self.qr_ui = QrCodeUI()
 
     ############################################################
@@ -97,15 +97,11 @@ class SettingUI(QObject):
             self.qr_ui.label.setText("## 扫码成功！请在手机上确认登录！")
 
     ############################################################
-    def init_qrCode(self, mainGUI: MainGUI) -> None:
-        """绑定二维码按钮
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
+    def init_qrCode(self) -> None:
+        """绑定二维码按钮"""
 
         def _() -> None:
-            qr = QrCode(mainGUI)
+            qr = QrCode(self.mainGUI)
             img = qr.generate()
             if img is None:
                 return
@@ -116,67 +112,62 @@ class SettingUI(QObject):
             self.qr_ui.show()
 
             # 开一个线程去检测二维码是否扫描成功
-            thread = threading.Thread(
+            threading.Thread(
                 target=qr.get_cookie,
                 args=(self.signal_qr_res,),
-            )
-            thread.start()
+                daemon=True,
+            ).start()
 
             # 如果用户把二维码窗口关了，就把线程也关了
             self.qr_ui.closeEvent = lambda _: setattr(qr, "close_flag", True)
 
         self.signal_qr_res.connect(self.qrCodeCallBack)
-        mainGUI.pushButton_qrcode.clicked.connect(partial(_))
+        self.mainGUI.pushButton_qrcode.clicked.connect(partial(_))
 
     ############################################################
-    def init_cookie(self, mainGUI: MainGUI) -> None:
-        """绑定Cookie值
+    def init_cookie(self) -> None:
+        """绑定Cookie值"""
 
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
-        stored_cookie = mainGUI.getConfig("cookie")
+        stored_cookie = self.mainGUI.getConfig("cookie")
         if stored_cookie:
-            mainGUI.lineEdit_my_cookie.setText(stored_cookie)
-            mainGUI.lineEdit_my_cookie.setEnabled(False)
-            mainGUI.pushButton_my_cookie.setEnabled(False)
-            threading.Thread(
-                target=self.check_cookie_valid,
-                args=(mainGUI, stored_cookie),
-            ).start()
+            self.mainGUI.lineEdit_my_cookie.setText(stored_cookie)
 
         def _() -> None:
-            new_cookie = mainGUI.lineEdit_my_cookie.text()
+            new_cookie = self.mainGUI.lineEdit_my_cookie.text()
             if new_cookie == "":
-                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                QMessageBox.information(self.mainGUI, "提示", "请输入Cookie！")
                 return
-            mainGUI.updateConfig("cookie", new_cookie)
-            mainGUI.lineEdit_my_cookie.setEnabled(False)
-            mainGUI.pushButton_my_cookie.clearFocus()
-            mainGUI.pushButton_my_cookie.setEnabled(False)
+            self.mainGUI.updateConfig("cookie", new_cookie)
+            self.mainGUI.lineEdit_my_cookie.setEnabled(False)
+            self.mainGUI.pushButton_my_cookie.clearFocus()
+            self.mainGUI.pushButton_my_cookie.setEnabled(False)
             threading.Thread(
                 target=self.check_cookie_valid,
-                args=(mainGUI, new_cookie, True),
+                args=(new_cookie, True),
+                daemon=True,
             ).start()
 
 
-        mainGUI.lineEdit_my_cookie.returnPressed.connect(_)
-        mainGUI.pushButton_my_cookie.clicked.connect(_)
+        self.mainGUI.lineEdit_my_cookie.returnPressed.connect(_)
+        self.mainGUI.pushButton_my_cookie.clicked.connect(_)
 
     ############################################################
-    def check_cookie_valid(self, mainGUI: MainGUI, cookie: str, notice: bool = False):
+    def check_cookie_valid(self, cookie: str, notice: bool = False) -> bool:
         """判断Cookie是否有效
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             cookie (str): Cookie值
             notice (bool): Cookie值有效是否提示
+        Returns:
+            bool: (Cookie是否有效)
         """
+
         detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
         headers = {
             "cookie": f"SESSDATA={cookie}",
         }
         payload = {"key_word": "test", "page_num": 1, "page_size": 1}
+        is_cookie_valid = False
 
         @retry(
             stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX
@@ -197,61 +188,64 @@ class SettingUI(QObject):
 
         try:
             _()
+            if notice:
+                self.mainGUI.signal_information_box.emit(
+                    "Cookie有效！"
+                )
+            is_cookie_valid = True
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 "重复测试Cookie是否有效多次后失败!\n请核对输入的Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
-        if notice:
-            mainGUI.signal_information_box.emit(
-                "Cookie有效！"
-            )
-        mainGUI.lineEdit_my_cookie.setEnabled(True)
-        mainGUI.pushButton_my_cookie.setEnabled(True)
+        self.mainGUI.lineEdit_my_cookie.setEnabled(True)
+        self.mainGUI.pushButton_my_cookie.setEnabled(True)
+        return is_cookie_valid
 
     ############################################################
-    def init_biliplus_cookie(self, mainGUI: MainGUI) -> None:
-        """绑定BiliPlus Cookie值
+    def init_biliplus_cookie(self) -> None:
+        """绑定BiliPlus Cookie值"""
 
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
-        stored_cookie = mainGUI.getConfig("biliplus_cookie")
+        stored_cookie = self.mainGUI.getConfig("biliplus_cookie")
         if stored_cookie:
-            mainGUI.lineEdit_biliplus_cookie.setText(stored_cookie)
+            self.mainGUI.lineEdit_biliplus_cookie.setText(stored_cookie)
 
         def _() -> None:
-            new_cookie = mainGUI.lineEdit_biliplus_cookie.text()
+            new_cookie = self.mainGUI.lineEdit_biliplus_cookie.text()
             if new_cookie == "":
-                QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
+                QMessageBox.information(self.mainGUI, "提示", "请输入Cookie！")
                 return
-            mainGUI.updateConfig("biliplus_cookie", new_cookie)
-            mainGUI.lineEdit_biliplus_cookie.setEnabled(False)
-            mainGUI.pushButton_biliplus_cookie.clearFocus()
-            mainGUI.pushButton_biliplus_cookie.setEnabled(False)
+            self.mainGUI.updateConfig("biliplus_cookie", new_cookie)
+            self.mainGUI.lineEdit_biliplus_cookie.setEnabled(False)
+            self.mainGUI.pushButton_biliplus_cookie.clearFocus()
+            self.mainGUI.pushButton_biliplus_cookie.setEnabled(False)
             threading.Thread(
                 target=self.check_biliplus_cookie_valid,
-                args=(mainGUI, new_cookie, True),
+                args=(new_cookie, True),
+                daemon=True,
             ).start()
 
-        mainGUI.lineEdit_biliplus_cookie.returnPressed.connect(_)
-        mainGUI.pushButton_biliplus_cookie.clicked.connect(_)
+        self.mainGUI.lineEdit_biliplus_cookie.returnPressed.connect(_)
+        self.mainGUI.pushButton_biliplus_cookie.clicked.connect(_)
 
     ############################################################
-    def check_biliplus_cookie_valid(self, mainGUI: MainGUI, cookie: str, notice: bool = False) -> None:
+    def check_biliplus_cookie_valid(self, cookie: str, notice: bool = False) -> bool:
         """判断BiliPlus Cookie是否有效
 
         Args:
-            mainGUI (MainGUI): 主窗口类实例
             cookie (str): Cookie值
             notice (bool): Cookie值有效是否提示
+        Returns:
+            bool: (Cookie是否有效)
         """
+
         # 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
         main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
         headers = {
             "cookie": f"login=2;access_key={cookie}",
         }
+        is_cookie_valid = False
 
         @retry(
             stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX
@@ -276,110 +270,104 @@ class SettingUI(QObject):
 
         try:
             _()
+            if notice:
+                self.mainGUI.signal_information_box.emit(
+                    "BiliPlus Cookie有效！"
+                )
+            is_cookie_valid = True
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
         except ReferenceError:
-            mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_message_box.emit(
                 "BiliPlus访问异常!\n暂时无法检测是否有效!\n请自行判断BiliPlus可访问状态或联系开发者"
             )
-        if notice:
-            mainGUI.signal_information_box.emit(
-                "BiliPlus Cookie有效！"
-            )
-        mainGUI.lineEdit_biliplus_cookie.setEnabled(True)
-        mainGUI.pushButton_biliplus_cookie.setEnabled(True)
+        self.mainGUI.lineEdit_biliplus_cookie.setEnabled(True)
+        self.mainGUI.pushButton_biliplus_cookie.setEnabled(True)
+        return is_cookie_valid
 
     ############################################################
-    def init_savePath(self, mainGUI: MainGUI) -> None:
-        """绑定漫画保存路径设置
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
+    def init_savePath(self) -> None:
+        """绑定漫画保存路径设置"""
 
         # ? 绑定选择路径按钮的回调函数
         def _() -> None:
-            path = QFileDialog.getExistingDirectory(mainGUI, "选择保存路径")
+            path = QFileDialog.getExistingDirectory(self.mainGUI, "选择保存路径")
             if os.path.exists(path):
-                mainGUI.lineEdit_save_path.setText(path)
-                mainGUI.updateConfig("save_path", path)
+                self.mainGUI.lineEdit_save_path.setText(path)
+                self.mainGUI.updateConfig("save_path", path)
             else:
-                mainGUI.lineEdit_save_path.setText(os.getcwd())
-                mainGUI.updateConfig("save_path", os.getcwd())
+                self.mainGUI.lineEdit_save_path.setText(os.getcwd())
+                self.mainGUI.updateConfig("save_path", os.getcwd())
 
-        mainGUI.pushButton_save_path.clicked.connect(_)
+        self.mainGUI.pushButton_save_path.clicked.connect(_)
 
         # ? 绑定保存路径文本框的回调函数
         def _() -> None:
-            path = mainGUI.lineEdit_save_path.text()
+            path = self.mainGUI.lineEdit_save_path.text()
             if os.path.exists(path):
-                mainGUI.updateConfig("save_path", path)
+                self.mainGUI.updateConfig("save_path", path)
             else:
-                mainGUI.lineEdit_save_path.setText(os.getcwd())
-                mainGUI.updateConfig("save_path", os.getcwd())
-            mainGUI.lineEdit_save_path.clearFocus()
+                self.mainGUI.lineEdit_save_path.setText(os.getcwd())
+                self.mainGUI.updateConfig("save_path", os.getcwd())
+            self.mainGUI.lineEdit_save_path.clearFocus()
 
-        mainGUI.lineEdit_save_path.returnPressed.connect(_)
+        self.mainGUI.lineEdit_save_path.returnPressed.connect(_)
 
     ############################################################
-    def init_num_thread(self, mainGUI: MainGUI) -> None:
+    def init_num_thread(self) -> None:
         """绑定线程数设置
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
 
-        if mainGUI.getConfig("num_thread"):
-            mainGUI.h_Slider_num_thread.setValue(mainGUI.getConfig("num_thread"))
+        if self.mainGUI.getConfig("num_thread"):
+            self.mainGUI.h_Slider_num_thread.setValue(self.mainGUI.getConfig("num_thread"))
         else:
-            mainGUI.updateConfig("num_thread", mainGUI.h_Slider_num_thread.value())
+            self.mainGUI.updateConfig("num_thread", self.mainGUI.h_Slider_num_thread.value())
 
-        mainGUI.label_num_thread_count.setText(
-            f"同时下载线程数：{mainGUI.getConfig('num_thread')}"
+        self.mainGUI.label_num_thread_count.setText(
+            f"同时下载线程数：{self.mainGUI.getConfig('num_thread')}"
         )
 
         def _(value) -> None:
-            mainGUI.label_num_thread_count.setText(f"同时下载线程数：{value}")
-            mainGUI.updateConfig("num_thread", value)
+            self.mainGUI.label_num_thread_count.setText(f"同时下载线程数：{value}")
+            self.mainGUI.updateConfig("num_thread", value)
 
-        mainGUI.h_Slider_num_thread.valueChanged.connect(_)
+        self.mainGUI.h_Slider_num_thread.valueChanged.connect(_)
 
     ############################################################
-    def init_openLog(self, mainGUI: MainGUI) -> None:
+    def init_openLog(self) -> None:
         """绑定打开日志文件
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
-        mainGUI.pushButton_open_log.clicked.connect(
-            lambda: openFileOrDir(mainGUI, os.path.join(log_path, "ERROR.log"))
+        self.mainGUI.pushButton_open_log.clicked.connect(
+            lambda: openFileOrDir(self.mainGUI, os.path.join(log_path, "ERROR.log"))
         )
 
     ############################################################
-    def init_about(self, mainGUI: MainGUI) -> None:
+    def init_about(self) -> None:
         """绑定关于按钮
 
         Args:
             mainGUI (MainGUI): 主窗口类实例
         """
         about_window = MyAboutUI()
-        mainGUI.pushButton_about.clicked.connect(partial(about_window.show))
+        self.mainGUI.pushButton_about.clicked.connect(partial(about_window.show))
 
     ############################################################
-    def init_clearUserData(self, mainGUI: MainGUI) -> None:
-        """绑定清理用户数据设置
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
+    def init_clearUserData(self) -> None:
+        """绑定清理用户数据设置"""
 
         def _() -> None:
             res = QMessageBox.information(
-                mainGUI,
+                self.mainGUI,
                 "提示",
                 "清除所有用户数据，不包括已下载漫画\n只包括Cookie和其他程序缓存文件\n\n注意：清除后将无法恢复\n当前会话不再产生新的配置文件，所有新配置只在当前会话有效",
                 QMessageBox.Yes | QMessageBox.No,
@@ -387,65 +375,54 @@ class SettingUI(QObject):
             if res == QMessageBox.Yes:
                 self.clear_user_data = True
 
-        mainGUI.pushButton_clear_data.clicked.connect(_)
+        self.mainGUI.pushButton_clear_data.clicked.connect(_)
 
     ############################################################
-    def init_saveMethod(self, mainGUI: MainGUI) -> None:
-        """绑定保存方式设置
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
-        if mainGUI.getConfig("save_method"):
-            for i in range(mainGUI.h_Layout_groupBox_save_method.count()):
-                button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(
+    def init_saveMethod(self) -> None:
+        """绑定保存方式设置"""
+        if self.mainGUI.getConfig("save_method"):
+            for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
+                button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(
                     i
                 ).widget()
-                if button.text() == mainGUI.getConfig("save_method"):
+                if button.text() == self.mainGUI.getConfig("save_method"):
                     button.setChecked(True)
         else:
-            for i in range(mainGUI.h_Layout_groupBox_save_method.count()):
-                button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(
+            for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
+                button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(
                     i
                 ).widget()
                 if button.isChecked():
-                    mainGUI.updateConfig("save_method", button.text())
+                    self.mainGUI.updateConfig("save_method", button.text())
                     break
 
         def _(button: QRadioButton, checked: bool) -> None:
             if checked:
-                mainGUI.updateConfig("save_method", button.text())
+                self.mainGUI.updateConfig("save_method", button.text())
 
-        for i in range(mainGUI.h_Layout_groupBox_save_method.count()):
-            button: QRadioButton = mainGUI.h_Layout_groupBox_save_method.itemAt(
+        for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
+            button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(
                 i
             ).widget()
             button.toggled.connect(partial(_, button))
 
     ############################################################
 
-    def init_checkUpdate(self, mainGUI: MainGUI) -> None:
-        """绑定检查更新按钮
-
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
-        mainGUI.pushButton_check_update.clicked.connect(
-            partial(checkNewVersion, mainGUI)
+    def init_checkUpdate(self) -> None:
+        """绑定检查更新按钮"""
+        self.mainGUI.pushButton_check_update.clicked.connect(
+            partial(checkNewVersion, self.mainGUI)
         )
 
     ############################################################
 
-    def init_theme(self, mainGUI: MainGUI) -> None:
-        """绑定主题相关设置
+    def init_theme(self) -> None:
+        """绑定主题相关设置"""
 
-        Args:
-            mainGUI (MainGUI): 主窗口类实例
-        """
         # ? 绑定主题样式设置
-        theme_style = mainGUI.getConfig("theme_style")
+        theme_style = self.mainGUI.getConfig("theme_style")
         if theme_style is None:
-            mainGUI.updateConfig("theme_style", "default")
+            self.mainGUI.updateConfig("theme_style", "default")
             theme_style = "default"
 
         styles_list = {
@@ -472,55 +449,55 @@ class SettingUI(QObject):
         }
 
         reversed_styles_list = {value: key for key, value in styles_list.items()}
-        mainGUI.comboBox_theme_style.addItems(styles_list.values())
-        mainGUI.comboBox_theme_style.setCurrentText(styles_list[theme_style])
+        self.mainGUI.comboBox_theme_style.addItems(styles_list.values())
+        self.mainGUI.comboBox_theme_style.setCurrentText(styles_list[theme_style])
 
         def _(text: str) -> None:
-            mainGUI.updateConfig("theme_style", reversed_styles_list[text])
-            mainGUI.apply_stylesheet(
-                mainGUI,
+            self.mainGUI.updateConfig("theme_style", reversed_styles_list[text])
+            self.mainGUI.apply_stylesheet(
+                self.mainGUI,
                 reversed_styles_list[text],
                 extra={
-                    "density_scale": f"{mainGUI.getConfig('theme_density')}",
+                    "density_scale": f"{self.mainGUI.getConfig('theme_density')}",
                 },
             )
 
             if text == "默认":
-                mainGUI.comboBox_theme_density.setEnabled(False)
+                self.mainGUI.comboBox_theme_density.setEnabled(False)
             else:
-                mainGUI.comboBox_theme_density.setEnabled(True)
+                self.mainGUI.comboBox_theme_density.setEnabled(True)
 
-        mainGUI.comboBox_theme_style.currentTextChanged.connect(_)
+        self.mainGUI.comboBox_theme_style.currentTextChanged.connect(_)
 
         # ? 绑定主题密度设置
-        theme_density = mainGUI.getConfig("theme_density")
+        theme_density = self.mainGUI.getConfig("theme_density")
         if theme_density is None:
-            mainGUI.updateConfig("theme_density", 0)
+            self.mainGUI.updateConfig("theme_density", 0)
             theme_density = 0
 
-        mainGUI.comboBox_theme_density.addItems(["-2", "-1", "0", "1", "2"])
-        mainGUI.comboBox_theme_density.setCurrentText(str(theme_density))
+        self.mainGUI.comboBox_theme_density.addItems(["-2", "-1", "0", "1", "2"])
+        self.mainGUI.comboBox_theme_density.setCurrentText(str(theme_density))
 
         def _(text: str) -> None:
-            mainGUI.updateConfig("theme_density", int(text))
-            mainGUI.apply_stylesheet(
-                mainGUI,
-                mainGUI.getConfig("theme_style"),
+            self.mainGUI.updateConfig("theme_density", int(text))
+            self.mainGUI.apply_stylesheet(
+                self.mainGUI,
+                self.mainGUI.getConfig("theme_style"),
                 extra={
                     "density_scale": f"{int(text)}",
                 },
             )
 
-        mainGUI.comboBox_theme_density.currentTextChanged.connect(_)
+        self.mainGUI.comboBox_theme_density.currentTextChanged.connect(_)
 
         # ? 初始化主题样式+密度
-        mainGUI.apply_stylesheet(
-            mainGUI,
-            mainGUI.getConfig("theme_style"),
+        self.mainGUI.apply_stylesheet(
+            self.mainGUI,
+            self.mainGUI.getConfig("theme_style"),
             extra={
-                "density_scale": f"{mainGUI.getConfig('theme_density')}",
+                "density_scale": f"{self.mainGUI.getConfig('theme_density')}",
             },
         )
 
-        if mainGUI.comboBox_theme_style.currentText() == "默认":
-            mainGUI.comboBox_theme_density.setEnabled(False)
+        if self.mainGUI.comboBox_theme_style.currentText() == "默认":
+            self.mainGUI.comboBox_theme_density.setEnabled(False)
