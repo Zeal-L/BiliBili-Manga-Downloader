@@ -45,6 +45,9 @@ class MangaUI(QObject):
     # ? 用于多线程更新封面图
     signal_my_cover_update_widget = Signal(dict)
 
+    # ? 用于多线程刷新漫画章节信息
+    signal_episode_info_update_widget = Signal(dict)
+
     # ? 用于多线程刷新漫画章节列表
     signal_episode_list_update_widget = Signal(dict)
 
@@ -159,6 +162,7 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 漫画章节列表更新触发函数绑定
+        self.signal_episode_info_update_widget.connect(self.updateEpisodeInfo)
         self.signal_episode_list_update_widget.connect(self.updateEpisodeList)
 
     ############################################################
@@ -542,8 +546,10 @@ class MangaUI(QObject):
         self.mainGUI.signal_resolve_status.emit("正在处理章节详情...")
 
         # ?###########################################################
-        # ? 分析章节元素
-        episode_list = []
+        # ? 分析章节信息
+        # 清除历史章节列表
+        self.signal_episode_list_update_widget.emit({})
+        # 丝滑插入章节
         for epi in self.epi_list:
             title = epi.title
             check_state = Qt.CheckState.Unchecked
@@ -564,24 +570,25 @@ class MangaUI(QObject):
             else:
                 num_unlocked += 1
 
-            episode_list.append({
-                "title": title,
-                "checkState": check_state,
-                "background": background,
-                "flags": flags,
-            })
-        
-        self.signal_episode_list_update_widget.emit(
+            self.signal_episode_list_update_widget.emit(
+                {
+                    "title": title,
+                    "check_state": check_state,
+                    "background": background,
+                    "flags": flags,
+                }
+            )
+        # 
+        self.signal_episode_info_update_widget.emit(
             {
                 "comic": comic,
                 "resolve_type": resolve_type,
                 "num_unlocked": num_unlocked,
-                "episode_list": episode_list,
             }
         )
 
     ############################################################
-    def updateEpisodeList(self, info: dict) -> None:
+    def updateEpisodeInfo(self, info: dict) -> None:
         """更新漫画详情的回调函数
 
         Args:
@@ -592,27 +599,12 @@ class MangaUI(QObject):
         comic: Comic = info["comic"]
         resolve_type: str = info["resolve_type"]
         num_unlocked: int = info["num_unlocked"]
-        episode_list: list = info["episode_list"]
 
         # ?###########################################################
         # ? 删除教学文本框
         if self.mainGUI.listWidget_chp_detail.maximumHeight() == 0:
             self.mainGUI.textBrowser_tutorial.deleteLater()
             self.mainGUI.listWidget_chp_detail.setMaximumHeight(16777215)
-
-
-        # ?###########################################################
-        # ? 生成章节元素
-        self.mainGUI.listWidget_chp_detail.clear()
-        for episode in episode_list:
-            temp = QListWidgetItem(episode.get("title"))
-            temp.setToolTip(episode.get("title"))
-            temp.setFlags(episode.get("flags"))
-            temp.setCheckState(episode.get("checkState"))
-            temp.setBackground(episode.get("background"))
-            temp.setSizeHint(QSize(160, 20))
-            temp.setTextAlignment(Qt.AlignmentFlag.AlignLeft)
-            self.mainGUI.listWidget_chp_detail.addItem(temp)
 
         # ?###########################################################
         # ? 各种章节数与状态显示的更新
@@ -624,6 +616,34 @@ class MangaUI(QObject):
         self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
         self.resolveEnable(self.mainGUI, resolve_type)
         self.mainGUI.signal_resolve_status.emit("")
+
+    ############################################################
+    def updateEpisodeList(self, info: dict) -> None:
+        """插入漫画列表章节的回调函数
+
+        Args:
+            info (dict): 执行分析章节信息后返回的数据
+
+        """
+    
+        if len(info) == 0:
+            self.mainGUI.listWidget_chp_detail.clear()
+            return
+        title: str = info["title"]
+        check_state: Qt.CheckState = info["check_state"]
+        background: QColor = info["background"]
+        flags: Qt.ItemFlag = info["flags"]
+
+        # ?###########################################################
+        # ? 生成章节元素
+        widget = QListWidgetItem(title)
+        widget.setToolTip(title)
+        widget.setFlags(flags)
+        widget.setCheckState(check_state)
+        widget.setBackground(background)
+        widget.setSizeHint(QSize(160, 20))
+        widget.setTextAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.mainGUI.listWidget_chp_detail.addItem(widget)
 
     ############################################################
 

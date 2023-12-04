@@ -138,6 +138,8 @@ class SettingUI(QObject):
         stored_cookie = mainGUI.getConfig("cookie")
         if stored_cookie:
             mainGUI.lineEdit_my_cookie.setText(stored_cookie)
+            mainGUI.lineEdit_biliplus_cookie.setEnabled(False)
+            mainGUI.pushButton_biliplus_cookie.setEnabled(False)
             threading.Thread(
                 target=self.check_cookie_valid,
                 args=(mainGUI, stored_cookie),
@@ -149,12 +151,12 @@ class SettingUI(QObject):
                 QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
                 return
             mainGUI.updateConfig("cookie", new_cookie)
-            mainGUI.lineEdit_my_cookie.clearFocus()
+            mainGUI.lineEdit_my_cookie.setEnabled(False)
+            mainGUI.pushButton_my_cookie.clearFocus()
             mainGUI.pushButton_my_cookie.setEnabled(False)
-            self.check_cookie_valid(mainGUI, new_cookie)
             threading.Thread(
                 target=self.check_cookie_valid,
-                args=(mainGUI, stored_cookie, True),
+                args=(mainGUI, new_cookie, True),
             ).start()
 
 
@@ -205,6 +207,7 @@ class SettingUI(QObject):
             mainGUI.signal_information_box.emit(
                 "Cookie有效！"
             )
+        mainGUI.lineEdit_my_cookie.setEnabled(True)
         mainGUI.pushButton_my_cookie.setEnabled(True)
 
     ############################################################
@@ -224,11 +227,12 @@ class SettingUI(QObject):
                 QMessageBox.information(mainGUI, "提示", "请输入Cookie！")
                 return
             mainGUI.updateConfig("biliplus_cookie", new_cookie)
-            mainGUI.lineEdit_biliplus_cookie.clearFocus()
+            mainGUI.lineEdit_biliplus_cookie.setEnabled(False)
+            mainGUI.pushButton_biliplus_cookie.clearFocus()
             mainGUI.pushButton_biliplus_cookie.setEnabled(False)
             threading.Thread(
                 target=self.check_biliplus_cookie_valid,
-                args=(mainGUI, stored_cookie, True),
+                args=(mainGUI, new_cookie, True),
             ).start()
 
         mainGUI.lineEdit_biliplus_cookie.returnPressed.connect(_)
@@ -286,6 +290,7 @@ class SettingUI(QObject):
             mainGUI.signal_information_box.emit(
                 "BiliPlus Cookie有效！"
             )
+        mainGUI.lineEdit_biliplus_cookie.setEnabled(True)
         mainGUI.pushButton_biliplus_cookie.setEnabled(True)
 
     ############################################################
