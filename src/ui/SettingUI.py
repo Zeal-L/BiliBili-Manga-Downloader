@@ -138,8 +138,8 @@ class SettingUI(QObject):
         stored_cookie = mainGUI.getConfig("cookie")
         if stored_cookie:
             mainGUI.lineEdit_my_cookie.setText(stored_cookie)
-            mainGUI.lineEdit_biliplus_cookie.setEnabled(False)
-            mainGUI.pushButton_biliplus_cookie.setEnabled(False)
+            mainGUI.lineEdit_my_cookie.setEnabled(False)
+            mainGUI.pushButton_my_cookie.setEnabled(False)
             threading.Thread(
                 target=self.check_cookie_valid,
                 args=(mainGUI, stored_cookie),
