@@ -210,6 +210,20 @@ class Episode:
 
     ############################################################
 
+    def clear(self, imgs_path: list[str]) -> None:
+        """删除临时图片, 终止时使用, 故无需多次尝试, 以最快的速度关闭, 且异常无需提示
+
+        Args:
+            imgs_path (list): 临时图片路径列表
+        """
+        for img in reversed(imgs_path):
+            try:
+                os.remove(img)
+            except: ...
+            imgs_path.remove(img)
+
+    ############################################################
+
     def save(self, imgs_path: list[str]) -> str:
         """保存章节
 

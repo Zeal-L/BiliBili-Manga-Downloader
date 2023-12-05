@@ -24,6 +24,7 @@ class DownloadManager:
         self.signal_rate_progress = signal_rate_progress
         self.signal_message_box = signal_message_box
 
+        self.terminated = False
         self.all_tasks = {}
         self.avg_speed_in_last_three_sec = {}
 
@@ -147,8 +148,10 @@ class DownloadManager:
         # ? 下载所有图片
         imgs_path = []
         for index, img in enumerate(epi.imgs_token, start=1):
+            if self.terminated:
+                epi.clear(imgs_path)
+                return
             img_url = f"{img['url']}?token={img['token']}"
-
             img_path = epi.downloadImg(index, img_url)
             if img_path is None:
                 self.reportError(curr_id)
