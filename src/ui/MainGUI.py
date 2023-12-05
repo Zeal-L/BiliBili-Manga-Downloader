@@ -102,8 +102,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
 
-        self.downloadUI.downloadManager.executor.shutdown(wait=False)
-        self.mangaUI.executor.shutdown(wait=False)
+        self.downloadUI.downloadManager.executor.shutdown(wait=False, cancel_futures=True)
+        self.mangaUI.executor.shutdown(wait=False, cancel_futures=True)
         logging.shutdown()
         event.accept()
 

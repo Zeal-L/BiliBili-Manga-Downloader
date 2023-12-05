@@ -91,7 +91,7 @@ class DownloadManager:
             float: 平均下载速度
         """
         self.avg_speed_in_last_three_sec[time.time()] = sum(
-            task["curr_speed"] for task in self.all_tasks.values()
+            task["curr_speed"] for task in self.all_tasks.values() if task["curr_rate"] != 1
         )
         # 取3秒内的平均速度，以防止速度突然变化
         # 比如下载完一个文件 速度突然变为0
@@ -164,14 +164,12 @@ class DownloadManager:
             save_path = None
             if rate == 1:
                 save_path = epi.save(imgs_path)
-                epi.clearAfterSave(imgs_path)
 
             self.updateTaskInfo(curr_id, rate)
             self.signal_rate_progress.emit(
                 {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
 
-        self.clearAfterFinish(curr_id)
 
     ############################################################
     # ? 为以后的特典下载留的接口
@@ -181,16 +179,6 @@ class DownloadManager:
 
     # def thread_SCTask(self) -> None:
     #     pass
-
-    ############################################################
-
-    def clearAfterFinish(self, curr_id: int) -> None:
-        """任务完成后的清理工作
-
-        Args:
-            curr_id (int): 当前任务的ID
-        """
-        self.all_tasks.pop(curr_id)
 
     ############################################################
 
@@ -216,7 +204,7 @@ class DownloadManager:
                 "rate": -1,
             }
         )
-        self.clearAfterFinish(curr_id)
+        self.all_tasks.pop(curr_id)
 
     ############################################################
     def formatSpeed(self, speed: float) -> str:

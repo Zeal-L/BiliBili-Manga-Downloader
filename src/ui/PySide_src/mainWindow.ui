@@ -713,8 +713,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>1082</width>
-                   <height>521</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_finished"/>
@@ -1050,7 +1050,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>修改保持格式后需要重新解析漫画才能生效</string>
+             <string>修改保存格式后需要重新解析漫画才能生效</string>
             </property>
            </widget>
           </item>
