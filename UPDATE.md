@@ -1,6 +1,6 @@
 ## ⚰️ 更新记录
 
-### **[v1.4.1](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.4.1)** - *2022-11-28*
+### **[v1.5.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.5.0)** - *2022-12-5*
 - 新增功能:
   - 现在在 Windows 环境支持下方的系统任务栏显示下载进度了
   - 新增 `Cbz` 保存格式

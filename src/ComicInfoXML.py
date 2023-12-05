@@ -7,12 +7,14 @@ import os
 from xml.sax.saxutils import escape
 from datetime import datetime
 
+
 class ComicInfoXML:
     """漫画章节元数据，用于创造ComicInfo.xml"""
+
     def __init__(
-            self,
-            series_info=None,
-            episode_info=None,
+        self,
+        series_info=None,
+        episode_info=None,
     ) -> None:
         self.metadata = {}
 
@@ -61,12 +63,14 @@ class ComicInfoXML:
         Args:
             output_path (str): ComicInfo.xml写出路径
         """
-        with open(os.path.join(output_path, 'ComicInfo.xml'), 'w', encoding="utf-8") as f:
+        with open(os.path.join(output_path, "ComicInfo.xml"), "w", encoding="utf-8") as f:
             f.write('<?xml version="1.0" encoding="utf-8"?>\n')
-            f.write('<ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
-                    'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n')
+            f.write(
+                '<ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+                'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n'
+            )
 
-            self.xml_write_simple_tag(f, "Manga", 'Yes')
+            self.xml_write_simple_tag(f, "Manga", "Yes")
 
             self.xml_write_simple_tag(f, "Series", self.metadata["Series"])
             self.xml_write_simple_tag(f, "Publisher", self.metadata["Publisher"])
@@ -83,7 +87,7 @@ class ComicInfoXML:
             self.xml_write_simple_tag(f, "Month", self.metadata["Month"])
             self.xml_write_simple_tag(f, "Day", self.metadata["Day"])
 
-            f.write('</ComicInfo>')
+            f.write("</ComicInfo>")
 
     def xml_write_simple_tag(self, f, name: str, val: str, indent=1) -> None:
         """xml帮手函数

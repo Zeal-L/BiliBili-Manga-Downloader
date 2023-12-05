@@ -25,9 +25,7 @@ class QrCode:
 
     def __init__(self, mainGUI: MainGUI) -> None:
         self.mainGUI = mainGUI
-        self.generate_url = (
-            "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
-        )
+        self.generate_url = "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
         self.poll_url = "https://passport.bilibili.com/x/passport-login/web/qrcode/poll"
         self.code_url = None
         self.qrcode_key = None
@@ -41,9 +39,7 @@ class QrCode:
 
         """
 
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> dict:
             try:
                 res = requests.get(self.generate_url, timeout=TIMEOUT_SMALL)
@@ -51,9 +47,7 @@ class QrCode:
                 logger.warning(f"获取登入二维码失败! 重试中...\n {e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(
-                    f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
+                logger.warning(f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
                 raise requests.HTTPError()
             return res.json()["data"]
 
@@ -86,9 +80,7 @@ class QrCode:
             str: SESSDATA cookie
         """
 
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> dict:
             try:
                 res = requests.get(
@@ -102,9 +94,7 @@ class QrCode:
                 logger.warning(f"确认二维码登入失败! 重试中...\n {e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(
-                    f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
+                logger.warning(f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
                 raise requests.HTTPError()
             return res.json()["data"]
 
@@ -113,9 +103,7 @@ class QrCode:
         except requests.RequestException as e:
             logger.error(f"重复确认登入多次后失败! {e}")
             logger.exception(e)
-            QMessageBox.warning(
-                self.mainGUI, "警告", "重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
-            )
+            QMessageBox.warning(self.mainGUI, "警告", "重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件")
             return None
 
         return data

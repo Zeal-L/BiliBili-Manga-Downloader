@@ -172,11 +172,13 @@ class MangaUI(QObject):
         # ?###########################################################
         # ? 检测cookie有效性并初始化我的库存漫画元数据
         stored_cookie = self.mainGUI.getConfig("cookie")
+
         def _() -> None:
             self.mainGUI.lineEdit_my_cookie.setEnabled(False)
             self.mainGUI.pushButton_my_cookie.setEnabled(False)
             if self.mainGUI.settingUI.check_cookie_valid(stored_cookie):
                 self.updateMyLibrary()
+
         self.readMyLibrary()
         if stored_cookie:
             self.executor.submit(_)
@@ -213,9 +215,7 @@ class MangaUI(QObject):
             self.mainGUI.lineEdit_save_path.setText(os.getcwd())
             self.mainGUI.updateConfig("save_path", os.getcwd())
 
-        self.mainGUI.label_myLibrary_count.setText(
-            f"我的库存：{len(self.mainGUI.my_library)}部"
-        )
+        self.mainGUI.label_myLibrary_count.setText(f"我的库存：{len(self.mainGUI.my_library)}部")
 
     ############################################################
     def updateMyLibrary(self, notice: bool = False) -> bool:
@@ -253,9 +253,7 @@ class MangaUI(QObject):
         )
 
     ############################################################
-    def updateMyLibraryWatcher(
-        self, futures: list, notice: bool
-    ) -> None:
+    def updateMyLibraryWatcher(self, futures: list, notice: bool) -> None:
         """监控我的库存是否更新完毕，并处理后续步骤
 
         Args:
@@ -263,9 +261,7 @@ class MangaUI(QObject):
             notice (bool): 更新完毕是否弹窗提示
         """
 
-        if fail_comic := [
-            future.result() for future in as_completed(futures) if future.result()
-        ]:
+        if fail_comic := [future.result() for future in as_completed(futures) if future.result()]:
             temp = "".join(self.mainGUI.my_library[i]["comic_name"] + "\n" for i in fail_comic)
             self.mainGUI.signal_message_box.emit(
                 f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -278,9 +274,7 @@ class MangaUI(QObject):
         self.mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
 
     ############################################################
-    def updateMyLibrarySingle(
-        self, comic_id: int, comic_path: str
-    ) -> int | None:
+    def updateMyLibrarySingle(self, comic_id: int, comic_path: str) -> int | None:
         """添加单个漫画到我的库存
 
         Args:
@@ -325,9 +319,7 @@ class MangaUI(QObject):
             )
         )
         h_layout_my_library.addStretch(1)
-        h_layout_my_library.addWidget(
-            QLabel(f"{comic.getNumDownloaded()}/{len(epi_list)}")
-        )
+        h_layout_my_library.addWidget(QLabel(f"{comic.getNumDownloaded()}/{len(epi_list)}"))
 
         widget = QWidget()
         widget.setStyleSheet("font-size: 10pt;")
@@ -339,14 +331,10 @@ class MangaUI(QObject):
             for i in range(self.mainGUI.v_Layout_myLibrary.count()):
                 temp = self.mainGUI.v_Layout_myLibrary.itemAt(i).widget()
                 temp.setStyleSheet("font-size: 10pt;")
-            widget.setStyleSheet(
-                "background-color:rgb(200, 200, 255); font-size: 10pt;"
-            )
+            widget.setStyleSheet("background-color:rgb(200, 200, 255); font-size: 10pt;")
 
         widget.mousePressEvent = partial(_, widget=widget, comic=comic)
-        widget.mouseDoubleClickEvent = partial(
-            self.updateComicInfoEvent, comic, "bilibili"
-        )
+        widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, comic, "bilibili")
         widget.setLayout(h_layout_my_library)
 
         # ?###########################################################
@@ -360,9 +348,7 @@ class MangaUI(QObject):
             menu.exec_(widget.mapToGlobal(pos))
 
         widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        widget.customContextMenuRequested.connect(
-            partial(myMenu_openFolder, widget, comic_path)
-        )
+        widget.customContextMenuRequested.connect(partial(myMenu_openFolder, widget, comic_path))
 
         # ? 按照标题的拼音顺序插入我的库存列表
         if self.mainGUI.v_Layout_myLibrary.count() == 0:
@@ -370,10 +356,7 @@ class MangaUI(QObject):
         else:
             for i in range(self.mainGUI.v_Layout_myLibrary.count()):
                 left: str = (
-                    self.mainGUI.v_Layout_myLibrary.itemAt(i)
-                    .widget()
-                    .findChild(QLabel)
-                    .text()
+                    self.mainGUI.v_Layout_myLibrary.itemAt(i).widget().findChild(QLabel).text()
                 )
                 left_title: str = left[left.find(">") + 1 : left.rfind("<")]
                 if i == self.mainGUI.v_Layout_myLibrary.count() - 1:
@@ -388,9 +371,7 @@ class MangaUI(QObject):
     ############################################################
 
     ############################################################
-    def updateComicInfoEvent(
-        self, comic: Comic, resolve_type: str, _event: QEvent = None
-    ) -> None:
+    def updateComicInfoEvent(self, comic: Comic, resolve_type: str, _event: QEvent = None) -> None:
         """更新漫画信息详情界面
 
         Args:
@@ -405,7 +386,6 @@ class MangaUI(QObject):
                 comic,
                 resolve_type,
             )
-
 
     ############################################################
     def getComicInfo(self, comic: Comic, resolve_type: str) -> None:
@@ -559,13 +539,13 @@ class MangaUI(QObject):
             title = epi.title
             check_state = Qt.CheckState.Unchecked
             flags = (
-                 Qt.ItemFlag.ItemIsSelectable
-                |Qt.ItemFlag.ItemIsDragEnabled
-                |Qt.ItemFlag.ItemIsUserCheckable
-                |Qt.ItemFlag.ItemIsEnabled
+                Qt.ItemFlag.ItemIsSelectable
+                | Qt.ItemFlag.ItemIsDragEnabled
+                | Qt.ItemFlag.ItemIsUserCheckable
+                | Qt.ItemFlag.ItemIsEnabled
             )
             background = QColor(0, 0, 0, 0)
-            
+
             if epi.isDownloaded():
                 flags = Qt.ItemFlag.NoItemFlags
                 check_state = Qt.CheckState.Checked
@@ -583,7 +563,7 @@ class MangaUI(QObject):
                     "flags": flags,
                 }
             )
-        # 
+
         self.signal_episode_info_update_widget.emit(
             {
                 "comic": comic,
@@ -615,9 +595,7 @@ class MangaUI(QObject):
         # ? 各种章节数与状态显示的更新
         self.mainGUI.label_chp_detail_total_chp.setText(f"总章数：{len(self.epi_list)}")
         self.mainGUI.label_chp_detail_num_unlocked.setText(f"已解锁：{num_unlocked}")
-        self.mainGUI.label_chp_detail_num_downloaded.setText(
-            f"已下载：{comic.getNumDownloaded()}"
-        )
+        self.mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{comic.getNumDownloaded()}")
         self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
         self.resolveEnable(resolve_type)
         self.mainGUI.signal_resolve_status.emit("")
@@ -630,7 +608,7 @@ class MangaUI(QObject):
             info (dict): 执行分析章节信息后返回的数据
 
         """
-    
+
         if len(info) == 0:
             self.mainGUI.listWidget_chp_detail.clear()
             return
@@ -677,9 +655,7 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 绑定鼠标点击选择信号
-        self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-            self.checkbox_change_callBack
-        )
+        self.mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def _(item: QListWidgetItem) -> None:
             if item.flags() == Qt.ItemFlag.NoItemFlags:
@@ -696,7 +672,9 @@ class MangaUI(QObject):
 
         def _(currentItem: QListWidgetItem) -> None:
             checked = (
-                Qt.CheckState.Unchecked if currentItem.checkState() == Qt.CheckState.Checked else Qt.CheckState.Checked
+                Qt.CheckState.Unchecked
+                if currentItem.checkState() == Qt.CheckState.Checked
+                else Qt.CheckState.Checked
             )
             selected_items = self.mainGUI.listWidget_chp_detail.selectedItems()
             for item in selected_items:
@@ -722,9 +700,7 @@ class MangaUI(QObject):
         def _(item: QListWidgetItem) -> None:
             if item.flags() == Qt.ItemFlag.NoItemFlags:
                 return
-            if not self.mainGUI.isFocus or not (
-                self.mainGUI.ShiftPress or self.mainGUI.AltPress
-            ):
+            if not self.mainGUI.isFocus or not (self.mainGUI.ShiftPress or self.mainGUI.AltPress):
                 return
             if self.mainGUI.ShiftPress and self.mainGUI.AltPress:
                 item.setCheckState(Qt.CheckState.Unchecked)
@@ -739,28 +715,26 @@ class MangaUI(QObject):
         def checkSelected() -> None:
             self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for item in self.mainGUI.listWidget_chp_detail.selectedItems():
-                if item.flags() != Qt.ItemFlag.NoItemFlags and item.checkState() == Qt.CheckState.Unchecked:
+                if (
+                    item.flags() != Qt.ItemFlag.NoItemFlags
+                    and item.checkState() == Qt.CheckState.Unchecked
+                ):
                     item.setCheckState(Qt.CheckState.Checked)
                     self.num_selected += 1
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
-            self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-                self.checkbox_change_callBack
-            )
+            self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            self.mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def uncheckSelected() -> None:
             self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for item in self.mainGUI.listWidget_chp_detail.selectedItems():
-                if item.flags() != Qt.ItemFlag.NoItemFlags and item.checkState() == Qt.CheckState.Checked:
+                if (
+                    item.flags() != Qt.ItemFlag.NoItemFlags
+                    and item.checkState() == Qt.CheckState.Checked
+                ):
                     item.setCheckState(Qt.CheckState.Unchecked)
                     self.num_selected -= 1
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
-            self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-                self.checkbox_change_callBack
-            )
+            self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            self.mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def checkAll() -> None:
             self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -769,12 +743,8 @@ class MangaUI(QObject):
                 if self.mainGUI.listWidget_chp_detail.item(i).flags() != Qt.ItemFlag.NoItemFlags:
                     self.mainGUI.listWidget_chp_detail.item(i).setCheckState(Qt.CheckState.Checked)
                     self.num_selected += 1
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
-            self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-                self.checkbox_change_callBack
-            )
+            self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            self.mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def uncheckAll() -> None:
             self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
@@ -784,12 +754,8 @@ class MangaUI(QObject):
                     self.mainGUI.listWidget_chp_detail.item(i).setCheckState(
                         Qt.CheckState.Unchecked
                     )
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
-            self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-                self.checkbox_change_callBack
-            )
+            self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
+            self.mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
         def myMenu(pos: QPoint) -> None:
             menu = QMenu()
@@ -799,7 +765,9 @@ class MangaUI(QObject):
             menu.addAction("取消全选", uncheckAll)
             menu.exec_(self.mainGUI.listWidget_chp_detail.mapToGlobal(pos))
 
-        self.mainGUI.listWidget_chp_detail.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.mainGUI.listWidget_chp_detail.setContextMenuPolicy(
+            Qt.ContextMenuPolicy.CustomContextMenu
+        )
         self.mainGUI.listWidget_chp_detail.customContextMenuRequested.connect(myMenu)
 
     ############################################################
@@ -856,12 +824,8 @@ class MangaUI(QObject):
                 + self.num_selected
             )
             self.num_selected = 0
-            self.mainGUI.label_chp_detail_num_downloaded.setText(
-                f"已下载：{num_downloaded}"
-            )
-            self.mainGUI.label_chp_detail_num_selected.setText(
-                f"已选中：{self.num_selected}"
-            )
+            self.mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{num_downloaded}")
+            self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
 
             # ?###########################################################
             # ? 初始化储存文件夹
@@ -880,23 +844,22 @@ class MangaUI(QObject):
             self.mainGUI.listWidget_chp_detail.itemChanged.disconnect()
             for i in range(self.mainGUI.listWidget_chp_detail.count()):
                 item = self.mainGUI.listWidget_chp_detail.item(i)
-                if item.flags() != Qt.ItemFlag.NoItemFlags and item.checkState() == Qt.CheckState.Checked:
+                if (
+                    item.flags() != Qt.ItemFlag.NoItemFlags
+                    and item.checkState() == Qt.CheckState.Checked
+                ):
                     comic = Comic(self.present_comic_id, self.mainGUI)
                     self.mainGUI.downloadUI.addTask(self.mainGUI, self.epi_list[i])
                     item.setFlags(Qt.ItemFlag.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
-            self.mainGUI.listWidget_chp_detail.itemChanged.connect(
-                self.checkbox_change_callBack
-            )
+            self.mainGUI.listWidget_chp_detail.itemChanged.connect(self.checkbox_change_callBack)
 
             # ?###########################################################
             # ? 更新我的库存界面信息 也就是v_Layout_myLibrary里的章节数量信息
             for i in range(self.mainGUI.v_Layout_myLibrary.count()):
                 temp = self.mainGUI.v_Layout_myLibrary.itemAt(i).widget().layout()
                 if self.epi_list[0].comic_name in temp.itemAt(0).widget().text():
-                    temp.itemAt(2).widget().setText(
-                        f"{num_downloaded}/{len(self.epi_list)}"
-                    )
+                    temp.itemAt(2).widget().setText(f"{num_downloaded}/{len(self.epi_list)}")
                     break
 
             # ?###########################################################
@@ -955,9 +918,7 @@ class MangaUI(QObject):
             "tags": [tag["name"] for tag in data["tags"]],
         }
 
-        with open(
-            os.path.join(data["save_path"], "元数据.json"), "w", encoding="utf-8"
-        ) as f:
+        with open(os.path.join(data["save_path"], "元数据.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, indent=4, ensure_ascii=False)
 
     ############################################################
@@ -974,16 +935,13 @@ class MangaUI(QObject):
         try:
             for item in os.listdir(path):
                 if os.path.exists(os.path.join(path, item, "元数据.json")):
-                    with open(
-                        os.path.join(path, item, "元数据.json"), "r", encoding="utf-8"
-                    ) as f:
+                    with open(os.path.join(path, item, "元数据.json"), "r", encoding="utf-8") as f:
                         comic_path = os.path.join(path, item)
                         data = json.load(f)
                         meta_dict[data["id"]] = {
                             "comic_name": data["title"],
                             "comic_path": comic_path,
                         }
-        except Exception as e:
+        except (OSError, ValueError) as e:
             logger.error(f"读取元数据时发生错误\n {e}")
         return meta_dict
-

@@ -22,7 +22,9 @@ class SearchComic:
     def __init__(self, comic_name: str, sessdata: str) -> None:
         self.comic_name = comic_name
         self.sessdata = sessdata
-        self.detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
+        self.detail_url = (
+            "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
+        )
         self.headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
@@ -39,9 +41,7 @@ class SearchComic:
             list: 搜索结果列表
         """
 
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> list:
             try:
                 res = requests.post(
@@ -54,9 +54,7 @@ class SearchComic:
                 logger.warning(f"获取搜索结果失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(
-                    f"获取搜索结果失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
+                logger.warning(f"获取搜索结果失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
                 raise requests.HTTPError()
             return res.json()["data"]["list"]
 
@@ -67,9 +65,7 @@ class SearchComic:
         except requests.RequestException as e:
             logger.error(f"重复获取搜索结果多次后失败!\n{e}")
             logger.exception(e)
-            QMessageBox.warning(
-                mainGUI, "警告", "重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
-            )
+            QMessageBox.warning(mainGUI, "警告", "重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件")
             return []
 
         logger.info(f"搜索结果数量:{len(data)}")

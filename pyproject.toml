@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bilibili-manga-downloader"
-version = "1.4.1"
+version = "1.5.0"
 description = "一个好用的哔哩哔哩漫画下载器，拥有图形界面，支持关键词搜索漫画和二维码登入，黑科技下载未解锁章节，多线程下载，多种保存格式，本地漫画管理，一键检查更新！"
 authors = ["Zeal-L <zeal.liang@gmail.com>"]
 license = "AGPL-3.0"
@@ -35,3 +35,6 @@ auto-py-to-exe = "^2.42.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100

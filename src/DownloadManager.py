@@ -45,9 +45,7 @@ class DownloadManager:
             "last_time": time.time(),
             "curr_speed": 0.1,
             "avg_speed": 0.1,
-            "future": self.executor.submit(
-                self.__thread__EpisodeTask, self.id_count, epi
-            ),
+            "future": self.executor.submit(self.__thread__EpisodeTask, self.id_count, epi),
         }
         self.id_count += 1
         return self.id_count - 1
@@ -64,9 +62,9 @@ class DownloadManager:
         task: dict = self.all_tasks[curr_id]
         curr_time = time.time()
 
-        task["curr_speed"] = (
-            task["size"] * rate - task["size"] * task["last_rate"]
-        ) / (curr_time - task["last_time"])
+        task["curr_speed"] = (task["size"] * rate - task["size"] * task["last_rate"]) / (
+            curr_time - task["last_time"]
+        )
 
         task["curr_rate"] = rate
         task["last_rate"] = task["curr_rate"]
@@ -81,9 +79,7 @@ class DownloadManager:
             return 100.0
 
         return (
-            sum(task["curr_rate"] for task in self.all_tasks.values())
-            / len(self.all_tasks)
-            * 100
+            sum(task["curr_rate"] for task in self.all_tasks.values()) / len(self.all_tasks) * 100
         )
 
     ############################################################

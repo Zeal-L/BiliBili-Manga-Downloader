@@ -176,7 +176,7 @@
                 <item>
                  <widget class="QPushButton" name="pushButton_myLibrary_update">
                   <property name="text">
-                   <string>扫描漫画</string>
+                   <string>检查更新</string>
                   </property>
                  </widget>
                 </item>
@@ -192,8 +192,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>28</height>
+                   <width>524</width>
+                   <height>191</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -371,6 +371,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_chp_detail_download_selected">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>200</width>
@@ -710,8 +713,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>28</height>
+                   <width>1082</width>
+                   <height>521</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_finished"/>
@@ -1026,6 +1029,29 @@ li.checked::marker { content: &quot;\2612&quot;; }
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>30</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>修改保持格式后需要重新解析漫画才能生效</string>
+            </property>
            </widget>
           </item>
           <item>

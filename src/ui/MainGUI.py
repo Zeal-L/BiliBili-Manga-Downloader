@@ -37,12 +37,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
-        self.signal_message_box.connect(
-            lambda msg: QMessageBox.warning(self, "警告", msg)
-        )
-        self.signal_information_box.connect(
-            lambda msg: QMessageBox.information(self, "通知", msg)
-        )
+        self.signal_message_box.connect(lambda msg: QMessageBox.warning(self, "警告", msg))
+        self.signal_information_box.connect(lambda msg: QMessageBox.information(self, "通知", msg))
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
         # ?###########################################################
@@ -129,9 +125,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 parent (Optional[QObject], optional): 父对象。默认为 None
             """
 
-            def __init__(
-                self, outer_self: MainGUI, parent: Optional[QObject] = None
-            ) -> None:
+            def __init__(self, outer_self: MainGUI, parent: Optional[QObject] = None) -> None:
                 self.outer_self = outer_self
                 super().__init__(parent)
 
@@ -247,6 +241,4 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 # ensure_ascii=False 保证中文不被转义
                 json.dump(self.config, f, indent=4, ensure_ascii=False)
         except OSError as e:
-            logger.error(
-                f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}"
-            )
+            logger.error(f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}")

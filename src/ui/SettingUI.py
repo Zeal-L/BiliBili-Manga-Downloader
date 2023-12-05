@@ -106,9 +106,7 @@ class SettingUI(QObject):
             if img is None:
                 return
 
-            self.qr_ui.label_img.setPixmap(
-                QPixmap.fromImage(QImage.fromData(img)).scaled(400, 400)
-            )
+            self.qr_ui.label_img.setPixmap(QPixmap.fromImage(QImage.fromData(img)).scaled(400, 400))
             self.qr_ui.show()
 
             # 开一个线程去检测二维码是否扫描成功
@@ -147,7 +145,6 @@ class SettingUI(QObject):
                 daemon=True,
             ).start()
 
-
         self.mainGUI.lineEdit_my_cookie.returnPressed.connect(_)
         self.mainGUI.pushButton_my_cookie.clicked.connect(_)
 
@@ -169,9 +166,7 @@ class SettingUI(QObject):
         payload = {"key_word": "test", "page_num": 1, "page_size": 1}
         is_cookie_valid = False
 
-        @retry(
-            stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> None:
             try:
                 res = requests.post(
@@ -181,17 +176,13 @@ class SettingUI(QObject):
                 logger.warning(f"测试Cookie是否有效失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(
-                    f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
+                logger.warning(f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
                 raise requests.HTTPError()
 
         try:
             _()
             if notice:
-                self.mainGUI.signal_information_box.emit(
-                    "Cookie有效！"
-                )
+                self.mainGUI.signal_information_box.emit("Cookie有效！")
             is_cookie_valid = True
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
@@ -240,16 +231,14 @@ class SettingUI(QObject):
             bool: (Cookie是否有效)
         """
 
-        # 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
+        #! 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
         main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
         headers = {
             "cookie": f"login=2;access_key={cookie}",
         }
         is_cookie_valid = False
 
-        @retry(
-            stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> None:
             try:
                 res = requests.post(main_url, headers=headers, timeout=TIMEOUT_SMALL)
@@ -271,9 +260,7 @@ class SettingUI(QObject):
         try:
             _()
             if notice:
-                self.mainGUI.signal_information_box.emit(
-                    "BiliPlus Cookie有效！"
-                )
+                self.mainGUI.signal_information_box.emit("BiliPlus Cookie有效！")
             is_cookie_valid = True
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
@@ -382,16 +369,12 @@ class SettingUI(QObject):
         """绑定保存方式设置"""
         if self.mainGUI.getConfig("save_method"):
             for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
-                button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(
-                    i
-                ).widget()
+                button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
                 if button.text() == self.mainGUI.getConfig("save_method"):
                     button.setChecked(True)
         else:
             for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
-                button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(
-                    i
-                ).widget()
+                button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
                 if button.isChecked():
                     self.mainGUI.updateConfig("save_method", button.text())
                     break
@@ -401,18 +384,14 @@ class SettingUI(QObject):
                 self.mainGUI.updateConfig("save_method", button.text())
 
         for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
-            button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(
-                i
-            ).widget()
+            button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
             button.toggled.connect(partial(_, button))
 
     ############################################################
 
     def init_checkUpdate(self) -> None:
         """绑定检查更新按钮"""
-        self.mainGUI.pushButton_check_update.clicked.connect(
-            partial(checkNewVersion, self.mainGUI)
-        )
+        self.mainGUI.pushButton_check_update.clicked.connect(partial(checkNewVersion, self.mainGUI))
 
     ############################################################
 

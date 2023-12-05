@@ -103,11 +103,11 @@ class Episode:
         """
         # ?###########################################################
         # ? 获取图片列表
-        GetImageIndexURL = "https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web"
-
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+        GetImageIndexURL = (
+            "https://manga.bilibili.com/twirp/comic.v1.Comic/GetImageIndex?device=pc&platform=web"
         )
+
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> list[dict]:
             try:
                 res = requests.post(
@@ -117,9 +117,7 @@ class Episode:
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(
-                    f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}"
-                )
+                logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -143,11 +141,11 @@ class Episode:
 
         # ?###########################################################
         # ? 获取图片token
-        ImageTokenURL = "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=pc&platform=web"
-
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
+        ImageTokenURL = (
+            "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=pc&platform=web"
         )
+
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> list[dict]:
             try:
                 res = requests.post(
@@ -157,9 +155,7 @@ class Episode:
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(
-                    f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}"
-                )
+                logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -171,9 +167,7 @@ class Episode:
         try:
             self.imgs_token = _()
         except requests.RequestException as e:
-            logger.error(
-                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}"
-            )
+            logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}")
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n"
@@ -201,18 +195,14 @@ class Episode:
                     if os.path.exists(img):
                         raise OSError()
                 except OSError as e:
-                    logger.warning(
-                        f"《{self.comic_name}》章节：{self.title} - {img} 删除临时图片失败! 重试中..."
-                    )
+                    logger.warning(f"《{self.comic_name}》章节：{self.title} - {img} 删除临时图片失败! 重试中...")
                     raise e
                 imgs_path.remove(img)
 
         try:
             _()
         except OSError as e:
-            logger.error(
-                f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}"
-            )
+            logger.error(f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}")
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -341,23 +331,17 @@ class Episode:
                         if img_format == "jpg":
                             jpg_exif(img_path)
                     except piexif.InvalidImageDataError as e:
-                        logger.warning(
-                            f"Failed to insert exif data for {img_path}: {e}"
-                        )
+                        logger.warning(f"Failed to insert exif data for {img_path}: {e}")
                         logger.exception(e)
 
                     # 复制图片到文件夹
                     shutil.copy2(
                         img_path,
-                        os.path.join(
-                            self.epi_path, f"{str(index).zfill(3)}.{img_format}"
-                        ),
+                        os.path.join(self.epi_path, f"{str(index).zfill(3)}.{img_format}"),
                     )
 
             except OSError as e:
-                logger.error(
-                    f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹失败! 重试中...\n{e}"
-                )
+                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹失败! 重试中...\n{e}")
                 raise e
 
         try:
@@ -394,9 +378,7 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(
-                    f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}"
-                )
+                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}")
                 raise e
 
         try:
@@ -432,9 +414,7 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(
-                    f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}"
-                )
+                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}")
                 raise e
 
         try:
@@ -471,9 +451,7 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(
-                    f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz失败! 重试中...\n{e}"
-                )
+                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz失败! 重试中...\n{e}")
                 raise e
 
         try:
@@ -500,9 +478,7 @@ class Episode:
 
         # ?###########################################################
         # ? 下载图片
-        @retry(
-            stop_max_delay=MAX_RETRY_LARGE, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_LARGE, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> bytes:
             try:
                 res = requests.get(img_url, timeout=TIMEOUT_LARGE)
