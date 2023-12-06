@@ -42,17 +42,17 @@
 
 **使用哔站解析**
 <div align=center>
-<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/39f4e66f-50f1-410b-8761-971eeb9cf30e" width=90%>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/5c39fef2-f511-4545-968f-0b4e4ffad110" width=90%>
 </div>
 
 **使用BiliPlus解析**
 <div align=center>
-<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/4686f08b-2e88-4070-8d90-661c0a4392b6" width=90%>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/158a0b8f-f9db-464d-82e2-391dc3a441d9" width=90%>
 </div>
 
 **下载进度界面**
 <div align=center>
-<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/9c99e3c8-4283-4b0d-a5cd-23dab08b78b6" width=90%>
+<img src="https://github.com/Zeal-L/BiliBili-Manga-Downloader/assets/72005386/9e12a306-9c91-49e7-8c26-6f39f0c225ec" width=90%>
 </div>
 
 ## 📝 使用指南
