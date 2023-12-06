@@ -8,7 +8,7 @@ a = Analysis(
     ['./app.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('./src/assets/easy-taskbar-progress.dll', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

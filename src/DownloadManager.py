@@ -24,6 +24,7 @@ class DownloadManager:
         self.signal_rate_progress = signal_rate_progress
         self.signal_message_box = signal_message_box
 
+        self.terminated = False
         self.all_tasks = {}
         self.avg_speed_in_last_three_sec = {}
 
@@ -42,12 +43,10 @@ class DownloadManager:
             "size": epi.size,
             "curr_rate": 0.0,
             "last_rate": 0.0,
-            "last_time": time.perf_counter(),
+            "last_time": time.time(),
             "curr_speed": 0.1,
             "avg_speed": 0.1,
-            "future": self.executor.submit(
-                self.__thread__EpisodeTask, self.id_count, epi
-            ),
+            "future": self.executor.submit(self.__thread__EpisodeTask, self.id_count, epi),
         }
         self.id_count += 1
         return self.id_count - 1
@@ -62,11 +61,11 @@ class DownloadManager:
             rate (float): 下载进度百分比
         """
         task: dict = self.all_tasks[curr_id]
-        curr_time = time.perf_counter()
+        curr_time = time.time()
 
-        task["curr_speed"] = (
-            task["size"] * rate - task["size"] * task["last_rate"]
-        ) / (curr_time - task["last_time"])
+        task["curr_speed"] = (task["size"] * rate - task["size"] * task["last_rate"]) / (
+            curr_time - task["last_time"]
+        )
 
         task["curr_rate"] = rate
         task["last_rate"] = task["curr_rate"]
@@ -81,9 +80,7 @@ class DownloadManager:
             return 100.0
 
         return (
-            sum(task["curr_rate"] for task in self.all_tasks.values())
-            / len(self.all_tasks)
-            * 100
+            sum(task["curr_rate"] for task in self.all_tasks.values()) / len(self.all_tasks) * 100
         )
 
     ############################################################
@@ -94,15 +91,14 @@ class DownloadManager:
         Returns:
             float: 平均下载速度
         """
-        self.avg_speed_in_last_three_sec[time.perf_counter()] = sum(
-            task["curr_speed"] for task in self.all_tasks.values()
+        self.avg_speed_in_last_three_sec[time.time()] = sum(
+            task["curr_speed"] for task in self.all_tasks.values() if task["curr_rate"] != 1
         )
-
         # 取3秒内的平均速度，以防止速度突然变化
         # 比如下载完一个文件 速度突然变为0
         # 或者开始一组新的下载，速度突然变为很大
         for key in list(self.avg_speed_in_last_three_sec.keys()):
-            if key < time.perf_counter() - 3:
+            if key < time.time() - 3:
                 self.avg_speed_in_last_three_sec.pop(key)
 
         return sum(self.avg_speed_in_last_three_sec.values()) / len(
@@ -130,7 +126,8 @@ class DownloadManager:
         total_size_left = sum(
             task["size"] * (1 - task["curr_rate"]) for task in self.all_tasks.values()
         )
-        return self.formatTime(total_size_left / self.getTotalSpeed())
+        total_speed = self.getTotalSpeed()
+        return self.formatTime(total_size_left / total_speed if total_speed != 0 else 1)
 
     ############################################################
 
@@ -151,8 +148,10 @@ class DownloadManager:
         # ? 下载所有图片
         imgs_path = []
         for index, img in enumerate(epi.imgs_token, start=1):
+            if self.terminated:
+                epi.clear(imgs_path)
+                return
             img_url = f"{img['url']}?token={img['token']}"
-
             img_path = epi.downloadImg(index, img_url)
             if img_path is None:
                 self.reportError(curr_id)
@@ -175,6 +174,7 @@ class DownloadManager:
                 {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
 
+
     ############################################################
     # ? 为以后的特典下载留的接口
 
@@ -183,16 +183,6 @@ class DownloadManager:
 
     # def thread_SCTask(self) -> None:
     #     pass
-
-    ############################################################
-
-    def clearAfterFinish(self, curr_id: int) -> None:
-        """任务完成后的清理工作
-
-        Args:
-            curr_id (int): 当前任务的ID
-        """
-        self.all_tasks.pop(curr_id)
 
     ############################################################
 
@@ -218,14 +208,14 @@ class DownloadManager:
                 "rate": -1,
             }
         )
-        self.clearAfterFinish(curr_id)
+        self.all_tasks.pop(curr_id)
 
     ############################################################
     def formatSpeed(self, speed: float) -> str:
         """格式化每秒速度大小
 
         Args:
-            size (int): 每秒速度大小
+            speed (float): 每秒速度大小 (字节)
 
         Returns:
             str: 格式化后的每秒速度大小, 例如: 1.23MB/s

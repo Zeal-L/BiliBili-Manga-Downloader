@@ -149,14 +149,14 @@
                 <item>
                  <widget class="QLabel" name="label_myLibrary_count">
                   <property name="text">
-                   <string>库存：</string>
+                   <string>尚未初始化</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label">
+                 <widget class="QLabel" name="label_myLibrary_tip">
                   <property name="text">
-                   <string>(右键打开文件夹)</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -371,6 +371,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_chp_detail_download_selected">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>200</width>
@@ -616,9 +619,23 @@ li.checked::marker { content: &quot;\2612&quot;; }
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_tasks_count">
+            <property name="text">
+             <string>任务数：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_13">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="label_total_progress_speed">
             <property name="text">
-             <string>总下载速度:</string>
+             <string>总下载速度：</string>
             </property>
            </widget>
           </item>
@@ -633,6 +650,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <widget class="QLabel" name="label_total_progress_time">
             <property name="text">
              <string>剩余时间：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_14">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -689,8 +713,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>61</width>
-                   <height>18</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_finished"/>
@@ -985,7 +1009,49 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QRadioButton" name="radioButton_save_method_Cbz">
+               <property name="minimumSize">
+                <size>
+                 <width>60</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Cbz压缩包</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>30</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>修改保存格式后需要重新解析漫画才能生效</string>
+            </property>
            </widget>
           </item>
           <item>

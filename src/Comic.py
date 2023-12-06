@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import TYPE_CHECKING
 
 import requests
@@ -35,9 +34,11 @@ class Comic:
         self.num_downloaded = 0
         self.episodes = []
         self.data = None
-        self.detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web"
+        self.detail_url = (
+            "https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web"
+        )
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}?from=manga_homepage",
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
@@ -85,14 +86,13 @@ class Comic:
         # ? 解析漫画信息
         self.data["title"] = myStrFilter(self.data["title"])
         self.data["author_name"] = "，".join(self.data["author_name"])
-        self.data["author_name"] = (
-            self.data["author_name"].replace("作者:", "").replace("出品:", "")
-        )
+        self.data["author_name"] = self.data["author_name"].replace("作者:", "").replace("出品:", "")
         self.data["author_name"] = myStrFilter(self.data["author_name"])
         self.data["styles"] = "，".join(self.data["styles"])
-        self.data[
-            "save_path"
-        ] = f"{self.save_path}/《{self.data['title']}》 作者：{self.data['author_name']}"
+        if self.comic_id in self.mainGUI.my_library:
+            self.data["save_path"] = self.mainGUI.my_library[self.comic_id].get("comic_path")
+        else:
+            self.data["save_path"] = f"{self.save_path}/{self.data['title']}"
 
         return self.data
 
@@ -104,9 +104,7 @@ class Comic:
             bytes: 漫画封面图片
         """
 
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX
-        )
+        @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> bytes:
             try:
                 res = requests.get(data["vertical_cover"], timeout=TIMEOUT_SMALL)
@@ -114,15 +112,11 @@ class Comic:
                 logger.warning(f"获取封面图片失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(
-                    f"获取封面图片失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
+                logger.warning(f"获取封面图片失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
                 raise requests.HTTPError()
             isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
             if not isValid:
-                logger.warning(
-                    f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5}"
-                )
+                logger.warning(f"图片内容 Checksum 不正确! 重试中...\n\t{res.headers['Etag']} ≠ {md5}")
                 raise requests.HTTPError()
             return res.content
 

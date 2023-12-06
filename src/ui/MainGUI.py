@@ -8,7 +8,7 @@ import os
 from functools import partial
 from typing import Any, Optional
 
-from PySide6.QtCore import Signal, Qt, QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
@@ -17,7 +17,7 @@ from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
 from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.Utils import __version__, logger, data_path
+from src.Utils import __version__, data_path, logger
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
@@ -26,6 +26,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
     # ? 主要是为了 Episode 类里面的提示框准备的，
     # ? 因为 Episode 类是在另一个线程里面运行的，而只有主线程才能修改 GUI
     signal_message_box = Signal(str)
+    signal_information_box = Signal(str)
 
     # ? 用于多线程报告程序详情
     signal_resolve_status = Signal(str)
@@ -36,9 +37,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
         self.setFont(QFont("Microsoft YaHei", 10))
-        self.signal_message_box.connect(
-            lambda msg: QMessageBox.warning(None, "警告", msg)
-        )
+        self.signal_message_box.connect(lambda msg: QMessageBox.warning(self, "警告", msg))
+        self.signal_information_box.connect(lambda msg: QMessageBox.information(self, "通知", msg))
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
         # ?###########################################################
@@ -68,9 +68,13 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         logger.info(f"save_method: {self.getConfig('save_method')}")
 
         # ?###########################################################
+        # ? 初始化 my_library，方便读取本地漫画元数据
+        self.my_library = {}
+
+        # ?###########################################################
         # ? 初始化UI绑定事件
-        self.mangaUI = MangaUI(self)
         self.settingUI = SettingUI(self)
+        self.mangaUI = MangaUI(self)
         self.downloadUI = DownloadUI(self)
 
     ############################################################
@@ -97,6 +101,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 logger.error(f"清除用户数据失败 - 目录:{data_path}\n{e}")
 
         logger.info("\n\n\t\t\t-------------------  程序正常退出 -------------------\n")
+
+        self.downloadUI.downloadManager.terminated = True
+        self.downloadUI.downloadManager.executor.shutdown(wait=False, cancel_futures=True)
+        self.mangaUI.executor.shutdown(wait=False, cancel_futures=True)
         logging.shutdown()
         event.accept()
 
@@ -118,30 +126,33 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 parent (Optional[QObject], optional): 父对象。默认为 None
             """
 
-            def __init__(
-                self, outer_self: MainGUI, parent: Optional[QObject] = None
-            ) -> None:
+            def __init__(self, outer_self: MainGUI, parent: Optional[QObject] = None) -> None:
                 self.outer_self = outer_self
                 super().__init__(parent)
 
-            def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+            def eventFilter(self, *args, **kwargs) -> bool:
                 """重写事件过滤器函数
 
                 Args:
-                    obj (QObject): 发送事件的对象
-                    event (QEvent): 事件对象
+                    *args: 位置参数
+                    **kwargs: 关键字参数
 
                 Returns:
                     bool: 是否过滤该事件
                 """
-                if event.type() == QEvent.ApplicationDeactivate:
-                    self.outer_self.isFocus = False
-                    self.outer_self.CtrlPress = (
-                        self.outer_self.AltPress
-                    ) = self.outer_self.ShiftPress = False
-                elif event.type() == QEvent.ApplicationActivate:
-                    self.outer_self.isFocus = True
-                return super().eventFilter(obj, event)
+                try:
+                    event: QEvent = args[1]
+                    if event.type() == QEvent.ApplicationDeactivate:
+                        self.outer_self.isFocus = False
+                        self.outer_self.CtrlPress = (
+                            self.outer_self.AltPress
+                        ) = self.outer_self.ShiftPress = False
+                    elif event.type() == QEvent.ApplicationActivate:
+                        self.outer_self.isFocus = True
+                    return super().eventFilter(*args, **kwargs)
+                except Exception as e:
+                    logger.error(f"主窗口事件过滤器出错！\n{e}")
+                    return False
 
         return MainEventFilter(outer_self=self)
 
@@ -231,6 +242,4 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 # ensure_ascii=False 保证中文不被转义
                 json.dump(self.config, f, indent=4, ensure_ascii=False)
         except OSError as e:
-            logger.error(
-                f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}"
-            )
+            logger.error(f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}")
