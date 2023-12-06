@@ -1,22 +1,25 @@
 ## ⚰️ 更新记录
 
-### **[v1.5.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.5.0)** - *2022-12-5*
+### **[v1.5.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.5.0)** - *2022-12-6*
 - 新增功能:
-  - 现在在 Windows 环境支持下方的系统任务栏显示下载进度了
-  - 新增 `Cbz` 保存格式
+  - 新增 `Windows` 系统任务栏下载进度显示
+  - 新增 `Cbz` 保存格式，该格式与`Zip`类似，但内置`ComicInfo.xml`，是许多漫画站点（如 komga 和 kavita）与浏览软件使用的元数据文件 ([#98][i98])
 - 修复bug:
   - 修复了一个下载完成后可能会导致进度条没有正确被清除的bug
   - 修复了一个导致下载速度错误显示，越来越大的bug
   - 修复了 `BiliPlus` 解析失败未正确返回的bug
-  - 修复了软件退出，下载进程仍然继续运行的bug
+  - 修复了软件退出，下载任务仍在后台继续运行的bug
 - 优化设置:
-  - 优化了现有的各种地方的明显界面卡顿
+  - 优化需要联网的初始任务处理，大幅度提升程序的启动速度
+  - 优化了现有的各种地方的明显界面卡顿，此后尽享丝滑
   - 优化下载速度统计逻辑，现在更加平稳和准确了
-  - 本地漫画保存文件夹名称精简，且现在可以任意命名了
+  - 本地漫画保存文件夹名称精简（默认不再包含作者名），且现在可以任意命名了 （PS: 元数据文件不能动）
   - 为 `BiliPlus` 下载添加便于识别的请求头，以及其他规范修复
 - 开发相关:
   - 改用 `poetry` 作为包管理器
   - 升级 `Python` 到 `3.12` 版本
+
+[i98]: https://github.com/Zeal-L/BiliBili-Manga-Downloader/pull/98
 
 ### **[v1.4.0](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases/tag/v1.4.0)** - *2022-09-30*
 - 新增功能:
