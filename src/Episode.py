@@ -578,5 +578,6 @@ class Episode:
         Returns:
             bool: True: 已下载; False: 未下载
         """
-        file_list = glob.glob(f"{self.epi_path}*")
+        file_name = re.sub(r'(\[|\])', r'[\1]', self.epi_path)
+        file_list = glob.glob(f"{file_name}*")
         return len(file_list) > 0
