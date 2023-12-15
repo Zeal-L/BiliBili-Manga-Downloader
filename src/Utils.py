@@ -107,10 +107,61 @@ def myStrFilter(s: str) -> str:
     s = re.sub(r"\|", "丨", s)
     s = re.sub(r"\s+$", "", s)
     s = re.sub(r"^\s+", " ", s)
-    s = re.sub(r"\.", "·", s)
 
     return s
 
+
+def fileNameParser(template: str, info: dict) -> str:
+    """根据模板和元数据生成文件名
+
+    Args:
+        template (str): 模板 模板样式 ${variable[ ?? fallback][ then function_name([arg])]} variable: 变量名 fallback: 变量不存在时的默认值 function_name: 函数名 arg: 函数参数
+        info (dict): 元数据
+
+    Returns:
+        str: 文件名
+    """
+
+    result = re.sub(r"(?<!\$)\$\{(?P<variable>\w+)(?:\s+\?\?\s+(?P<fallback>\d+(?:\.\d+)|\w+|\".*?\"))?(?:(?<!\?\?)\s+then\s+(?P<function_name>padEnd|padStart)\((?P<arg>\d+)?\))?\}",
+                    lambda m: __inner__fileNameParser(m, info), template)
+    # ? 过滤非法字符
+    result = myStrFilter(result)
+    return result
+
+
+def __inner__fileNameParser(match: re.Match, info: dict) -> str:
+    """根据模板和元数据生成文件名
+
+    Args:
+        match (re.Match): 正则匹配结果
+        info (dict): 元数据
+
+    Returns:
+        str: 文件名
+    """
+    match_dict = match.groupdict()
+    variable = match_dict.get("variable")
+    fallback = match_dict.get("fallback")
+    function_name = match_dict.get("function_name")
+    arg = match_dict.get("arg")
+    args = str(arg).split(",") if arg is not None else []
+    value = ""
+    if variable not in info:
+        if fallback is None:
+            return match.group(0)
+        else:
+            value = fallback
+    else:
+        value = str(info[variable])
+    if function_name is None:
+        return value
+    else:
+        if function_name == "padEnd":
+            return value.ljust(int(args[0] if args[0] is not None else 0), "0")
+        elif function_name == "padStart":
+            return value.rjust(int(args[0] if args[0] is not None else 0), "0")
+        else:
+            return match.group(0)
 
 ############################################################
 
