@@ -44,6 +44,7 @@ class Comic:
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
         }
         self.payload = {"comic_id": self.comic_id}
+        self.episode_template_name = "${ord}-${title}"
 
     ############################################################
     def getComicInfo(self) -> dict:
@@ -89,6 +90,7 @@ class Comic:
         self.data["author_name"] = self.data["author_name"].replace("作者:", "").replace("出品:", "")
         self.data["author_name"] = myStrFilter(self.data["author_name"])
         self.data["styles"] = "，".join(self.data["styles"])
+        self.data["episode_template_name"] = self.episode_template_name
         if self.comic_id in self.mainGUI.my_library:
             self.data["save_path"] = self.mainGUI.my_library[self.comic_id].get("comic_path")
         else:

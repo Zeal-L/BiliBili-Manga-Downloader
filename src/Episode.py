@@ -29,6 +29,7 @@ from src.Utils import (
     __app_name__,
     __copyright__,
     __version__,
+    fileNameParser,
     isCheckSumValid,
     logger,
     myStrFilter,
@@ -57,14 +58,9 @@ class Episode:
         self.imgs_token = None
         self.author = comic_info["author_name"]
         self.save_method = mainGUI.getConfig("save_method")
-
+        self.episode_template_name = comic_info["episode_template_name"]
         if self.save_method == "Cbz压缩包":
             self.comicinfoxml = ComicInfoXML(comic_info, episode)
-
-        # ?###########################################################
-        # ? 修复标题中的特殊字符
-        episode["short_title"] = myStrFilter(episode["short_title"])
-        episode["title"] = myStrFilter(episode["title"])
 
         # ?###########################################################
         # ? 修复重复标题
@@ -91,6 +87,15 @@ class Episode:
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}/{self.id}?from=manga_homepage",
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
         }
+        info_dict = dict()
+        info_dict["comic_id"] = comic_id
+        info_dict["ep_id"] = self.id
+        info_dict["ord"] = self.ord
+        info_dict["title"] = self.title
+        info_dict["size"] = self.size
+        info_dict["available"] = self.available
+        info_dict["author"] = comic_info["author_name"]
+        self.title = fileNameParser(self.episode_template_name, info_dict)
         self.save_path = comic_info["save_path"]
         self.epi_path = os.path.join(self.save_path, f"{self.title}")
 
