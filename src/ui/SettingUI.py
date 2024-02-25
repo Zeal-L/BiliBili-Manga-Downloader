@@ -176,7 +176,9 @@ class SettingUI(QObject):
                 logger.warning(f"测试Cookie是否有效失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                logger.warning(
+                    f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
                 raise requests.HTTPError()
 
         try:

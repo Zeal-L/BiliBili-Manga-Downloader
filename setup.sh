@@ -15,9 +15,18 @@ poetry run pyside6-uic src/ui/PySide_src/myAbout.ui -o src/ui/PySide_src/myAbout
 poetry run pyside6-uic src/ui/PySide_src/qrCode.ui -o src/ui/PySide_src/qrCode_ui.py
 
 echo -e "\033[34m\n 修复UI文件中的导入问题 ... \n\033[0m"
-sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/mainWindow_ui.py
-sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/myAbout_ui.py
-sed -i 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/qrCode_ui.py
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    SED_INPLACE=(-i '')
+else
+    # 其他环境，假设使用 GNU sed
+    SED_INPLACE=(-i)
+fi
+
+sed "${SED_INPLACE[@]}" 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/mainWindow_ui.py
+sed "${SED_INPLACE[@]}" 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/myAbout_ui.py
+sed "${SED_INPLACE[@]}" 's/resource_rc/src.ui.PySide_src.resource_rc/' src/ui/PySide_src/qrCode_ui.py
+
 
 echo -e "\033[34m\n 显示虚拟环境相关信息 ... \n\033[0m"
 poetry debug info

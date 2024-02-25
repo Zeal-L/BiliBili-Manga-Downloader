@@ -16,7 +16,6 @@ from src.Utils import (
     TBPF_NOPROGRESS,
     TBPF_NORMAL,
     EasyProgressBar,
-    __main_window_title__,
     openFolderAndSelectItems,
 )
 

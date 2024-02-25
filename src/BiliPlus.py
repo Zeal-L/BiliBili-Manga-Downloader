@@ -97,7 +97,7 @@ class BiliPlusComic(Comic):
 
         try:
             biliplus_html = _(biliplus_detail_url)
-            if None == biliplus_html:
+            if None is biliplus_html:
                 self.mainGUI.signal_message_box.emit(
                     "BiliPlus无法解析任何章节，可能有如下两种可能\n"
                     "1、您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie\n"
@@ -123,7 +123,9 @@ class BiliPlusComic(Comic):
                 total_ep = total_ep_element.contents[0].split("/")[1]
                 total_pages = int(int(total_ep) / 200) + 1
                 for pages in range(2, total_pages + 1):
-                    self.mainGUI.signal_resolve_status.emit(f"正在解析漫画章节({pages}/{total_pages})...")
+                    self.mainGUI.signal_resolve_status.emit(
+                        f"正在解析漫画章节({pages}/{total_pages})..."
+                    )
                     page_html = _(f"{biliplus_detail_url}&page={pages}")
                     document = BeautifulSoup(page_html, "html.parser")
                     ep_items = document.find_all("div", {"class": "episode-item"})
@@ -180,7 +182,9 @@ class BiliPlusEpisode(Episode):
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(f"《{self.comic_name}》章节：{self.title}，从BiliPlus获取图片列表失败! 重试中...\n{e}")
+                logger.warning(
+                    f"《{self.comic_name}》章节：{self.title}，从BiliPlus获取图片列表失败! 重试中...\n{e}"
+                )
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -193,7 +197,9 @@ class BiliPlusEpisode(Episode):
         try:
             biliplus_html = _()
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!，跳过!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!，跳过!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!\n"
@@ -215,13 +221,17 @@ class BiliPlusEpisode(Episode):
                 biliplus_imgs_token.append({"url": url, "token": token})
             self.imgs_token = biliplus_imgs_token
             if not biliplus_imgs_token:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因获取的Token无效导致失败!")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus地址时因获取的Token无效导致失败!"
+                )
                 self.mainGUI.signal_message_box.emit(
                     f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时因获取的Token无效导致失败!"
                 )
                 return False
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时失败!\n\n"

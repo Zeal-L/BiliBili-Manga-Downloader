@@ -797,7 +797,9 @@ class MangaUI(QObject):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
                 return
             if not self.mainGUI.getConfig("biliplus_cookie"):
-                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
+                QMessageBox.critical(
+                    self.mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！"
+                )
                 return
             self.resolveEnable("resolving")
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)

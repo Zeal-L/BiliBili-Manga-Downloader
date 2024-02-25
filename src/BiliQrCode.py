@@ -51,7 +51,9 @@ class QrCode:
                 logger.warning(f"获取登入二维码失败! 重试中...\n {e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                logger.warning(
+                    f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
                 raise requests.HTTPError()
             return res.json()["data"]
 
@@ -61,11 +63,13 @@ class QrCode:
             data = _()
             self.code_url = data["url"]
             self.qrcode_key = data["qrcode_key"]
-        except (requests.RequestException, requests.HTTPError)  as e:
+        except (requests.RequestException, requests.HTTPError) as e:
             logger.error(f"重复获取登入二维码多次后失败! {e}")
             logger.exception(e)
             QMessageBox.warning(
-                self.mainGUI, "警告", "重复获取登入二维码多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
+                self.mainGUI,
+                "警告",
+                "重复获取登入二维码多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件",
             )
             return None
 
@@ -99,7 +103,9 @@ class QrCode:
                 logger.warning(f"确认二维码登入失败! 重试中...\n {e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                logger.warning(
+                    f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
                 raise requests.HTTPError()
             return res.json()["data"]
 
@@ -108,7 +114,9 @@ class QrCode:
         except (requests.RequestException, requests.HTTPError) as e:
             logger.error(f"重复确认登入多次后失败! {e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit("重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件")
+            self.mainGUI.signal_message_box.emit(
+                "重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
+            )
             return None
 
         return data

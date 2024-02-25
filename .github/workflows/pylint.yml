@@ -20,8 +20,8 @@ jobs:
         python -m pip install --upgrade pip
         sh setup.sh
 
-    - name: Analysing the code with pylint
-      id: pylint
+    - name: Analysing the code with ruff
+      id: ruff
       run: |
-        poetry run pylint $(git ls-files '*.py' | grep -v "PySide_src")
+        poetry run ruff format -q  $(git ls-files '*.py' | grep -v "PySide_src")
       continue-on-error: true

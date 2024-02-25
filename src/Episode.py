@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
-import os
-import re
 import glob
 import json
+import os
+import re
 import shutil
 from typing import TYPE_CHECKING
 from zipfile import ZipFile
@@ -117,7 +117,9 @@ class Episode:
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}")
+                logger.warning(
+                    f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}"
+                )
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -129,7 +131,9 @@ class Episode:
         try:
             imgs_urls = [img["path"] for img in _()]
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n"
@@ -155,7 +159,9 @@ class Episode:
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}")
+                logger.warning(
+                    f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}"
+                )
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -167,7 +173,9 @@ class Episode:
         try:
             self.imgs_token = _()
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n"
@@ -195,14 +203,18 @@ class Episode:
                     if os.path.exists(img):
                         raise OSError()
                 except OSError as e:
-                    logger.warning(f"《{self.comic_name}》章节：{self.title} - {img} 删除临时图片失败! 重试中...")
+                    logger.warning(
+                        f"《{self.comic_name}》章节：{self.title} - {img} 删除临时图片失败! 重试中..."
+                    )
                     raise e
                 imgs_path.remove(img)
 
         try:
             _()
         except OSError as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -217,9 +229,7 @@ class Episode:
             imgs_path (list): 临时图片路径列表
         """
         for img in reversed(imgs_path):
-            try:
-                os.remove(img)
-            except: ...
+            os.remove(img)
             imgs_path.remove(img)
 
     ############################################################
@@ -355,7 +365,9 @@ class Episode:
                     )
 
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -363,7 +375,9 @@ class Episode:
                 os.makedirs(self.epi_path)
             _()
         except OSError as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -392,7 +406,9 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -428,7 +444,9 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -465,7 +483,9 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -578,6 +598,6 @@ class Episode:
         Returns:
             bool: True: 已下载; False: 未下载
         """
-        file_name = re.sub(r'(\[|\])', r'[\1]', self.epi_path)
+        file_name = re.sub(r"(\[|\])", r"[\1]", self.epi_path)
         file_list = glob.glob(f"{file_name}*")
         return len(file_list) > 0

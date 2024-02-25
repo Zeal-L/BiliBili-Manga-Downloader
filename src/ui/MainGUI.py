@@ -226,9 +226,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             return None
         except json.JSONDecodeError as e:
             logger.error(f"解析配置文件失败 - 目录:{self.config_path}\n{e}")
-            QMessageBox.warning(None, "警告",
-                "配置文件发生异常损毁，解析失败!\n"
-                "更多详细信息请查看日志文件, 或联系开发者！"
+            QMessageBox.warning(
+                None,
+                "警告",
+                "配置文件发生异常损毁，解析失败!\n" "更多详细信息请查看日志文件, 或联系开发者！",
             )
             return None
         return self.config.get(key)
@@ -248,4 +249,6 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 # ensure_ascii=False 保证中文不被转义
                 json.dump(self.config, f, indent=4, ensure_ascii=False)
         except OSError as e:
-            logger.error(f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}")
+            logger.error(
+                f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}"
+            )

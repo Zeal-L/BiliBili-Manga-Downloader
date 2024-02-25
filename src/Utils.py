@@ -245,7 +245,9 @@ def checkNewVersion(mainGUI: MainGUI):
             logger.warning(f"获取更新信息失败! 重试中...\n{e}")
             raise e
         if res.status_code != 200:
-            logger.warning(f"获取更新信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+            logger.warning(
+                f"获取更新信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+            )
             raise requests.HTTPError()
         return res.json()
 
@@ -273,7 +275,9 @@ def checkNewVersion(mainGUI: MainGUI):
         message_box.exec()
 
     else:
-        QMessageBox.information(mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了")
+        QMessageBox.information(
+            mainGUI, "更新小助手", f"您当前使用的版本为 v{__version__}，已经是最新版本了"
+        )
 
 
 ############################################################
