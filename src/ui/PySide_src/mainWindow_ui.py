@@ -16,12 +16,12 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
-    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QListView, QListWidget, QListWidgetItem, QMainWindow,
-    QProgressBar, QPushButton, QRadioButton, QScrollArea,
-    QSizePolicy, QSlider, QSpacerItem, QTabWidget,
-    QTextBrowser, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
+    QFrame, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListView, QListWidget, QListWidgetItem,
+    QMainWindow, QProgressBar, QPushButton, QRadioButton,
+    QScrollArea, QSizePolicy, QSlider, QSpacerItem,
+    QTabWidget, QTextBrowser, QVBoxLayout, QWidget)
 import src.ui.PySide_src.resource_rc
 
 class Ui_MainWindow(object):
@@ -145,7 +145,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 547, 193))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 524, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -467,7 +467,7 @@ class Ui_MainWindow(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1032, 519))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1082, 554))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -489,7 +489,7 @@ class Ui_MainWindow(object):
         self.scrollArea_finished.setWidgetResizable(True)
         self.scrollAreaWidgetContents_finished = QWidget()
         self.scrollAreaWidgetContents_finished.setObjectName(u"scrollAreaWidgetContents_finished")
-        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 56, 24))
+        self.scrollAreaWidgetContents_finished.setGeometry(QRect(0, 0, 98, 28))
         self.verticalLayout_finished = QVBoxLayout(self.scrollAreaWidgetContents_finished)
         self.verticalLayout_finished.setObjectName(u"verticalLayout_finished")
         self.scrollArea_finished.setWidget(self.scrollAreaWidgetContents_finished)
@@ -683,6 +683,40 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_3)
 
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_6 = QLabel(self.tab_setting)
+        self.label_6.setObjectName(u"label_6")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
+        self.label_6.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_5.addWidget(self.label_6)
+
+        self.horizontalSpacer_11 = QSpacerItem(20, 20, QSizePolicy.Preferred, QSizePolicy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_11)
+
+        self.checkBox_exif_info = QCheckBox(self.tab_setting)
+        self.checkBox_exif_info.setObjectName(u"checkBox_exif_info")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.checkBox_exif_info.sizePolicy().hasHeightForWidth())
+        self.checkBox_exif_info.setSizePolicy(sizePolicy3)
+        self.checkBox_exif_info.setChecked(True)
+
+        self.horizontalLayout_5.addWidget(self.checkBox_exif_info)
+
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_12)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+
         self.verticalSpacer_3 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_3)
@@ -840,7 +874,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addItem(self.verticalSpacer_2)
 
-        self.verticalLayout_5.setStretch(12, 1)
+        self.verticalLayout_5.setStretch(13, 1)
         self.tabWidget.addTab(self.tab_setting, "")
 
         self.horizontalLayout_2.addWidget(self.tabWidget)
@@ -896,29 +930,29 @@ class Ui_MainWindow(object):
 "hr { height: 1px; border-width: 0; }\n"
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:14pt; font-weight:700; color:#0055ff;\"> </span></p>\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Microsoft YaHei UI'; font-size:14pt; font-weight:700; color:#0055ff;\"><br /></p>\n"
-""
-                        "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:14pt; font-weight:700; color:#0055ff;\">\u2764\u6b22\u8fce\u4f7f\u7528\u672c\u4e0b\u8f7d\u5668(*\uff40\u2200\u00b4*)\u30ce</span></p>\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Microsoft YaHei UI'; font-size:9pt;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700;\">\u7b2c\u4e00\u6b21\u4f7f\u7528\u8bf7\u5148\u5728\u4e0a\u65b9\u7684\u8bbe\u7f6e\u9875\u9762\u5185\u626b\u7801\u767b\u5165B\u7ad9\u5e10\u53f7</span></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margi"
-                        "n-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700;\">\u5e76\u4e14\u914d\u7f6e\u597d\u60a8\u9700\u8981\u7684\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\u4e0e\u683c\u5f0f</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700; color:#000000;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700;\">\u672a\u89e3\u9501\u7684\u7ae0\u8282\u53ef\u4ee5\u5c1d\u8bd5\u4f7f\u7528BiliPlus\u89e3\u6790\uff0c\u53ef\u80fd\u4f1a\u7ed9\u60a8\u5e26\u6765\u60ca\u559c</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-"
-                        "indent:0px; font-family:'Microsoft YaHei UI'; font-size:9pt;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Microsoft YaHei UI'; font-size:9pt;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:14pt; font-weight:700; color:#aa55ff;\">\u2b50\u7ae0\u8282\u9009\u62e9\u5c0f\u6280\u5de7(#^.^#)</span></p>\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Microsoft YaHei UI'; font-size:14pt; font-weight:700; color:#aa55ff;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Mic"
-                        "rosoft YaHei UI'; font-size:10pt; font-weight:700;\">\u6280\u5de7\u4e00\uff1a</span><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt;\">\u6441\u4f4f\u9f20\u6807\u5de6\u952e\u62d6\u52a8\u53ef\u6279\u91cf\u6846\u9009\u7ae0\u8282\uff0c\u7136\u540e\u9f20\u6807\u53f3\u952e\u786e\u8ba4\u64cd\u4f5c</span></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700;\">\u6280\u5de7\u4e8c\uff1a</span><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt;\">\u6441\u4f4fAlt\u540e\u9f20\u6807\u5212\u8fc7\u7ae0\u8282\u540d\u5feb\u901f\u9009\u4e2d\uff0cShift+Alt\u5feb\u901f\u53d6\u6d88\u9009\u4e2d</span></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700;\">\u6280"
-                        "\u5de7\u4e09\uff1a</span><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt;\">\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u56de\u8f66\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt; font-weight:700;\">\u6280\u5de7\u56db\uff1a</span><span style=\" font-family:'Microsoft YaHei UI'; font-size:10pt;\">Ctrl+A\u5168\u9009\u540e\u56de\u8f66\u786e\u8ba4 </span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Microsoft YaHei UI'; font-size:10pt;\"><br /></p></body></html>", None))
+"</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#0055ff;\"> </span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:14pt; font-weight:700; color:#0055ff;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margi"
+                        "n-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#0055ff;\">\u2764\u6b22\u8fce\u4f7f\u7528\u672c\u4e0b\u8f7d\u5668(*\uff40\u2200\u00b4*)\u30ce</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u7b2c\u4e00\u6b21\u4f7f\u7528\u8bf7\u5148\u5728\u4e0a\u65b9\u7684\u8bbe\u7f6e\u9875\u9762\u5185\u626b\u7801\u767b\u5165B\u7ad9\u5e10\u53f7</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u5e76\u4e14\u914d\u7f6e\u597d\u60a8\u9700\u8981\u7684\u6f2b\u753b\u4fdd\u5b58\u8def"
+                        "\u5f84\u4e0e\u683c\u5f0f</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:700; color:#000000;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u672a\u89e3\u9501\u7684\u7ae0\u8282\u53ef\u4ee5\u5c1d\u8bd5\u4f7f\u7528BiliPlus\u89e3\u6790\uff0c\u53ef\u80fd\u4f1a\u7ed9\u60a8\u5e26\u6765\u60ca\u559c</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"
+                        " -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#aa55ff;\">\u2b50\u7ae0\u8282\u9009\u62e9\u5c0f\u6280\u5de7(#^.^#)</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:14pt; font-weight:700; color:#aa55ff;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7\u4e00\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4f\u9f20\u6807\u5de6\u952e\u62d6\u52a8\u53ef\u6279\u91cf\u6846\u9009\u7ae0\u8282\uff0c\u7136\u540e\u9f20\u6807\u53f3\u952e\u786e\u8ba4\u64cd\u4f5c</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7"
+                        "\u4e8c\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4fAlt\u540e\u9f20\u6807\u5212\u8fc7\u7ae0\u8282\u540d\u5feb\u901f\u9009\u4e2d\uff0cShift+Alt\u5feb\u901f\u53d6\u6d88\u9009\u4e2d</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7\u4e09\uff1a</span><span style=\" font-size:10pt;\">\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u56de\u8f66\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7\u56db\uff1a</span><span style=\" font-size:10pt;\">Ctrl+A\u5168\u9009\u540e\u56de\u8f66\u786e\u8ba4 </span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-r"
+                        "ight:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWindow", u"\u603b\u8fdb\u5ea6", None))
         self.label_tasks_count.setText(QCoreApplication.translate("MainWindow", u"\u4efb\u52a1\u6570\uff1a", None))
@@ -943,6 +977,8 @@ class Ui_MainWindow(object):
         self.radioButton_save_method_Zip.setText(QCoreApplication.translate("MainWindow", u"Zip\u538b\u7f29\u5305", None))
         self.radioButton_save_method_Cbz.setText(QCoreApplication.translate("MainWindow", u"Cbz\u538b\u7f29\u5305", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u4fdd\u5b58\u683c\u5f0f\u540e\u9700\u8981\u91cd\u65b0\u89e3\u6790\u6f2b\u753b\u624d\u80fd\u751f\u6548", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u9644\u52a0\u4fe1\u606f\uff1a", None))
+        self.checkBox_exif_info.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u5728\u4fdd\u5b58\u6587\u4ef6\u5c5e\u6027\u4e2d\u8bb0\u5f55\u7ae0\u8282\u6807\u9898\u3001\u4f5c\u8005\u3001\u51fa\u7248\u793e\u7b49\u9644\u52a0\u4fe1\u606f", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))
