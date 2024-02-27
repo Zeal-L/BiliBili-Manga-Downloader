@@ -16,7 +16,7 @@ import piexif
 import requests
 from PIL import Image
 from py7zr import SevenZipFile
-from PyPDF2 import PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 from retrying import retry
 
 from src.ComicInfoXML import ComicInfoXML
