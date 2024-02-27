@@ -24,9 +24,9 @@ if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 __author__ = "Zeal L"
-__copyright__ = "Copyright (C) 2023 Zeal L"
+__copyright__ = "Copyright (C) 2023-2024 Zeal L"
 __main_window_title__ = f"哔哩哔哩漫画下载器 v{__version__}"
 
 ############################################################

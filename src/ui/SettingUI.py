@@ -54,6 +54,7 @@ class SettingUI(QObject):
         self.init_saveMethod()
         self.init_checkUpdate()
         self.init_theme()
+        self.init_exif_setting()
         self.qr_ui = QrCodeUI()
 
     ############################################################
@@ -314,7 +315,7 @@ class SettingUI(QObject):
             mainGUI (MainGUI): 主窗口类实例
         """
 
-        if self.mainGUI.getConfig("num_thread"):
+        if self.mainGUI.getConfig("num_thread") is not None:
             self.mainGUI.h_Slider_num_thread.setValue(self.mainGUI.getConfig("num_thread"))
         else:
             self.mainGUI.updateConfig("num_thread", self.mainGUI.h_Slider_num_thread.value())
@@ -369,7 +370,7 @@ class SettingUI(QObject):
     ############################################################
     def init_saveMethod(self) -> None:
         """绑定保存方式设置"""
-        if self.mainGUI.getConfig("save_method"):
+        if self.mainGUI.getConfig("save_method") is not None:
             for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
                 button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
                 if button.text() == self.mainGUI.getConfig("save_method"):
@@ -482,3 +483,16 @@ class SettingUI(QObject):
 
         if self.mainGUI.comboBox_theme_style.currentText() == "默认":
             self.mainGUI.comboBox_theme_density.setEnabled(False)
+
+    ############################################################
+
+    def init_exif_setting(self) -> None:
+        if self.mainGUI.getConfig("exif") is not None:
+            self.mainGUI.checkBox_exif_info.setChecked(self.mainGUI.getConfig("exif"))
+        else:
+            self.mainGUI.updateConfig("exif", True)
+
+        def _(checked: bool) -> None:
+            self.mainGUI.updateConfig("exif", checked)
+
+        self.mainGUI.checkBox_exif_info.toggled.connect(_)

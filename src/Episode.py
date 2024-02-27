@@ -57,6 +57,7 @@ class Episode:
         self.imgs_token = None
         self.author = comic_info["author_name"]
         self.save_method = mainGUI.getConfig("save_method")
+        self.exif_setting = mainGUI.getConfig("exif")
 
         if self.save_method == "Cbz压缩包":
             self.comicinfoxml = ComicInfoXML(comic_info, episode)
@@ -291,6 +292,8 @@ class Episode:
                     img.close()
 
                 # 在pdf文件属性中记录章节标题作者和软件版本以及版权信息
+                if not self.exif_setting:
+                    return
                 with open(f"{self.epi_path}.pdf", "rb") as f:
                     pdf = PdfReader(f)
                     pdf_writer = PdfWriter()
@@ -351,12 +354,13 @@ class Episode:
                     img_format = img_path.split(".")[-1]
 
                     # 将 exif 数据插入到图像文件中, 如果插入失败则跳过
-                    try:
-                        if img_format == "jpg":
-                            jpg_exif(img_path)
-                    except piexif.InvalidImageDataError as e:
-                        logger.warning(f"Failed to insert exif data for {img_path}: {e}")
-                        logger.exception(e)
+                    if self.exif_setting:
+                        try:
+                            if img_format == "jpg":
+                                jpg_exif(img_path)
+                        except piexif.InvalidImageDataError as e:
+                            logger.warning(f"Failed to insert exif data for {img_path}: {e}")
+                            logger.exception(e)
 
                     # 复制图片到文件夹
                     shutil.copy2(
