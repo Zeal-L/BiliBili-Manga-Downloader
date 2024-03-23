@@ -89,14 +89,16 @@ class ComicInfoXML:
 
             f.write("</ComicInfo>")
 
-    def xml_write_simple_tag(self, f, name: str, val: str, indent=1) -> None:
+    def xml_write_simple_tag(self, f, name: str, val, indent=1) -> None:
         """xml帮手函数
 
         Args:
             f (file descriptor)
             name (str): XML tag
-            val (str): XML value
+            val : XML value
             output_path (str): ComicInfo.xml写出路径
         """
+        if val.__class__ != "str":
+            val = str(val)
         if val != "":
             f.write(f'{" " * indent}<{name}>{escape(val)}</{name}>\n')
