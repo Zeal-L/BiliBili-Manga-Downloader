@@ -98,7 +98,7 @@ class ComicInfoXML:
             val : XML value
             output_path (str): ComicInfo.xml写出路径
         """
-        if val.__class__ != "str":
+        if not isinstance(val, str):
             val = str(val)
         if val != "":
             f.write(f'{" " * indent}<{name}>{escape(val)}</{name}>\n')
