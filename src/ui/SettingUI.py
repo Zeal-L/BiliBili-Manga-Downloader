@@ -237,7 +237,7 @@ class SettingUI(QObject):
         #! 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
         main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
         headers = {
-            "cookie": f"login=2;access_key={cookie}",
+            "cookie": f"login=2;manga_sharing=on;access_key={cookie}",
         }
         is_cookie_valid = False
 
