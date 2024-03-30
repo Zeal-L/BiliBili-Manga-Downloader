@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.1
+## Created by: Qt User Interface Compiler version 6.6.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.label_myLibrary_tip)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_3)
 
@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         self.label_manga_image = QLabel(self.groupBox_my_manga)
         self.label_manga_image.setObjectName(u"label_manga_image")
         self.label_manga_image.setEnabled(True)
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_manga_image.sizePolicy().hasHeightForWidth())
@@ -323,7 +323,7 @@ class Ui_MainWindow(object):
 
         self.label_resolve_status = QLabel(self.widget_biliplus_detail)
         self.label_resolve_status.setObjectName(u"label_resolve_status")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.label_resolve_status.sizePolicy().hasHeightForWidth())
@@ -498,7 +498,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_finished = QHBoxLayout()
         self.h_Layout_finished.setObjectName(u"h_Layout_finished")
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_finished.addItem(self.horizontalSpacer_6)
 
@@ -523,7 +523,7 @@ class Ui_MainWindow(object):
         self.tab_setting.setObjectName(u"tab_setting")
         self.verticalLayout_5 = QVBoxLayout(self.tab_setting)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_4 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_4 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_4)
 
@@ -618,7 +618,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.label_4)
 
-        self.horizontalSpacer_8 = QSpacerItem(19, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_8 = QSpacerItem(19, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_8)
 
@@ -667,7 +667,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.groupBox_save_method)
 
-        self.horizontalSpacer = QSpacerItem(30, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(30, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer)
 
@@ -676,7 +676,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.label)
 
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_7)
 
@@ -687,7 +687,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.label_6 = QLabel(self.tab_setting)
         self.label_6.setObjectName(u"label_6")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
@@ -695,13 +695,13 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.label_6)
 
-        self.horizontalSpacer_11 = QSpacerItem(20, 20, QSizePolicy.Preferred, QSizePolicy.Minimum)
+        self.horizontalSpacer_11 = QSpacerItem(20, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_11)
 
         self.checkBox_exif_info = QCheckBox(self.tab_setting)
         self.checkBox_exif_info.setObjectName(u"checkBox_exif_info")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.checkBox_exif_info.sizePolicy().hasHeightForWidth())
@@ -710,14 +710,14 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.checkBox_exif_info)
 
-        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_12)
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_3 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_3)
 
@@ -728,7 +728,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.line_8)
 
-        self.verticalSpacer_5 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_5 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_5)
 
@@ -746,7 +746,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread_count)
 
-        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_10)
 
@@ -763,7 +763,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
 
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_9)
 
@@ -773,7 +773,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_2)
 
@@ -783,7 +783,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.groupBox)
 
-        self.verticalSpacer_6 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_6 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_6)
 
@@ -794,7 +794,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.line_9)
 
-        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_7)
 
@@ -814,7 +814,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.comboBox_theme_style)
 
-        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
 
@@ -829,14 +829,14 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.comboBox_theme_density)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
 
 
         self.verticalLayout_5.addWidget(self.groupBox_2)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer)
 
@@ -870,7 +870,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addLayout(self.h_Layout_buttons)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_2)
 

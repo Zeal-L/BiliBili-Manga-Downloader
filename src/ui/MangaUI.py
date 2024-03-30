@@ -370,7 +370,6 @@ class MangaUI(QObject):
     # 以下三个函数是为了获取漫画信息详情
     ############################################################
 
-    ############################################################
     def updateComicInfoEvent(self, comic: Comic, resolve_type: str, _event: QEvent = None) -> None:
         """更新漫画信息详情界面
 
@@ -609,7 +608,7 @@ class MangaUI(QObject):
 
         """
 
-        if len(info) == 0:
+        if not info:
             self.mainGUI.listWidget_chp_detail.clear()
             return
         title: str = info["title"]
