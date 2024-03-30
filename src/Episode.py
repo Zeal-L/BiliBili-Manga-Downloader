@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
-import os
-import re
 import glob
 import json
+import os
+import re
 import shutil
 from typing import TYPE_CHECKING
 from zipfile import ZipFile
@@ -16,7 +16,7 @@ import piexif
 import requests
 from PIL import Image
 from py7zr import SevenZipFile
-from PyPDF2 import PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 from retrying import retry
 
 from src.ComicInfoXML import ComicInfoXML
@@ -42,21 +42,24 @@ class Episode:
     """漫画章节类，用于管理漫画章节的详细信息"""
 
     def __init__(
-        self,
-        episode: dict,
-        comic_id: str,
-        comic_info: dict,
-        mainGUI: MainGUI,
+        self, episode: dict, comic_id: str, comic_info: dict, mainGUI: MainGUI, idx: int
     ) -> None:
         self.mainGUI = mainGUI
         self.id = episode["id"]
         self.available = not episode["is_locked"]
         self.ord = episode["ord"]
+        self.real_ord = idx
         self.comic_name = comic_info["title"]
         self.size = episode["size"]
         self.imgs_token = None
         self.author = comic_info["author_name"]
         self.save_method = mainGUI.getConfig("save_method")
+        self.exif_setting = mainGUI.getConfig("exif")
+
+        # if self.ord != self.real_ord:
+        #     logger.warning(
+        #         f"章节序号错误！{self.comic_name} - {episode["title"]}; ord: {self.ord} ≠ real_ord: {self.real_ord}, 请责怪B站"
+        #     )
 
         if self.save_method == "Cbz压缩包":
             self.comicinfoxml = ComicInfoXML(comic_info, episode)
@@ -75,15 +78,20 @@ class Episode:
         temp = re.search(r"^(\d+)\s+第(\d+)话", self.title)
         if temp and temp[1] == temp[2]:
             self.title = re.sub(r"^\d+\s+(第\d+话)", r"\1", self.title)
+        temp = re.search(r"^(\d+)\s+第(\d+)$", self.title)
+        if temp and temp[1] == temp[2]:
+            self.title = re.sub(r"^\d+\s+(第\d+)$", r"\1话", self.title)
         if re.search(r"^特别篇\s+特别篇", self.title):
             self.title = re.sub(r"^特别篇\s+特别篇", r"特别篇", self.title)
 
         # ?###########################################################
         # ? 修复短标题中的数字
-        if re.search(r"^[0-9\-]+话", self.title):
-            self.title = re.sub(r"^([0-9\-]+)", r"第\1", self.title)
-        elif re.search(r"^[0-9\-]+", self.title):
-            self.title = re.sub(r"^([0-9\-]+)", r"第\1话", self.title)
+        if re.search(r"^[0-9\-\.]+话", self.title):
+            self.title = re.sub(r"^([0-9\-\.]+)话", r"第\1话", self.title)
+        elif re.search(r"^[0-9\-\.]+ ", self.title):
+            self.title = re.sub(r"^([0-9\-\.]+) ", r"第\1话 ", self.title)
+        elif re.search(r"^[0-9\-\.]+$", self.title):
+            self.title = re.sub(r"^([0-9\-\.]+)$", r"第\1话", self.title)
 
         self.headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
@@ -117,7 +125,9 @@ class Episode:
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}")
+                logger.warning(
+                    f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}"
+                )
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -129,7 +139,9 @@ class Episode:
         try:
             imgs_urls = [img["path"] for img in _()]
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n"
@@ -155,7 +167,9 @@ class Episode:
                     timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
-                logger.warning(f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}")
+                logger.warning(
+                    f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}"
+                )
                 raise e
             if res.status_code != 200:
                 logger.warning(
@@ -167,7 +181,9 @@ class Episode:
         try:
             self.imgs_token = _()
         except requests.RequestException as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n"
@@ -195,14 +211,18 @@ class Episode:
                     if os.path.exists(img):
                         raise OSError()
                 except OSError as e:
-                    logger.warning(f"《{self.comic_name}》章节：{self.title} - {img} 删除临时图片失败! 重试中...")
+                    logger.warning(
+                        f"《{self.comic_name}》章节：{self.title} - {img} 删除临时图片失败! 重试中..."
+                    )
                     raise e
                 imgs_path.remove(img)
 
         try:
             _()
         except OSError as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -217,9 +237,7 @@ class Episode:
             imgs_path (list): 临时图片路径列表
         """
         for img in reversed(imgs_path):
-            try:
-                os.remove(img)
-            except: ...
+            os.remove(img)
             imgs_path.remove(img)
 
     ############################################################
@@ -281,6 +299,8 @@ class Episode:
                     img.close()
 
                 # 在pdf文件属性中记录章节标题作者和软件版本以及版权信息
+                if not self.exif_setting:
+                    return
                 with open(f"{self.epi_path}.pdf", "rb") as f:
                     pdf = PdfReader(f)
                     pdf_writer = PdfWriter()
@@ -341,12 +361,13 @@ class Episode:
                     img_format = img_path.split(".")[-1]
 
                     # 将 exif 数据插入到图像文件中, 如果插入失败则跳过
-                    try:
-                        if img_format == "jpg":
-                            jpg_exif(img_path)
-                    except piexif.InvalidImageDataError as e:
-                        logger.warning(f"Failed to insert exif data for {img_path}: {e}")
-                        logger.exception(e)
+                    if self.exif_setting:
+                        try:
+                            if img_format == "jpg":
+                                jpg_exif(img_path)
+                        except piexif.InvalidImageDataError as e:
+                            logger.warning(f"Failed to insert exif data for {img_path}: {e}")
+                            logger.exception(e)
 
                     # 复制图片到文件夹
                     shutil.copy2(
@@ -355,7 +376,9 @@ class Episode:
                     )
 
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -363,7 +386,9 @@ class Episode:
                 os.makedirs(self.epi_path)
             _()
         except OSError as e:
-            logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}")
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}"
+            )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
@@ -392,7 +417,9 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到7z失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -428,7 +455,9 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到Zip失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -465,7 +494,9 @@ class Episode:
                             )
                     shutil.rmtree(self.epi_path)
             except OSError as e:
-                logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz失败! 重试中...\n{e}")
+                logger.error(
+                    f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz失败! 重试中...\n{e}"
+                )
                 raise e
 
         try:
@@ -531,7 +562,7 @@ class Episode:
         # ?###########################################################
         # ? 保存图片
         img_format = img_url.split(".")[-1].split("?")[0].lower()
-        path_to_save = os.path.join(self.save_path, f"{self.ord}_{index}.{img_format}")
+        path_to_save = os.path.join(self.save_path, f"{self.real_ord}_{index}.{img_format}")
 
         @retry(stop_max_attempt_number=5)
         def _() -> None:
@@ -578,5 +609,6 @@ class Episode:
         Returns:
             bool: True: 已下载; False: 未下载
         """
-        file_list = glob.glob(f"{self.epi_path}*")
+        file_name = re.sub(r"(\[|\])", r"[\1]", self.epi_path)
+        file_list = glob.glob(f"{file_name}*")
         return len(file_list) > 0

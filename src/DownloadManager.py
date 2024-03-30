@@ -174,7 +174,6 @@ class DownloadManager:
                 {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
 
-
     ############################################################
     # ? 为以后的特典下载留的接口
 

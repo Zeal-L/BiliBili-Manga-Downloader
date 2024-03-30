@@ -54,7 +54,9 @@ class SearchComic:
                 logger.warning(f"获取搜索结果失败! 重试中...\n{e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f"获取搜索结果失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                logger.warning(
+                    f"获取搜索结果失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
                 raise requests.HTTPError()
             return res.json()["data"]["list"]
 
@@ -65,7 +67,11 @@ class SearchComic:
         except requests.RequestException as e:
             logger.error(f"重复获取搜索结果多次后失败!\n{e}")
             logger.exception(e)
-            QMessageBox.warning(mainGUI, "警告", "重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件")
+            QMessageBox.warning(
+                mainGUI,
+                "警告",
+                "重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件",
+            )
             return []
 
         logger.info(f"搜索结果数量:{len(data)}")

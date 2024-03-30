@@ -30,6 +30,10 @@ class QrCode:
         self.code_url = None
         self.qrcode_key = None
         self.close_flag = False
+        self.headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "origin": "https://manga.bilibili.com",
+        }
 
     def generate(self) -> str | None:
         """生成登入二维码
@@ -42,12 +46,14 @@ class QrCode:
         @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> dict:
             try:
-                res = requests.get(self.generate_url, timeout=TIMEOUT_SMALL)
+                res = requests.get(self.generate_url, headers=self.headers, timeout=TIMEOUT_SMALL)
             except requests.RequestException as e:
                 logger.warning(f"获取登入二维码失败! 重试中...\n {e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                logger.warning(
+                    f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
                 raise requests.HTTPError()
             return res.json()["data"]
 
@@ -57,11 +63,13 @@ class QrCode:
             data = _()
             self.code_url = data["url"]
             self.qrcode_key = data["qrcode_key"]
-        except requests.RequestException as e:
+        except (requests.RequestException, requests.HTTPError) as e:
             logger.error(f"重复获取登入二维码多次后失败! {e}")
             logger.exception(e)
             QMessageBox.warning(
-                self.mainGUI, "警告", "重复获取登入二维码多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
+                self.mainGUI,
+                "警告",
+                "重复获取登入二维码多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件",
             )
             return None
 
@@ -85,6 +93,7 @@ class QrCode:
             try:
                 res = requests.get(
                     self.poll_url,
+                    headers=self.headers,
                     params={
                         "qrcode_key": self.qrcode_key,
                     },
@@ -94,16 +103,20 @@ class QrCode:
                 logger.warning(f"确认二维码登入失败! 重试中...\n {e}")
                 raise e
             if res.status_code != 200:
-                logger.warning(f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                logger.warning(
+                    f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                )
                 raise requests.HTTPError()
             return res.json()["data"]
 
         try:
             data = _()
-        except requests.RequestException as e:
+        except (requests.RequestException, requests.HTTPError) as e:
             logger.error(f"重复确认登入多次后失败! {e}")
             logger.exception(e)
-            QMessageBox.warning(self.mainGUI, "警告", "重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件")
+            self.mainGUI.signal_message_box.emit(
+                "重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
+            )
             return None
 
         return data
@@ -120,7 +133,7 @@ class QrCode:
             data = self.confirm()
 
             # 扫码登录成功或者二维码过期或者请求失败
-            if data["code"] in [0, 86038] or data is None:
+            if data is None or data["code"] in [0, 86038]:
                 qr_res.emit(data)
                 break
 

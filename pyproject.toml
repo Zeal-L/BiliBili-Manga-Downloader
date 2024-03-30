@@ -1,40 +1,39 @@
 [tool.poetry]
-name = "bilibili-manga-downloader"
-version = "1.5.0"
-description = "一个好用的哔哩哔哩漫画下载器，拥有图形界面，支持关键词搜索漫画和二维码登入，黑科技下载未解锁章节，多线程下载，多种保存格式，本地漫画管理，一键检查更新！"
 authors = ["Zeal-L <zeal.liang@gmail.com>"]
+description = "一个好用的哔哩哔哩漫画下载器，拥有图形界面，支持关键词搜索漫画和二维码登入，黑科技下载未解锁章节，多线程下载，多种保存格式，本地漫画管理，一键检查更新！"
 license = "AGPL-3.0"
+name = "bilibili-manga-downloader"
 readme = "README.md"
+version = "1.5.1"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+beautifulsoup4 = "^4.12.3"
 piexif = "^1.1.3"
+pillow = "10.2.0"
 py7zr = "^0.20.8"
-pypdf2 = "^3.0.1"
-pyside6 = "^6.6.0"
+pypdf = "^4.0.2"
+pypinyin = "^0.49.0"
+pyside6 = "^6.6.2"
+python = ">=3.12,<3.13"
+qrcode = "^7.4.2"
+qt-material = "^2.14"
 requests = "^2.31.0"
 retrying = "^1.3.4"
-pillow = "^10.1.0"
-pypinyin = "^0.49.0"
-qt-material = "^2.14"
-beautifulsoup4 = "^4.12.2"
-qrcode = "^7.4.2"
+
+[tool.poetry.group.dev.dependencies]
+auto-py-to-exe = "^2.42.0"
+pyinstaller = "^6.4.0"
+rich = "^13.7.0"
+ruff = "^0.2.2"
 
 [[tool.poetry.source]]
 name = "mirrors"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 priority = "supplemental"
-
-
-[tool.poetry.group.dev.dependencies]
-rich = "^13.7.0"
-pylint = "^3.0.2"
-pyinstaller = "^6.2.0"
-auto-py-to-exe = "^2.42.0"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 
 [build-system]
-requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
 
-[tool.black]
+[tool.ruff]
 line-length = 100

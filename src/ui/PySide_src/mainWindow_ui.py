@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.0
+## Created by: Qt User Interface Compiler version 6.6.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,12 +16,12 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
-    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QListView, QListWidget, QListWidgetItem, QMainWindow,
-    QProgressBar, QPushButton, QRadioButton, QScrollArea,
-    QSizePolicy, QSlider, QSpacerItem, QTabWidget,
-    QTextBrowser, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
+    QFrame, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListView, QListWidget, QListWidgetItem,
+    QMainWindow, QProgressBar, QPushButton, QRadioButton,
+    QScrollArea, QSizePolicy, QSlider, QSpacerItem,
+    QTabWidget, QTextBrowser, QVBoxLayout, QWidget)
 import src.ui.PySide_src.resource_rc
 
 class Ui_MainWindow(object):
@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.label_myLibrary_tip)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_3)
 
@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         self.label_manga_image = QLabel(self.groupBox_my_manga)
         self.label_manga_image.setObjectName(u"label_manga_image")
         self.label_manga_image.setEnabled(True)
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_manga_image.sizePolicy().hasHeightForWidth())
@@ -323,7 +323,7 @@ class Ui_MainWindow(object):
 
         self.label_resolve_status = QLabel(self.widget_biliplus_detail)
         self.label_resolve_status.setObjectName(u"label_resolve_status")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.label_resolve_status.sizePolicy().hasHeightForWidth())
@@ -498,7 +498,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_finished = QHBoxLayout()
         self.h_Layout_finished.setObjectName(u"h_Layout_finished")
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_finished.addItem(self.horizontalSpacer_6)
 
@@ -523,7 +523,7 @@ class Ui_MainWindow(object):
         self.tab_setting.setObjectName(u"tab_setting")
         self.verticalLayout_5 = QVBoxLayout(self.tab_setting)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_4 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_4 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_4)
 
@@ -618,7 +618,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.label_4)
 
-        self.horizontalSpacer_8 = QSpacerItem(19, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_8 = QSpacerItem(19, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_8)
 
@@ -667,7 +667,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.groupBox_save_method)
 
-        self.horizontalSpacer = QSpacerItem(30, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(30, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer)
 
@@ -676,14 +676,48 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.label)
 
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_7)
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_3)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_6 = QLabel(self.tab_setting)
+        self.label_6.setObjectName(u"label_6")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
+        self.label_6.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_5.addWidget(self.label_6)
+
+        self.horizontalSpacer_11 = QSpacerItem(20, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_11)
+
+        self.checkBox_exif_info = QCheckBox(self.tab_setting)
+        self.checkBox_exif_info.setObjectName(u"checkBox_exif_info")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.checkBox_exif_info.sizePolicy().hasHeightForWidth())
+        self.checkBox_exif_info.setSizePolicy(sizePolicy3)
+        self.checkBox_exif_info.setChecked(True)
+
+        self.horizontalLayout_5.addWidget(self.checkBox_exif_info)
+
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_12)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_3)
 
@@ -694,7 +728,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.line_8)
 
-        self.verticalSpacer_5 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_5 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_5)
 
@@ -712,7 +746,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread_count)
 
-        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_10)
 
@@ -729,7 +763,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
 
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_9)
 
@@ -739,7 +773,7 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.label_num_thread)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_2)
 
@@ -749,7 +783,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.groupBox)
 
-        self.verticalSpacer_6 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_6 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_6)
 
@@ -760,7 +794,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.line_9)
 
-        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_7 = QSpacerItem(20, 10, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_7)
 
@@ -780,7 +814,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.comboBox_theme_style)
 
-        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(20, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
 
@@ -795,14 +829,14 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.comboBox_theme_density)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
 
 
         self.verticalLayout_5.addWidget(self.groupBox_2)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer)
 
@@ -836,11 +870,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addLayout(self.h_Layout_buttons)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_2)
 
-        self.verticalLayout_5.setStretch(12, 1)
+        self.verticalLayout_5.setStretch(13, 1)
         self.tabWidget.addTab(self.tab_setting, "")
 
         self.horizontalLayout_2.addWidget(self.tabWidget)
@@ -902,23 +936,23 @@ class Ui_MainWindow(object):
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margi"
                         "n-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#0055ff;\">\u2764\u6b22\u8fce\u4f7f\u7528\u672c\u4e0b\u8f7d\u5668(*\uff40\u2200\u00b4*)\u30ce</span></p>\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700; color:#000000;\">\u7b2c\u4e00\u6b21\u4f7f\u7528\u8bf7\u5148\u5728\u4e0a\u65b9\u7684\u8bbe\u7f6e\u9875\u9762\u5185\u626b\u7801\u767b\u5165B\u7ad9\u5e10\u53f7</span></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700; color:#000000;\">\u5e76\u4e14\u914d\u7f6e\u597d\u60a8\u9700\u8981\u7684"
-                        "\u6f2b\u753b\u4fdd\u5b58\u8def\u5f84\u4e0e\u683c\u5f0f</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u7b2c\u4e00\u6b21\u4f7f\u7528\u8bf7\u5148\u5728\u4e0a\u65b9\u7684\u8bbe\u7f6e\u9875\u9762\u5185\u626b\u7801\u767b\u5165B\u7ad9\u5e10\u53f7</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u5e76\u4e14\u914d\u7f6e\u597d\u60a8\u9700\u8981\u7684\u6f2b\u753b\u4fdd\u5b58\u8def"
+                        "\u5f84\u4e0e\u683c\u5f0f</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:700; color:#000000;\"><br /></p>\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u672a\u89e3\u9501\u7684\u7ae0\u8282\u53ef\u4ee5\u5c1d\u8bd5\u4f7f\u7528BiliPlus\u89e3\u6790\uff0c\u53ef\u80fd\u4f1a\u7ed9\u60a8\u5e26\u6765\u60ca\u559c</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; marg"
-                        "in-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#aa55ff;\">\u2b50\u7ae0\u8282\u9009\u62e9\u5c0f\u6280\u5de7(#^.^#)</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;"
+                        " -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:700; color:#aa55ff;\">\u2b50\u7ae0\u8282\u9009\u62e9\u5c0f\u6280\u5de7(#^.^#)</span></p>\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:14pt; font-weight:700; color:#aa55ff;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u4e00\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4f\u9f20\u6807\u5de6\u952e\u62d6\u52a8\u53ef\u6279\u91cf\u6846\u9009\u7ae0\u8282\uff0c\u7136\u540e\u9f20\u6807\u53f3\u952e\u786e\u8ba4\u64cd\u4f5c</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u4e8c"
-                        "\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4fAlt\u540e\u9f20\u6807\u5212\u8fc7\u7ae0\u8282\u540d\u5feb\u901f\u9009\u4e2d\uff0cShift+Alt\u5feb\u901f\u53d6\u6d88\u9009\u4e2d</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u4e09\uff1a</span><span style=\" font-size:10pt;\">\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u56de\u8f66\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">	\u6280\u5de7\u56db\uff1a</span><span style=\" font-size:10pt;\">Ctrl+A\u5168\u9009\u540e\u56de\u8f66\u786e\u8ba4</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inde"
-                        "nt:0px; font-size:10pt;\"><br /></p></body></html>", None))
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7\u4e00\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4f\u9f20\u6807\u5de6\u952e\u62d6\u52a8\u53ef\u6279\u91cf\u6846\u9009\u7ae0\u8282\uff0c\u7136\u540e\u9f20\u6807\u53f3\u952e\u786e\u8ba4\u64cd\u4f5c</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7"
+                        "\u4e8c\uff1a</span><span style=\" font-size:10pt;\">\u6441\u4f4fAlt\u540e\u9f20\u6807\u5212\u8fc7\u7ae0\u8282\u540d\u5feb\u901f\u9009\u4e2d\uff0cShift+Alt\u5feb\u901f\u53d6\u6d88\u9009\u4e2d</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7\u4e09\uff1a</span><span style=\" font-size:10pt;\">\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u56de\u8f66\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:700;\">\u6280\u5de7\u56db\uff1a</span><span style=\" font-size:10pt;\">Ctrl+A\u5168\u9009\u540e\u56de\u8f66\u786e\u8ba4 </span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-r"
+                        "ight:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
         self.label_total_progress.setText(QCoreApplication.translate("MainWindow", u"\u603b\u8fdb\u5ea6", None))
         self.label_tasks_count.setText(QCoreApplication.translate("MainWindow", u"\u4efb\u52a1\u6570\uff1a", None))
@@ -943,6 +977,8 @@ class Ui_MainWindow(object):
         self.radioButton_save_method_Zip.setText(QCoreApplication.translate("MainWindow", u"Zip\u538b\u7f29\u5305", None))
         self.radioButton_save_method_Cbz.setText(QCoreApplication.translate("MainWindow", u"Cbz\u538b\u7f29\u5305", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u4fdd\u5b58\u683c\u5f0f\u540e\u9700\u8981\u91cd\u65b0\u89e3\u6790\u6f2b\u753b\u624d\u80fd\u751f\u6548", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u9644\u52a0\u4fe1\u606f\uff1a", None))
+        self.checkBox_exif_info.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u5728\u4fdd\u5b58\u6587\u4ef6\u5c5e\u6027\u4e2d\u8bb0\u5f55\u7ae0\u8282\u6807\u9898\u3001\u4f5c\u8005\u3001\u51fa\u7248\u793e\u7b49\u9644\u52a0\u4fe1\u606f", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))

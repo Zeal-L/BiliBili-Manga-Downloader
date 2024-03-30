@@ -370,7 +370,6 @@ class MangaUI(QObject):
     # 以下三个函数是为了获取漫画信息详情
     ############################################################
 
-    ############################################################
     def updateComicInfoEvent(self, comic: Comic, resolve_type: str, _event: QEvent = None) -> None:
         """更新漫画信息详情界面
 
@@ -609,7 +608,7 @@ class MangaUI(QObject):
 
         """
 
-        if len(info) == 0:
+        if not info:
             self.mainGUI.listWidget_chp_detail.clear()
             return
         title: str = info["title"]
@@ -797,7 +796,9 @@ class MangaUI(QObject):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
                 return
             if not self.mainGUI.getConfig("biliplus_cookie"):
-                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！")
+                QMessageBox.critical(
+                    self.mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！"
+                )
                 return
             self.resolveEnable("resolving")
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
