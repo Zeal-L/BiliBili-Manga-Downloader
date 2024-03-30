@@ -3,7 +3,7 @@
 <!-- ![GitHub top language](https://img.shields.io/github/languages/top/Zeal-L/BiliBili-Manga-Downloader) -->
 
 ![GitHub Python version](https://img.shields.io/badge/python-v3.12-blue)
-![platform](https://img.shields.io/badge/platform-Windows_|_Linux-blue)
+![platform](https://img.shields.io/badge/platform-Windows_|_Macos_|_Linux-blue)
 ![Scc Count Badge](https://sloc.xyz/github/Zeal-L/BiliBili-Manga-Downloader/)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Zeal-L/BiliBili-Manga-Downloader)
 ![GitHub - License](https://img.shields.io/github/license/Zeal-L/BiliBili-Manga-Downloader)
