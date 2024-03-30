@@ -33,7 +33,7 @@ class BiliPlusComic(Comic):
         self.access_key = mainGUI.getConfig("biliplus_cookie")
         self.headers = {
             "User-Agent": f"{__app_name__}/{__version__}",
-            "cookie": f"manga_pic_format=jpg-full;login=2;access_key={self.access_key}",
+            "cookie": f"manga_pic_format=jpg-full;manga_sharing=on;login=2;access_key={self.access_key}",
         }
 
     ############################################################
