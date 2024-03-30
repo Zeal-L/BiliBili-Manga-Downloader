@@ -75,7 +75,7 @@
     - 利用 [biliplus](https://www.biliplus.com/) 提供的 [ComicWebReader](https://www.biliplus.com/manga/) 在线漫画平台的api来尝试获取更多的可下载章节
     - 该网站现有 4w+ 已关联 `Bilibili` 帐号的访客，也就是说很有概率你想看的漫画已经有人购买了，所以可以尝试一下
     - **特别提示: 毕竟是要提供 Cookie 给第三方网站托管，因此可能会有潜在的安全风险。敏感人群请不要使用自己主账号的 Cookie**
-    - `BiliPlus` 的 `Cookie` 获取方法跟上述一致，在 [ComicWebReader](https://www.biliplus.com/manga/) 登入后在开发者工具中找到 `access_key` 粘贴到程序设置选项中的 `BiliPlus Cookie` 即可
+    - `BiliPlus` 的 `Cookie` 获取方法跟上述类似，在 [ComicWebReader](https://www.biliplus.com/manga/) 登入后在开发者工具中找到 `Cookie` 后，将其整个复制并粘贴到程序设置选项中的 `BiliPlus Cookie` 即可
 
 - **兼容性：支持Windows、MacOS与Linux平台，发现问题的欢迎提Issues**
 - **搜索 / 选择章节 / 下载 的功能介绍我想已经不言而喻了，这就是图形化界面的好处！**

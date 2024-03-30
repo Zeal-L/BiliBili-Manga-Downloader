@@ -234,15 +234,14 @@ class SettingUI(QObject):
             bool: (Cookie是否有效)
         """
 
-        #! 此处对Cookie是否有效验证使用了硬编码，如果该漫画或该章节变更，需要修改才能继续正常验证
-        main_url = "https://www.biliplus.com/manga/?act=read&mangaid=26551&epid=316882"
+        main_url = "https://www.biliplus.com/manga/"
         headers = {
-            "cookie": f"login=2;manga_sharing=on;access_key={cookie}",
+            "cookie": f"{cookie};manga_sharing=on;",
         }
         is_cookie_valid = False
 
         @retry(stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _() -> None:
+        def _() -> bool | None:
             try:
                 res = requests.post(main_url, headers=headers, timeout=TIMEOUT_SMALL)
             except requests.RequestException as e:
@@ -253,27 +252,33 @@ class SettingUI(QObject):
                     f"测试BiliPlus Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            if "hoz-container" not in res.text:
-                logger.warning("BiliPlus Cookie检测出现故障，暂时无法检测是否有效...")
-                raise ReferenceError
-            if 'class="comic-single"' not in res.text or 'src="http' not in res.text:
-                logger.warning("BiliPlus Cookie无效!重试中...")
-                raise requests.HTTPError()
-
+            if "书架" in res.text:
+                return True
+            elif "未登录" in res.text:
+                return False
+            else:
+                return False
         try:
-            _()
-            if notice:
-                self.mainGUI.signal_information_box.emit("BiliPlus Cookie有效！")
-            is_cookie_valid = True
+            result = _()
+            if None is result:
+                self.mainGUI.signal_message_box.emit(
+                    "BiliPlus访问异常!\n暂时无法检测是否有效!\n请自行判断BiliPlus可访问状态或联系开发者"
+                )
+            elif False is result:
+                self.mainGUI.signal_message_box.emit(
+                    "BiliPlus Cookie检测无效!\n请核对输入的Cookie是否正确以及完整!"
+                )
+            elif True is result:
+                is_cookie_valid = True
+                if notice:
+                    self.mainGUI.signal_information_box.emit("BiliPlus Cookie有效！")
         except requests.RequestException as e:
-            logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
+            msg = "重复测试biliplus Cookie是否有效多次后失败!"
+            logger.error(msg)
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
-                "重复测试biliplus Cookie是否有效多次后失败!\n请核对输入的biliplus Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
-            )
-        except ReferenceError:
-            self.mainGUI.signal_message_box.emit(
-                "BiliPlus访问异常!\n暂时无法检测是否有效!\n请自行判断BiliPlus可访问状态或联系开发者"
+                f"{msg}\n请检查网络连接或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
             )
         self.mainGUI.lineEdit_biliplus_cookie.setEnabled(True)
         self.mainGUI.pushButton_biliplus_cookie.setEnabled(True)
