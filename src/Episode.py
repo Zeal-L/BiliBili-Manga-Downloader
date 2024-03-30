@@ -42,22 +42,24 @@ class Episode:
     """漫画章节类，用于管理漫画章节的详细信息"""
 
     def __init__(
-        self,
-        episode: dict,
-        comic_id: str,
-        comic_info: dict,
-        mainGUI: MainGUI,
+        self, episode: dict, comic_id: str, comic_info: dict, mainGUI: MainGUI, idx: int
     ) -> None:
         self.mainGUI = mainGUI
         self.id = episode["id"]
         self.available = not episode["is_locked"]
         self.ord = episode["ord"]
+        self.real_ord = idx
         self.comic_name = comic_info["title"]
         self.size = episode["size"]
         self.imgs_token = None
         self.author = comic_info["author_name"]
         self.save_method = mainGUI.getConfig("save_method")
         self.exif_setting = mainGUI.getConfig("exif")
+
+        # if self.ord != self.real_ord:
+        #     logger.warning(
+        #         f"章节序号错误！{self.comic_name} - {episode["title"]}; ord: {self.ord} ≠ real_ord: {self.real_ord}, 请责怪B站"
+        #     )
 
         if self.save_method == "Cbz压缩包":
             self.comicinfoxml = ComicInfoXML(comic_info, episode)
@@ -560,7 +562,7 @@ class Episode:
         # ?###########################################################
         # ? 保存图片
         img_format = img_url.split(".")[-1].split("?")[0].lower()
-        path_to_save = os.path.join(self.save_path, f"{self.ord}_{index}.{img_format}")
+        path_to_save = os.path.join(self.save_path, f"{self.real_ord}_{index}.{img_format}")
 
         @retry(stop_max_attempt_number=5)
         def _() -> None:

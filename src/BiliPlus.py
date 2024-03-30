@@ -51,13 +51,9 @@ class BiliPlusComic(Comic):
         # ?###########################################################
         # ? 解析 Biliplus 章节
         biliplus_ep_list = self.data["ep_list"]
-        for episode in reversed(biliplus_ep_list):
+        for idx, episode in enumerate(reversed(biliplus_ep_list), start=1):
             epi = BiliPlusEpisode(
-                episode,
-                self.headers,
-                self.comic_id,
-                self.data,
-                self.mainGUI,
+                episode, self.headers, self.comic_id, self.data, self.mainGUI, idx
             )
             self.episodes.append(epi)
             if epi.isDownloaded():
@@ -154,8 +150,9 @@ class BiliPlusEpisode(Episode):
         comic_id: str,
         comic_info: dict,
         mainGUI: MainGUI,
+        idx: int,
     ) -> None:
-        super().__init__(episode, comic_id, comic_info, mainGUI)
+        super().__init__(episode, comic_id, comic_info, mainGUI, idx)
         self.headers = headers
         self.comic_id = comic_id
 

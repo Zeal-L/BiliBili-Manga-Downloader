@@ -154,8 +154,8 @@ class Comic:
         # ?###########################################################
         # ? 解析章节
         ep_list = self.data["ep_list"]
-        for episode in reversed(ep_list):
-            epi = Episode(episode, self.comic_id, self.data, self.mainGUI)
+        for idx, episode in enumerate(reversed(ep_list), start=1):
+            epi = Episode(episode, self.comic_id, self.data, self.mainGUI, idx)
             self.episodes.append(epi)
             if epi.isDownloaded():
                 self.num_downloaded += 1
