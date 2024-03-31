@@ -123,7 +123,7 @@ class MangaUI(QObject):
             self.present_comic_id = comic_id
             self.resolveEnable("resolving")
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "bilibili")
+            self.updateComicInfoEvent(comic, "done")
 
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)
         self.mainGUI.pushButton_manga_search_id.clicked.connect(_)
@@ -138,7 +138,7 @@ class MangaUI(QObject):
             self.present_comic_id = self.search_info[index]["id"]
             self.resolveEnable("resolving")
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "bilibili")
+            self.updateComicInfoEvent(comic, "done")
 
         self.mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
 
@@ -375,7 +375,7 @@ class MangaUI(QObject):
 
         Args:
             comic (Comic): 漫画类实例
-            resolve_type (str): 更新的解析类型
+            resolve_type (str): 更新的进度类型
         """
 
         if self.mainGUI.label_resolve_status.text() == "":
@@ -392,7 +392,7 @@ class MangaUI(QObject):
 
         Args:
             comic (Comic): 获取的漫画实例
-            resolve_type (str): 更新的解析类型
+            resolve_type (str): 更新的进度类型
 
         """
 
@@ -785,7 +785,7 @@ class MangaUI(QObject):
                 return
             self.resolveEnable("resolving")
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "bilibili")
+            self.updateComicInfoEvent(comic, "done")
 
         self.mainGUI.pushButton_resolve_detail.clicked.connect(_)
 
@@ -802,7 +802,7 @@ class MangaUI(QObject):
                 return
             self.resolveEnable("resolving")
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "biliplus")
+            self.updateComicInfoEvent(comic, "done")
 
         self.mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
 
@@ -869,7 +869,6 @@ class MangaUI(QObject):
             self.mainGUI.tabWidget_download_list.setCurrentIndex(0)
 
         self.mainGUI.pushButton_chp_detail_download_selected.clicked.connect(_)
-        self.mainGUI.pushButton_biliplus_detail_download_selected.clicked.connect(_)
 
     ###########################################################
 
@@ -883,17 +882,12 @@ class MangaUI(QObject):
             self.mainGUI.pushButton_resolve_detail.setEnabled(False)
             self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(False)
             self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
-            self.mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
         else:
             self.mainGUI.pushButton_resolve_detail.setEnabled(True)
             self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
 
-        if resolve_type == "bilibili":
+        if resolve_type == "done":
             self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
-            self.mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(False)
-        elif resolve_type == "biliplus":
-            self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
-            self.mainGUI.pushButton_biliplus_detail_download_selected.setEnabled(True)
 
     ############################################################
 

@@ -141,20 +141,17 @@ class BiliPlusComic(Comic):
                     ep.available = True
 
             if len(ep_available) == 0:
-                self.mainGUI.signal_message_box.emit(
-                    "BiliPlus无此漫画的缓存记录\n"
-                    "请在BiliPlus的该漫画详情页面使用功能“获取未缓存索引”后重试\n\n"
-                    "Ciallo～(∠・ω< )⌒★\n"
-                    "您的主动分享能温暖每一个漫画人\n"
-                    "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
-                )
+                msg = "BiliPlus无此漫画的缓存记录\n\n" \
+                      "请在BiliPlus的该漫画详情页面使用功能“获取未缓存索引”后重试\n\n"
+            elif unlock_times != 0:
+                msg = f"BiliPlus为本漫画额外解锁{unlock_times}个章节\n\n"
             else:
-                self.mainGUI.signal_information_box.emit(
-                    f"BiliPlus为本漫画额外解锁{unlock_times}个章节\n\n"
-                    "Ciallo～(∠・ω< )⌒★\n"
-                    "你的主动分享能温暖每一个漫画人\n"
-                    "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
-                )
+                msg = "BiliPlus未能为此漫画解锁更多章节\n\n"
+            self.mainGUI.signal_information_box.emit(
+                f"{msg}Ciallo～(∠・ω< )⌒★\n"
+                "您的主动分享能温暖每一个漫画人\n"
+                "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
+            )
         except requests.RequestException as e:
             msg = f"漫画id:{self.comic_id} 处理BiliPlus解锁章节数据多次后失败!"
             logger.error(msg)

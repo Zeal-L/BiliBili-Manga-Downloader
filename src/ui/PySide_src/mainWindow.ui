@@ -462,36 +462,6 @@
                   </property>
                  </widget>
                 </item>
-                <item>
-                 <widget class="QLabel" name="label_biliplus_empty">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="Line" name="line_11">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="pushButton_biliplus_detail_download_selected">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>130</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>下载BiliPlus选中章节</string>
-                  </property>
-                 </widget>
-                </item>
                </layout>
               </item>
              </layout>
