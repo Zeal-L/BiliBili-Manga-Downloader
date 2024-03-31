@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import time
 import requests
 from bs4 import BeautifulSoup
 from retrying import retry
@@ -72,7 +73,7 @@ class BiliPlusComic(Comic):
         biliplus_html = ""
 
         @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _(url: str) -> str | None:
+        def _(url: str) -> str:
             try:
                 res = requests.post(
                     url,
@@ -83,20 +84,13 @@ class BiliPlusComic(Comic):
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if "未登录" in res.text:
-                self.mainGUI.signal_message_box.emit(
-                    "您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie"
-                )
-                return None
+                raise ReferenceError
             if 'src="http' not in res.text:
-                self.mainGUI.signal_message_box.emit(
-                    "BiliPlus无此漫画的缓存记录\n"
-                    "请在BiliPlus的该漫画详情页面使用功能“获取未缓存索引”后重试"
-                )
-                return None
+                return ""
             if res.status_code != 200:
                 logger.warning(
                     f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! "
-                    "状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
             return res.text
@@ -105,6 +99,10 @@ class BiliPlusComic(Comic):
             biliplus_html = _(biliplus_detail_url)
             if None is biliplus_html:
                 return None
+        except ReferenceError:
+            self.mainGUI.signal_message_box.emit(
+                "您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie!"
+            )
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)
@@ -133,6 +131,14 @@ class BiliPlusComic(Comic):
                     for ep in ep_items:
                         if ep.img["src"] != "about:blank":
                             ep_available.append(ep.a["href"].split("epid=")[1])
+            if len(ep_available) == 0:
+                self.mainGUI.signal_message_box.emit(
+                    "BiliPlus无此漫画的缓存记录\n"
+                    "请在BiliPlus的该漫画详情页面使用功能“获取未缓存索引”后重试\n\n"
+                    "Ciallo～(∠・ω< )⌒★\n"
+                    "你的主动分享能温暖每一个漫画人\n"
+                    "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
+                )
             for ep in episodes:
                 if str(ep.id) in ep_available:
                     ep.available = True
@@ -180,6 +186,7 @@ class BiliPlusEpisode(Episode):
         biliplus_img_url = (
             f"https://www.biliplus.com/manga/?act=read&mangaid={self.comic_id}&epid={self.id}"
         )
+        biliplus_img_url += f"&t={time.time()}"
         biliplus_html = ""
 
         @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
@@ -221,7 +228,7 @@ class BiliPlusEpisode(Episode):
         # ? 解析BiliPlus解锁章节图片地址
         try:
             biliplus_imgs_token = []
-            if "获取凭证出错" in biliplus_html:
+            if "获取凭证出错" in biliplus_html and 'src="http' not in biliplus_html:
                 msg = f"《{self.comic_name}》章节：{self.title} " \
                        "在BiliPlus上的章节共享者已退出登陆，下载失败！"
                 logger.error(msg)
