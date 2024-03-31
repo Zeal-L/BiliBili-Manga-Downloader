@@ -10,7 +10,7 @@ import os
 import re
 import shutil
 from typing import TYPE_CHECKING
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
 
 import piexif
 import requests
@@ -197,13 +197,13 @@ class Episode:
     ############################################################
 
     def clearAfterSave(self, imgs_path: list[str]) -> None:
-        """删除临时图片, 偶尔会出现删除失败的情况，故给与重试5次
+        """删除临时图片, 偶尔会出现删除失败的情况，故给与重试3次
 
         Args:
             imgs_path (list): 临时图片路径列表
         """
 
-        @retry(stop_max_attempt_number=5)
+        @retry(stop_max_attempt_number=3)
         def _() -> None:
             for img in reversed(imgs_path):
                 try:
@@ -297,6 +297,7 @@ class Episode:
                 # 关闭所有图像, 释放内存
                 for img in temp_imgs:
                     img.close()
+                self.clearAfterSave(imgs_path)
 
                 # 在pdf文件属性中记录章节标题作者和软件版本以及版权信息
                 if not self.exif_setting:
@@ -370,7 +371,7 @@ class Episode:
                             logger.exception(e)
 
                     # 复制图片到文件夹
-                    shutil.copy2(
+                    shutil.move(
                         img_path,
                         os.path.join(self.epi_path, f"{str(index).zfill(3)}.{img_format}"),
                     )
@@ -445,7 +446,7 @@ class Episode:
         @retry(stop_max_attempt_number=5)
         def _() -> None:
             try:
-                with ZipFile(f"{self.epi_path}.zip", "w") as z:
+                with ZipFile(f"{self.epi_path}.zip", "w", compression=ZIP_DEFLATED) as z:
                     # 压缩文件里不要子目录，全部存在根目录
                     for root, _dirs, files in os.walk(self.epi_path):
                         for file in files:
@@ -484,7 +485,7 @@ class Episode:
         @retry(stop_max_attempt_number=5)
         def _() -> None:
             try:
-                with ZipFile(f"{self.epi_path}.cbz", "w") as z:
+                with ZipFile(f"{self.epi_path}.cbz", "w", compression=ZIP_DEFLATED) as z:
                     # 压缩文件里不要子目录，全部存在根目录
                     for root, _dirs, files in os.walk(self.epi_path):
                         for file in files:

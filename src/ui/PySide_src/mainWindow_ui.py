@@ -333,25 +333,6 @@ class Ui_MainWindow(object):
 
         self.h_Layout_biliplus_detail.addWidget(self.label_resolve_status)
 
-        self.label_biliplus_empty = QLabel(self.widget_biliplus_detail)
-        self.label_biliplus_empty.setObjectName(u"label_biliplus_empty")
-
-        self.h_Layout_biliplus_detail.addWidget(self.label_biliplus_empty)
-
-        self.line_11 = QFrame(self.widget_biliplus_detail)
-        self.line_11.setObjectName(u"line_11")
-        self.line_11.setFrameShape(QFrame.VLine)
-        self.line_11.setFrameShadow(QFrame.Sunken)
-
-        self.h_Layout_biliplus_detail.addWidget(self.line_11)
-
-        self.pushButton_biliplus_detail_download_selected = QPushButton(self.widget_biliplus_detail)
-        self.pushButton_biliplus_detail_download_selected.setObjectName(u"pushButton_biliplus_detail_download_selected")
-        self.pushButton_biliplus_detail_download_selected.setEnabled(False)
-        self.pushButton_biliplus_detail_download_selected.setMaximumSize(QSize(130, 25))
-
-        self.h_Layout_biliplus_detail.addWidget(self.pushButton_biliplus_detail_download_selected)
-
 
         self.h_Layout_widget_biliplus_detail.addLayout(self.h_Layout_biliplus_detail)
 
@@ -922,8 +903,6 @@ class Ui_MainWindow(object):
         self.pushButton_resolve_detail.setText(QCoreApplication.translate("MainWindow", u"B\u7ad9\u89e3\u6790", None))
         self.pushButton_biliplus_resolve_detail.setText(QCoreApplication.translate("MainWindow", u"BiliPlus\u89e3\u6790", None))
         self.label_resolve_status.setText("")
-        self.label_biliplus_empty.setText("")
-        self.pushButton_biliplus_detail_download_selected.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7dBiliPlus\u9009\u4e2d\u7ae0\u8282", None))
         self.textBrowser_tutorial.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

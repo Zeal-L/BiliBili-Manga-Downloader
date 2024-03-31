@@ -167,7 +167,6 @@ class DownloadManager:
             save_path = None
             if rate == 1:
                 save_path = epi.save(imgs_path)
-                epi.clearAfterSave(imgs_path)
 
             self.updateTaskInfo(curr_id, rate)
             self.signal_rate_progress.emit(
