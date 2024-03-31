@@ -84,7 +84,7 @@ class BiliPlusComic(Comic):
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus获取漫画信息失败! 重试中...\n{e}")
                 raise e
             if "未登录" in res.text:
-                raise ReferenceError
+                return "cookie invalid"
             if 'src="http' not in res.text:
                 return ""
             if res.status_code != 200:
@@ -97,12 +97,13 @@ class BiliPlusComic(Comic):
 
         try:
             biliplus_html = _(biliplus_detail_url)
-            if None is biliplus_html:
+            if "" == biliplus_html:
                 return None
-        except ReferenceError:
-            self.mainGUI.signal_message_box.emit(
-                "您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie!"
-            )
+            if "cookie invalid" == biliplus_html:
+                self.mainGUI.signal_message_box.emit(
+                    "您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie!"
+                )
+                return None
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 在BiliPlus重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)
@@ -131,17 +132,29 @@ class BiliPlusComic(Comic):
                     for ep in ep_items:
                         if ep.img["src"] != "about:blank":
                             ep_available.append(ep.a["href"].split("epid=")[1])
+
+            unlock_times = 0
+            for ep in episodes:
+                if str(ep.id) in ep_available:
+                    if ep.available is False:
+                        unlock_times += 1
+                    ep.available = True
+
             if len(ep_available) == 0:
                 self.mainGUI.signal_message_box.emit(
                     "BiliPlus无此漫画的缓存记录\n"
                     "请在BiliPlus的该漫画详情页面使用功能“获取未缓存索引”后重试\n\n"
                     "Ciallo～(∠・ω< )⌒★\n"
+                    "您的主动分享能温暖每一个漫画人\n"
+                    "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
+                )
+            else:
+                self.mainGUI.signal_information_box.emit(
+                    f"BiliPlus为本漫画额外解锁{unlock_times}个章节\n\n"
+                    "Ciallo～(∠・ω< )⌒★\n"
                     "你的主动分享能温暖每一个漫画人\n"
                     "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
                 )
-            for ep in episodes:
-                if str(ep.id) in ep_available:
-                    ep.available = True
         except requests.RequestException as e:
             msg = f"漫画id:{self.comic_id} 处理BiliPlus解锁章节数据多次后失败!"
             logger.error(msg)

@@ -132,7 +132,7 @@ class SettingUI(QObject):
             self.mainGUI.lineEdit_my_cookie.setText(stored_cookie)
 
         def _() -> None:
-            new_cookie = self.mainGUI.lineEdit_my_cookie.text()
+            new_cookie = self.mainGUI.lineEdit_my_cookie.text().strip()
             if new_cookie == "":
                 QMessageBox.information(self.mainGUI, "提示", "请输入Cookie！")
                 return
