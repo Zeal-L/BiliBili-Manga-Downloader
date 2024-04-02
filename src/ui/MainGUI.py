@@ -36,7 +36,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.app = app
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
-        self.setFont(QFont("Microsoft YaHei", 10))
+        self.setFont(QFont("PingFang SC", 12))
         self.signal_message_box.connect(lambda msg: QMessageBox.warning(self, "警告", msg))
         self.signal_information_box.connect(lambda msg: QMessageBox.information(self, "通知", msg))
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
