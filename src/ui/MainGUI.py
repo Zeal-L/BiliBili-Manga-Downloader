@@ -16,7 +16,8 @@ from qt_material import QtStyleTools
 
 from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
-if platform.system() == 'Darwin':
+
+if platform == "darwin":
     from src.ui.PySide_src.mainWindow_mac_ui import Ui_MainWindow
 else:
     from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
@@ -40,7 +41,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.app = app
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
-        if platform.system() == 'Darwin':
+        if platform == "darwin":
             self.setFont(QFont("PingFang SC", 12))
         else:
             self.setFont(QFont("Microsoft YaHei", 10))

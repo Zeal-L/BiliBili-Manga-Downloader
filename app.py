@@ -16,7 +16,7 @@ if __name__ == "__main__":
     app = QApplication.instance() or QApplication(argv)
 
     if platform == "win32" and ctypes.windll.user32.FindWindowW(None, __main_window_title__) != 0:
-        box = QMessageBox.information(
+        _box = QMessageBox.information(
             None, "提示", "有一个我已经不满足不了你吗？\n\t...(｡•ˇ‸ˇ•｡) ..."
         )
         exit(0)
