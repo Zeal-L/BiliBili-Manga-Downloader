@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from functools import partial
+from sys import platform
 from typing import Any, Optional
 
 from PySide6.QtCore import QEvent, QObject, Qt, Signal
@@ -15,7 +16,10 @@ from qt_material import QtStyleTools
 
 from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
-from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
+if platform.system() == 'Darwin':
+    from src.ui.PySide_src.mainWindow_mac_ui import Ui_MainWindow
+else:
+    from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
 from src.Utils import __version__, data_path, logger
 
@@ -36,7 +40,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.app = app
         self.setupUi(self)
         self.setWindowTitle(f"哔哩哔哩漫画下载器 v{__version__}")
-        self.setFont(QFont("PingFang SC", 12))
+        if platform.system() == 'Darwin':
+            self.setFont(QFont("PingFang SC", 12))
+        else:
+            self.setFont(QFont("Microsoft YaHei", 10))
         self.signal_message_box.connect(lambda msg: QMessageBox.warning(self, "警告", msg))
         self.signal_information_box.connect(lambda msg: QMessageBox.information(self, "通知", msg))
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
