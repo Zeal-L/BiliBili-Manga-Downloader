@@ -85,8 +85,6 @@ class BiliPlusComic(Comic):
                 raise e
             if "未登录" in res.text:
                 return "cookie invalid"
-            if 'src="http' not in res.text:
-                return ""
             if res.status_code != 200:
                 logger.warning(
                     f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! "
