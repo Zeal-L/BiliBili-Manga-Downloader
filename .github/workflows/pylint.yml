@@ -23,5 +23,11 @@ jobs:
     - name: Analysing the code with ruff
       id: ruff
       run: |
-        poetry run ruff format -q  $(git ls-files '*.py' | grep -v "PySide_src")
+        tmp_dir=$(mktemp -d) &&
+        git ls-files '*.py' | grep -v "PySide_src" | xargs -I {} cp --parents {} $tmp_dir &&
+        poetry run ruff format $(find $tmp_dir -name '*.py') &&
+        git ls-files '*.py' | grep -v "PySide_src" | while read -r file; do
+          diff -u "$file" "$tmp_dir/$file"
+        done &&
+        rm -rf $tmp_dir
       continue-on-error: true
