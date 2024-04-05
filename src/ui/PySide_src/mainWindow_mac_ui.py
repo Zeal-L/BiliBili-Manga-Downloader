@@ -145,7 +145,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 483, 193))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -448,7 +448,7 @@ class Ui_MainWindow(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1032, 525))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 98, 28))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -928,7 +928,7 @@ class Ui_MainWindow(object):
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Helvetica';\">\u6280\u5de7\u4e00\uff1a\u6309\u4f4f\u9f20\u6807\u5de6\u952e\u62d6\u52a8\u53ef\u6279\u91cf\u6846\u9009\u7ae0\u8282\uff0c\u7136\u540e\u70b9\u51fb\u9f20\u6807\u53f3\u952e\u786e\u8ba4\u64cd\u4f5c</span></p>\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Helvetica';\">\u6280\u5de7\u4e8c\uff1a\u6309\u4f4f\u2325 (Option)\u540e\u9f20"
                         "\u6807\u5212\u8fc7\u7ae0\u8282\u540d\u5feb\u901f\u9009\u4e2d\uff0cShift+\u2325\u5feb\u901f\u53d6\u6d88\u9009\u4e2d</span></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Helvetica';\">\u6280\u5de7\u4e09\uff1a\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u56de\u8f66\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Helvetica';\">\u6280\u5de7\u4e09\uff1a\u4f7f\u7528\u65b9\u5411\u952e\u914d\u5408\u2318 (Cmd)+O\u5355\u9009\u7ae0\u8282\uff0c\u4e5f\u53ef\u4ee5\u518d\u914d\u5408Shift\u591a\u9009</span></p>\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Helvetica';\">\u6280\u5de7\u56db\uff1a\u2318 (Cmd)+A\u5168\u9009\u540e\u56de\u8f66\u786e\u8ba4 </span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica';\"><br /></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_my_manga), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u6f2b\u753b", None))
