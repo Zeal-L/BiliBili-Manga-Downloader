@@ -114,7 +114,7 @@ class BiliPlusComic(Comic):
             ep_items = document.find_all("div", {"class": "episode-item"})
             ep_available = []
             for ep in ep_items:
-                if ep.img["src"] != "about:blank":
+                if "https://" in ep.img["src"]:
                     ep_available.append(ep.a["href"].split("epid=")[1])
             total_ep_element = document.select_one("center p")
             if total_ep_element:
@@ -128,7 +128,7 @@ class BiliPlusComic(Comic):
                     document = BeautifulSoup(page_html, "html.parser")
                     ep_items = document.find_all("div", {"class": "episode-item"})
                     for ep in ep_items:
-                        if ep.img["src"] != "about:blank":
+                        if "https://" in ep.img["src"]:
                             ep_available.append(ep.a["href"].split("epid=")[1])
 
             unlock_times = 0
@@ -236,7 +236,7 @@ class BiliPlusEpisode(Episode):
         # ? 解析BiliPlus解锁章节图片地址
         try:
             biliplus_imgs_token = []
-            if "获取凭证出错" in biliplus_html and 'src="http' not in biliplus_html:
+            if "获取凭据出错" in biliplus_html and 'src="http' not in biliplus_html:
                 msg = f"《{self.comic_name}》章节：{self.title} " \
                        "在BiliPlus上的章节共享者已退出登陆，下载失败！"
                 logger.error(msg)
@@ -253,7 +253,9 @@ class BiliPlusEpisode(Episode):
                 msg = f"《{self.comic_name}》章节：{self.title} " \
                        "在处理BiliPlus章节图片地址时因获取的Token无效导致失败!\n\n"
                 logger.error(msg)
-                self.mainGUI.signal_message_box.emit(f"{msg}此问题不是下载器引发的")
+                self.mainGUI.signal_message_box.emit(
+                    f"{msg}此问题不是下载器引发的, 请在BiliPlus本章节页面上查看失败原因!"
+                )
                 return False
         except Exception as e:
             msg = f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时意外失败!"
