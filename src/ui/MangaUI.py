@@ -121,7 +121,7 @@ class MangaUI(QObject):
                 QMessageBox.critical(self.mainGUI, "警告", "请输入五位漫画ID！")
                 return
             self.present_comic_id = comic_id
-            self.resolveEnable("resolving")
+            self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic, "done")
 
@@ -136,7 +136,7 @@ class MangaUI(QObject):
         def _(item: QListWidgetItem) -> None:
             index = self.mainGUI.listWidget_manga_search.indexFromItem(item).row()
             self.present_comic_id = self.search_info[index]["id"]
-            self.resolveEnable("resolving")
+            self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic, "done")
 
@@ -370,12 +370,11 @@ class MangaUI(QObject):
     # 以下三个函数是为了获取漫画信息详情
     ############################################################
 
-    def updateComicInfoEvent(self, comic: Comic, resolve_type: str, _event: QEvent = None) -> None:
+    def updateComicInfoEvent(self, comic: Comic, _event: QEvent = None) -> None:
         """更新漫画信息详情界面
 
         Args:
             comic (Comic): 漫画类实例
-            resolve_type (str): 更新的进度类型
         """
 
         if self.mainGUI.label_resolve_status.text() == "":
@@ -383,16 +382,14 @@ class MangaUI(QObject):
             self.executor.submit(
                 self.getComicInfo,
                 comic,
-                resolve_type,
             )
 
     ############################################################
-    def getComicInfo(self, comic: Comic, resolve_type: str) -> None:
+    def getComicInfo(self, comic: Comic) -> None:
         """更新封面的执行函数
 
         Args:
             comic (Comic): 获取的漫画实例
-            resolve_type (str): 更新的进度类型
 
         """
 
@@ -403,7 +400,6 @@ class MangaUI(QObject):
                 "mainGUI": self.mainGUI,
                 "comic": comic,
                 "data": data,
-                "resolve_type": resolve_type,
             }
         )
 
@@ -417,7 +413,6 @@ class MangaUI(QObject):
 
         comic: Comic = info["comic"]
         data: dict = info["data"]
-        resolve_type: str = info["resolve_type"]
 
         self.present_comic_id = comic.comic_id
         # ? 获取漫画信息失败直接跳过
@@ -425,6 +420,8 @@ class MangaUI(QObject):
             self.mainGUI.signal_message_box.emit(
                 "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
+            self.resolveEnable(True)
+            self.mainGUI.signal_resolve_status.emit("")
             return
         self.mainGUI.label_manga_title.setText(
             "<span style='color:blue;font-weight:bold'>标题：</span>" + data["title"]
@@ -460,7 +457,7 @@ class MangaUI(QObject):
 
         # ?###########################################################
         # ? 用多线程更新漫画章节详情界面显示，避免卡顿
-        self.executor.submit(self.getEpisodeList, comic, resolve_type)
+        self.executor.submit(self.getEpisodeList, comic)
 
     ############################################################
     # 以下两个函数是为了获取漫画封面
@@ -513,12 +510,11 @@ class MangaUI(QObject):
         _()
 
     ############################################################
-    def getEpisodeList(self, comic: Comic, resolve_type: str) -> None:
+    def getEpisodeList(self, comic: Comic) -> None:
         """更新漫画详情的执行函数
 
         Args:
             comic (Comic): 获取的漫画实例
-            resolve_type (str): 解析漫画方式
 
         """
 
@@ -566,7 +562,6 @@ class MangaUI(QObject):
         self.signal_episode_info_update_widget.emit(
             {
                 "comic": comic,
-                "resolve_type": resolve_type,
                 "num_unlocked": num_unlocked,
             }
         )
@@ -581,7 +576,6 @@ class MangaUI(QObject):
         """
 
         comic: Comic = info["comic"]
-        resolve_type: str = info["resolve_type"]
         num_unlocked: int = info["num_unlocked"]
 
         # ?###########################################################
@@ -596,7 +590,7 @@ class MangaUI(QObject):
         self.mainGUI.label_chp_detail_num_unlocked.setText(f"已解锁：{num_unlocked}")
         self.mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{comic.getNumDownloaded()}")
         self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
-        self.resolveEnable(resolve_type)
+        self.resolveEnable(True)
         self.mainGUI.signal_resolve_status.emit("")
 
     ############################################################
@@ -783,7 +777,7 @@ class MangaUI(QObject):
             if not self.mainGUI.getConfig("cookie"):
                 QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
                 return
-            self.resolveEnable("resolving")
+            self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic, "done")
 
@@ -800,7 +794,7 @@ class MangaUI(QObject):
                     self.mainGUI, "警告", "请先在设置界面填写自己的BiliPlus Cookie！"
                 )
                 return
-            self.resolveEnable("resolving")
+            self.resolveEnable(False)
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic, "done")
 
@@ -872,22 +866,20 @@ class MangaUI(QObject):
 
     ###########################################################
 
-    def resolveEnable(self, resolve_type: str) -> None:
+    def resolveEnable(self, enable: bool) -> None:
         """根据解析状态对按钮进行允许和禁用状态的改变
 
         Args:
-            resolve_type (str): 解析状态
+            enable (str): 是否允许解析
         """
-        if resolve_type == "resolving":
+        if enable:
+            self.mainGUI.pushButton_resolve_detail.setEnabled(True)
+            self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
+            self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
+        else:
             self.mainGUI.pushButton_resolve_detail.setEnabled(False)
             self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(False)
             self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
-        else:
-            self.mainGUI.pushButton_resolve_detail.setEnabled(True)
-            self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
-
-        if resolve_type == "done":
-            self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
 
     ############################################################
 
