@@ -77,6 +77,9 @@ class Comic:
 
         try:
             self.data = _()
+            if self.data is None:
+                logger.error(f"漫画id:{self.comic_id} 无效，该漫画不存在!")
+                return {}
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 重复获取漫画信息多次后失败!\n{e}")
             logger.exception(e)
