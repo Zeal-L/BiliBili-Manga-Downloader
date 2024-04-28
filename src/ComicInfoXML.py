@@ -31,7 +31,7 @@ class ComicInfoXML:
         """
         self.metadata["Series"] = series_info.get("title", "")
         self.metadata["Publisher"] = "bilibili漫画"
-        self.metadata["Writer"] = series_info.get("author_name", "").replace("，", ",")
+        self.metadata["Writer"] = series_info.get("author_name", "")
         self.metadata["Genre"] = series_info.get("styles", "")
         self.metadata["Summary"] = series_info.get("evaluate", "")
         self.metadata["Count"] = series_info.get("last_ord", "")

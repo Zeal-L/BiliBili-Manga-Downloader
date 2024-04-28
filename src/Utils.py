@@ -114,6 +114,34 @@ def myStrFilter(s: str) -> str:
     return s
 
 
+def sizeToBytes(size_str: str) -> int:
+    """把文件大小字符串转化为字节数
+
+    Args:
+        size_str (str): 文件大小字符串
+
+    Returns:
+        int: 字节数
+    """    
+    
+    multipliers = {
+        'KB': 1024,
+        'MB': 1024**2,
+        'GB': 1024**3,
+        'TB': 1024**4,
+        'PB': 1024**5,
+        'EB': 1024**6,
+    }
+    size_str = size_str.upper()
+    number = float(size_str[:-2])
+    unit = size_str[-2:]
+    if unit in multipliers:
+        return int(number * multipliers[unit])
+    else:
+        logger.error("文件大小转化错误! 不支持的文件大小格式: {size_str}")
+    return 0
+    
+
 ############################################################
 
 

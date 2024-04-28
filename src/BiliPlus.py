@@ -20,6 +20,8 @@ from src.Utils import (
     __app_name__,
     __version__,
     logger,
+    myStrFilter,
+    sizeToBytes,
 )
 
 if TYPE_CHECKING:
@@ -32,10 +34,121 @@ class BiliPlusComic(Comic):
     def __init__(self, comic_id: int, mainGUI: MainGUI) -> None:
         super().__init__(comic_id, mainGUI)
         self.cookie = mainGUI.getConfig("biliplus_cookie")
+        self.biliplus_detail_url = 'https://www.biliplus.com/manga/?act=detail&mangaid='
         self.headers = {
             "User-Agent": f"{__app_name__}/{__version__}",
             "cookie": f"{self.cookie};manga_sharing=on;manga_pic_format=jpg-full;",
         }
+
+    ############################################################
+    def getComicInfo(self) -> dict:
+        """使用BiliPlus 页面爬取得到的漫画数据
+
+        Returns:
+            dict: 漫画信息
+        """
+        
+        data = super().getComicInfo()
+        if data:
+             return data
+
+        biliplus_detail_url = (
+            f"https://www.biliplus.com/manga/?act=detail&mangaid={self.comic_id}"
+        )
+        biliplus_html = ""
+        def _() -> dict:
+            try:
+                res = requests.post(
+                    biliplus_detail_url,
+                    headers=self.headers,
+                    timeout=TIMEOUT_SMALL - 3,
+                )
+            except requests.RequestException as e:
+                logger.warning(f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! \n{e}")
+                raise e
+            if res.status_code != 200:
+                logger.warning(
+                    f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason}"
+                )
+                raise requests.HTTPError()
+            return res.text
+
+        try:
+            biliplus_html = _()
+            if "漫画不存在" in biliplus_html:
+                logger.error(f"漫画id:{self.comic_id} 无效, 该漫画在BiliPlus不存在!")
+                return {}
+            if "contents" not in biliplus_html:
+                logger.error(f"漫画id:{self.comic_id} 获取异常, 请手动登入该漫画网页查看详情!")
+                return {}
+        except requests.RequestException as e:
+            logger.error(f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败!\n{e}")
+            logger.exception(e)
+            return {}
+
+        # ?###########################################################
+        # ? 解析漫画信息
+        try:
+            soup = BeautifulSoup(biliplus_html, "html.parser")
+            comic_title = soup.h3.text
+            author_name = soup.h5.text.split()
+            evaluate = soup.body.div.p.text
+            styles = soup.body.div.div.text.split()
+            horizontal_cover = soup.body.div.find_all("div")[1].div.find_all("a")[0]["href"]
+            vertical_cover = soup.body.div.find_all("div")[1].div.find_all("a")[1]["href"]
+            square_cover = soup.body.div.find_all("div")[1].div.find_all("a")[2]["href"]
+            renewal_time = soup.body.div.find_all("p")[2].text
+            episode_div_list = soup.body.div.find_all("div", {"class": "contents-full"})
+            ep_list = []
+            for idx, episode_div in enumerate(episode_div_list):
+                ord = idx
+                id = episode_div.find("div", {"class": "epid"}).text.split()[-1]
+                temp = episode_div.find("div").find_all("div")[-1].text.split(" / ")
+                if 2 == len(temp):
+                    size, image_count = sizeToBytes(temp[0]), temp[1]
+                else:
+                    size, image_count = 0, temp[0]
+                image_count = int(image_count.replace("页", ""))
+                short_title, title = episode_div.find("a").text.split(". ")
+                ep_list.append({
+                    "id": id,
+                    "ord": ord,
+                    "size": size,
+                    "short_title": short_title,
+                    "title": title,
+                    "is_locked": True,
+                    "image_count": image_count,
+                })
+        except Exception as e:
+            msg = f"漫画id:{self.comic_id} 处理BiliPlus解析漫画信息时意外失败!"
+            logger.error(msg)
+            logger.exception(e)
+            self.mainGUI.signal_message_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
+        
+        self.data = {}
+        self.data["id"] = self.comic_id
+        self.data["title"] = myStrFilter(comic_title)
+        self.data["author_name"] = ",".join(author_name)
+        self.data["author_name"] = (
+            self.data["author_name"].replace("作者:", "").replace("出品:", "")
+        )
+        self.data["author_name"] = myStrFilter(self.data["author_name"])
+        self.data["evaluate"] = evaluate
+        self.data["styles"] = ",".join(styles)
+        self.data["horizontal_cover"] = horizontal_cover
+        self.data["square_cover"] = square_cover
+        self.data["vertical_cover"] = vertical_cover
+        self.data["renewal_time"] = renewal_time
+        self.data["hall_icon_text"] = ""
+        self.data["tags"] = []
+        self.data["is_finish"] = True if renewal_time == "已完结" else False
+        self.data["ep_list"] = ep_list
+        if self.comic_id in self.mainGUI.my_library:
+            self.data["save_path"] = self.mainGUI.my_library[self.comic_id].get("comic_path")
+        else:
+            self.data["save_path"] = f"{self.save_path}/{self.data['title']}"
+
+        return self.data
 
     ############################################################
     def getEpisodesInfo(self) -> list[Episode]:
@@ -73,10 +186,10 @@ class BiliPlusComic(Comic):
         biliplus_html = ""
 
         @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _(url: str) -> str:
+        def _() -> str:
             try:
                 res = requests.post(
-                    url,
+                    biliplus_detail_url,
                     headers=self.headers,
                     timeout=TIMEOUT_SMALL,
                 )
@@ -94,12 +207,12 @@ class BiliPlusComic(Comic):
             return res.text
 
         try:
-            biliplus_html = _(biliplus_detail_url)
+            biliplus_html = _()
             if "" == biliplus_html:
                 return None
             if "cookie invalid" == biliplus_html:
                 self.mainGUI.signal_message_box.emit(
-                    "您的BiliPlus Cookie无效，请更新您的BiliPlus Cookie!"
+                    "您的BiliPlus Cookie无效, 请更新您的BiliPlus Cookie!"
                 )
                 return None
         except requests.RequestException as e:
@@ -110,13 +223,13 @@ class BiliPlusComic(Comic):
         # ?###########################################################
         # ? 解析BiliPlus解锁章节信息
         try:
-            document = BeautifulSoup(biliplus_html, "html.parser")
-            ep_items = document.find_all("div", {"class": "episode-item"})
+            soup = BeautifulSoup(biliplus_html, "html.parser")
+            ep_items = soup.find_all("div", {"class": "episode-item"})
             ep_available = []
             for ep in ep_items:
                 if "https://" in ep.img["src"]:
                     ep_available.append(ep.a["href"].split("epid=")[1])
-            total_ep_element = document.select_one("center p")
+            total_ep_element = soup.select_one("center p")
             if total_ep_element:
                 total_ep = total_ep_element.contents[0].split("/")[1]
                 total_pages = int(int(total_ep) / 200) + 1
@@ -125,8 +238,8 @@ class BiliPlusComic(Comic):
                         f"正在解析漫画章节({pages}/{total_pages})..."
                     )
                     page_html = _(f"{biliplus_detail_url}&page={pages}")
-                    document = BeautifulSoup(page_html, "html.parser")
-                    ep_items = document.find_all("div", {"class": "episode-item"})
+                    soup = BeautifulSoup(page_html, "html.parser")
+                    ep_items = soup.find_all("div", {"class": "episode-item"})
                     for ep in ep_items:
                         if "https://" in ep.img["src"]:
                             ep_available.append(ep.a["href"].split("epid=")[1])
@@ -238,12 +351,12 @@ class BiliPlusEpisode(Episode):
             biliplus_imgs_token = []
             if "获取凭据出错" in biliplus_html and 'src="http' not in biliplus_html:
                 msg = f"《{self.comic_name}》章节：{self.title} " \
-                       "在BiliPlus上的章节共享者已退出登陆，下载失败！"
+                       "在BiliPlus上的章节共享者已退出登陆, 下载失败！"
                 logger.error(msg)
                 self.mainGUI.signal_message_box.emit(msg)
                 return False
-            document = BeautifulSoup(biliplus_html, "html.parser")
-            images = document.find_all("img", {"class": "comic-single"})
+            soup = BeautifulSoup(biliplus_html, "html.parser")
+            images = soup.find_all("img", {"class": "comic-single"})
             for img in images:
                 img_url = img["_src"]
                 url, token = img_url.split("?token=")

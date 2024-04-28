@@ -126,7 +126,7 @@ class Episode:
                 )
             except requests.RequestException as e:
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title}，获取图片列表失败! 重试中...\n{e}"
+                    f"《{self.comic_name}》章节：{self.title}, 获取图片列表失败! 重试中...\n{e}"
                 )
                 raise e
             if res.status_code != 200:
@@ -140,7 +140,7 @@ class Episode:
             imgs_urls = [img["path"] for img in _()]
         except requests.RequestException as e:
             logger.error(
-                f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!，跳过!\n{e}"
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败! 跳过!\n{e}"
             )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(
@@ -168,7 +168,7 @@ class Episode:
                 )
             except requests.RequestException as e:
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title}，获取图片token失败! 重试中...\n{e}"
+                    f"《{self.comic_name}》章节：{self.title}, 获取图片token失败! 重试中...\n{e}"
                 )
                 raise e
             if res.status_code != 200:
@@ -182,7 +182,7 @@ class Episode:
             self.imgs_token = _()
         except requests.RequestException as e:
             logger.error(
-                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败，跳过!\n{e}"
+                f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败! 跳过!\n{e}"
             )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(

@@ -122,7 +122,7 @@ class MangaUI(QObject):
                 return
             self.present_comic_id = comic_id
             self.resolveEnable(False)
-            comic = Comic(self.present_comic_id, self.mainGUI)
+            comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic, "done")
 
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)

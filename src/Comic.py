@@ -78,7 +78,7 @@ class Comic:
         try:
             self.data = _()
             if self.data is None:
-                logger.error(f"漫画id:{self.comic_id} 无效，该漫画不存在!")
+                logger.error(f"漫画id:{self.comic_id} 无效, 该漫画不存在!")
                 return {}
         except requests.RequestException as e:
             logger.error(f"漫画id:{self.comic_id} 重复获取漫画信息多次后失败!\n{e}")
@@ -88,12 +88,12 @@ class Comic:
         # ?###########################################################
         # ? 解析漫画信息
         self.data["title"] = myStrFilter(self.data["title"])
-        self.data["author_name"] = "，".join(self.data["author_name"])
+        self.data["author_name"] = ",".join(self.data["author_name"])
         self.data["author_name"] = (
             self.data["author_name"].replace("作者:", "").replace("出品:", "")
         )
         self.data["author_name"] = myStrFilter(self.data["author_name"])
-        self.data["styles"] = "，".join(self.data["styles"])
+        self.data["styles"] = ",".join(self.data["styles"])
         if self.comic_id in self.mainGUI.my_library:
             self.data["save_path"] = self.mainGUI.my_library[self.comic_id].get("comic_path")
         else:
@@ -134,7 +134,7 @@ class Comic:
             img = _()
             return img
         except RetryError as e:
-            logger.error(f"获取封面图片多次后失败，跳过!\n{e}")
+            logger.error(f"获取封面图片多次后失败, 跳过!\n{e}")
             self.mainGUI.signal_message_box.emit(
                 "获取封面图片多次后失败!\n"
                 "请检查网络连接或者重启软件!\n\n"
