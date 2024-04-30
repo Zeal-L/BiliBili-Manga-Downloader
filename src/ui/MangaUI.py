@@ -845,7 +845,6 @@ class MangaUI(QObject):
                     item.flags() != Qt.ItemFlag.NoItemFlags
                     and item.checkState() == Qt.CheckState.Checked
                 ):
-                    comic = Comic(self.present_comic_id, self.mainGUI)
                     self.mainGUI.downloadUI.addTask(self.mainGUI, self.epi_list[i])
                     item.setFlags(Qt.ItemFlag.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))
