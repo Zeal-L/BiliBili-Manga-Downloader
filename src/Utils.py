@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
 
 __app_name__ = "BiliBili-Manga-Downloader"
-__version__ = "1.5.1"
+__version__ = "1.6.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023-2024 Zeal L"
 __main_window_title__ = f"哔哩哔哩漫画下载器 v{__version__}"
@@ -122,8 +122,8 @@ def sizeToBytes(size_str: str) -> int:
 
     Returns:
         int: 字节数
-    """    
-    
+    """
+
     multipliers = {
         'KB': 1024,
         'MB': 1024**2,
@@ -140,7 +140,7 @@ def sizeToBytes(size_str: str) -> int:
     else:
         logger.error("文件大小转化错误! 不支持的文件大小格式: {size_str}")
     return 0
-    
+
 
 ############################################################
 

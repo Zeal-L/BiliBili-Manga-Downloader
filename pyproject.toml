@@ -4,7 +4,7 @@ description = "一个好用的哔哩哔哩漫画下载器，拥有图形界面�
 license = "AGPL-3.0"
 name = "bilibili-manga-downloader"
 readme = "README.md"
-version = "1.5.1"
+version = "1.6.0"
 
 [tool.poetry.dependencies]
 beautifulsoup4 = "^4.12.3"

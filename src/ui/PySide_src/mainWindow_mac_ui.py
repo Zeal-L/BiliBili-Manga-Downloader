@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow_mac.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.3
+## Created by: Qt User Interface Compiler version 6.7.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -80,8 +80,8 @@ class Ui_MainWindow(object):
 
         self.line_12 = QFrame(self.tab_manga_search)
         self.line_12.setObjectName(u"line_12")
-        self.line_12.setFrameShape(QFrame.VLine)
-        self.line_12.setFrameShadow(QFrame.Sunken)
+        self.line_12.setFrameShape(QFrame.Shape.VLine)
+        self.line_12.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_manga_search.addWidget(self.line_12)
 
@@ -207,7 +207,7 @@ class Ui_MainWindow(object):
         self.label_manga_outline.setObjectName(u"label_manga_outline")
         self.label_manga_outline.setWordWrap(True)
 
-        self.v_Layout_manga_detail.addWidget(self.label_manga_outline, 0, Qt.AlignTop)
+        self.v_Layout_manga_detail.addWidget(self.label_manga_outline, 0, Qt.AlignmentFlag.AlignTop)
 
         self.v_Layout_manga_detail.setStretch(4, 1)
 
@@ -230,8 +230,8 @@ class Ui_MainWindow(object):
         self.h_Layout_chp_detail.setObjectName(u"h_Layout_chp_detail")
         self.line_5 = QFrame(self.groupBox_chp_detail)
         self.line_5.setObjectName(u"line_5")
-        self.line_5.setFrameShape(QFrame.VLine)
-        self.line_5.setFrameShadow(QFrame.Sunken)
+        self.line_5.setFrameShape(QFrame.Shape.VLine)
+        self.line_5.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_chp_detail.addWidget(self.line_5)
 
@@ -242,8 +242,8 @@ class Ui_MainWindow(object):
 
         self.line = QFrame(self.groupBox_chp_detail)
         self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
+        self.line.setFrameShape(QFrame.Shape.VLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_chp_detail.addWidget(self.line)
 
@@ -254,8 +254,8 @@ class Ui_MainWindow(object):
 
         self.line_2 = QFrame(self.groupBox_chp_detail)
         self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.VLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
+        self.line_2.setFrameShape(QFrame.Shape.VLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_chp_detail.addWidget(self.line_2)
 
@@ -266,8 +266,8 @@ class Ui_MainWindow(object):
 
         self.line_3 = QFrame(self.groupBox_chp_detail)
         self.line_3.setObjectName(u"line_3")
-        self.line_3.setFrameShape(QFrame.VLine)
-        self.line_3.setFrameShadow(QFrame.Sunken)
+        self.line_3.setFrameShape(QFrame.Shape.VLine)
+        self.line_3.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_chp_detail.addWidget(self.line_3)
 
@@ -278,8 +278,8 @@ class Ui_MainWindow(object):
 
         self.line_4 = QFrame(self.groupBox_chp_detail)
         self.line_4.setObjectName(u"line_4")
-        self.line_4.setFrameShape(QFrame.VLine)
-        self.line_4.setFrameShadow(QFrame.Sunken)
+        self.line_4.setFrameShape(QFrame.Shape.VLine)
+        self.line_4.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_chp_detail.addWidget(self.line_4)
 
@@ -316,8 +316,8 @@ class Ui_MainWindow(object):
 
         self.line_10 = QFrame(self.widget_biliplus_detail)
         self.line_10.setObjectName(u"line_10")
-        self.line_10.setFrameShape(QFrame.VLine)
-        self.line_10.setFrameShadow(QFrame.Sunken)
+        self.line_10.setFrameShape(QFrame.Shape.VLine)
+        self.line_10.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_biliplus_detail.addWidget(self.line_10)
 
@@ -329,7 +329,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.label_resolve_status.sizePolicy().hasHeightForWidth())
         self.label_resolve_status.setSizePolicy(sizePolicy1)
         self.label_resolve_status.setCursor(QCursor(Qt.IBeamCursor))
-        self.label_resolve_status.setAlignment(Qt.AlignCenter)
+        self.label_resolve_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.h_Layout_biliplus_detail.addWidget(self.label_resolve_status)
 
@@ -341,7 +341,7 @@ class Ui_MainWindow(object):
 
         self.textBrowser_tutorial = QTextBrowser(self.groupBox_chp_detail)
         self.textBrowser_tutorial.setObjectName(u"textBrowser_tutorial")
-        self.textBrowser_tutorial.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.textBrowser_tutorial.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
 
         self.verticalLayout_4.addWidget(self.textBrowser_tutorial)
 
@@ -351,12 +351,12 @@ class Ui_MainWindow(object):
         self.listWidget_chp_detail.setMouseTracking(True)
         self.listWidget_chp_detail.setAutoFillBackground(True)
         self.listWidget_chp_detail.setDragEnabled(True)
-        self.listWidget_chp_detail.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.listWidget_chp_detail.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.listWidget_chp_detail.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.listWidget_chp_detail.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.listWidget_chp_detail.setProperty("isWrapping", True)
-        self.listWidget_chp_detail.setResizeMode(QListView.Adjust)
+        self.listWidget_chp_detail.setResizeMode(QListView.ResizeMode.Adjust)
         self.listWidget_chp_detail.setSpacing(5)
-        self.listWidget_chp_detail.setViewMode(QListView.IconMode)
+        self.listWidget_chp_detail.setViewMode(QListView.ViewMode.IconMode)
         self.listWidget_chp_detail.setUniformItemSizes(True)
         self.listWidget_chp_detail.setBatchSize(100)
         self.listWidget_chp_detail.setWordWrap(False)
@@ -391,8 +391,8 @@ class Ui_MainWindow(object):
 
         self.line_7 = QFrame(self.tab_download)
         self.line_7.setObjectName(u"line_7")
-        self.line_7.setFrameShape(QFrame.VLine)
-        self.line_7.setFrameShadow(QFrame.Sunken)
+        self.line_7.setFrameShape(QFrame.Shape.VLine)
+        self.line_7.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_total_progress.addWidget(self.line_7)
 
@@ -403,8 +403,8 @@ class Ui_MainWindow(object):
 
         self.line_13 = QFrame(self.tab_download)
         self.line_13.setObjectName(u"line_13")
-        self.line_13.setFrameShape(QFrame.VLine)
-        self.line_13.setFrameShadow(QFrame.Sunken)
+        self.line_13.setFrameShape(QFrame.Shape.VLine)
+        self.line_13.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_total_progress.addWidget(self.line_13)
 
@@ -415,8 +415,8 @@ class Ui_MainWindow(object):
 
         self.line_6 = QFrame(self.tab_download)
         self.line_6.setObjectName(u"line_6")
-        self.line_6.setFrameShape(QFrame.VLine)
-        self.line_6.setFrameShadow(QFrame.Sunken)
+        self.line_6.setFrameShape(QFrame.Shape.VLine)
+        self.line_6.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_total_progress.addWidget(self.line_6)
 
@@ -427,8 +427,8 @@ class Ui_MainWindow(object):
 
         self.line_14 = QFrame(self.tab_download)
         self.line_14.setObjectName(u"line_14")
-        self.line_14.setFrameShape(QFrame.VLine)
-        self.line_14.setFrameShadow(QFrame.Sunken)
+        self.line_14.setFrameShape(QFrame.Shape.VLine)
+        self.line_14.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.h_Layout_total_progress.addWidget(self.line_14)
 
@@ -691,6 +691,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.checkBox_exif_info)
 
+        self.checkBox_save_meta = QCheckBox(self.tab_setting)
+        self.checkBox_save_meta.setObjectName(u"checkBox_save_meta")
+        self.checkBox_save_meta.setChecked(True)
+
+        self.horizontalLayout_5.addWidget(self.checkBox_save_meta)
+
         self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_12)
@@ -704,8 +710,8 @@ class Ui_MainWindow(object):
 
         self.line_8 = QFrame(self.tab_setting)
         self.line_8.setObjectName(u"line_8")
-        self.line_8.setFrameShape(QFrame.HLine)
-        self.line_8.setFrameShadow(QFrame.Sunken)
+        self.line_8.setFrameShape(QFrame.Shape.HLine)
+        self.line_8.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.verticalLayout_5.addWidget(self.line_8)
 
@@ -740,7 +746,7 @@ class Ui_MainWindow(object):
         self.h_Slider_num_thread.setSingleStep(2)
         self.h_Slider_num_thread.setPageStep(2)
         self.h_Slider_num_thread.setValue(16)
-        self.h_Slider_num_thread.setOrientation(Qt.Horizontal)
+        self.h_Slider_num_thread.setOrientation(Qt.Orientation.Horizontal)
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
 
@@ -770,8 +776,8 @@ class Ui_MainWindow(object):
 
         self.line_9 = QFrame(self.tab_setting)
         self.line_9.setObjectName(u"line_9")
-        self.line_9.setFrameShape(QFrame.HLine)
-        self.line_9.setFrameShadow(QFrame.Sunken)
+        self.line_9.setFrameShape(QFrame.Shape.HLine)
+        self.line_9.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.verticalLayout_5.addWidget(self.line_9)
 
@@ -957,6 +963,7 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u4fdd\u5b58\u683c\u5f0f\u540e\u9700\u8981\u91cd\u65b0\u89e3\u6790\u6f2b\u753b\u624d\u80fd\u751f\u6548", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u9644\u52a0\u4fe1\u606f\uff1a", None))
         self.checkBox_exif_info.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u5728\u4fdd\u5b58\u6587\u4ef6\u5c5e\u6027\u4e2d\u8bb0\u5f55\u7ae0\u8282\u6807\u9898\u3001\u4f5c\u8005\u3001\u51fa\u7248\u793e\u7b49\u9644\u52a0\u4fe1\u606f", None))
+        self.checkBox_save_meta.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u521b\u5efa\u6f2b\u753b\u5143\u6570\u636e\u6587\u4ef6", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
         self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))

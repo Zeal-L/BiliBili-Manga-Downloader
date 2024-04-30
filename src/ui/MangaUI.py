@@ -830,7 +830,9 @@ class MangaUI(QObject):
 
             # ?###########################################################
             # ? 保存元数据
-            if not os.path.exists(os.path.join(save_path, "元数据.json")):
+            if self.mainGUI.getConfig("save_meta") and not os.path.exists(
+                os.path.join(save_path, "元数据.json")
+            ):
                 comic = Comic(self.present_comic_id, self.mainGUI)
                 self.save_meta(comic.getComicInfo())
 

@@ -7,8 +7,8 @@ VSVersionInfo(
         # filevers 和 prodvers 应该总是一个包含四项的元组：(1, 2, 3, 4)
         # 将不需要的项目设置为零。
         # 文件版本号
-        filevers=(1, 5, 1, 0),
-        prodvers=(1, 5, 1, 0),
+        filevers=(1, 6, 0, 0),
+        prodvers=(1, 6, 0, 0),
         # 包含指定有效位“flags”的位掩码
         mask=0x3f,
         # 包含指定文件布尔属性的位掩码。
@@ -32,9 +32,9 @@ VSVersionInfo(
                 u'040904B0',
             # 文件说明
                 [StringStruct(u'FileDescription', u'哔哩哔哩漫画下载器'),
-                StringStruct(u'FileVersion', u'1, 5, 1'),
+                StringStruct(u'FileVersion', u'1, 6, 0'),
             # 内部名称
-                StringStruct(u'InternalName', u'哔哩哔哩漫画下载器 v1.5.1'),
+                StringStruct(u'InternalName', u'哔哩哔哩漫画下载器 v1.6.0'),
             # 版权
                 StringStruct(u'LegalCopyright', u'Copyright (C) 2023-2024 Zeal L'),
             # 原始文件名
@@ -42,7 +42,7 @@ VSVersionInfo(
             # 产品名称
                 StringStruct(u'ProductName', u'BiliBili-Manga-Downloader'),
             # 产品版本号
-                StringStruct(u'ProductVersion', u'1.5.1')])
+                StringStruct(u'ProductVersion', u'1.6.0')])
                 ]),
             VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
         ]

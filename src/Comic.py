@@ -77,7 +77,7 @@ class Comic:
 
         try:
             self.data = _()
-            if self.data is None:
+            if not self.data:
                 logger.error(f"漫画id:{self.comic_id} 无效, 该漫画不存在!")
                 return {}
         except requests.RequestException as e:
