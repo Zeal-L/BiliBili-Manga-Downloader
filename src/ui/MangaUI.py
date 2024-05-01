@@ -123,7 +123,7 @@ class MangaUI(QObject):
             self.present_comic_id = comic_id
             self.resolveEnable(False)
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "done")
+            self.updateComicInfoEvent(comic)
 
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)
         self.mainGUI.pushButton_manga_search_id.clicked.connect(_)
@@ -138,7 +138,7 @@ class MangaUI(QObject):
             self.present_comic_id = self.search_info[index]["id"]
             self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "done")
+            self.updateComicInfoEvent(comic)
 
         self.mainGUI.listWidget_manga_search.itemDoubleClicked.connect(_)
 
@@ -282,7 +282,7 @@ class MangaUI(QObject):
             comic_path (str): 漫画保存路径
         """
 
-        comic = Comic(comic_id, self.mainGUI)
+        comic = BiliPlusComic(comic_id, self.mainGUI)
         data = comic.getComicInfo()
         # ? 获取漫画信息失败直接跳过
         if not data:
@@ -334,7 +334,7 @@ class MangaUI(QObject):
             widget.setStyleSheet("background-color:rgb(200, 200, 255); font-size: 10pt;")
 
         widget.mousePressEvent = partial(_, widget=widget, comic=comic)
-        widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, comic, "bilibili")
+        widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, comic)
         widget.setLayout(h_layout_my_library)
 
         # ?###########################################################
@@ -779,7 +779,7 @@ class MangaUI(QObject):
                 return
             self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "done")
+            self.updateComicInfoEvent(comic)
 
         self.mainGUI.pushButton_resolve_detail.clicked.connect(_)
 
@@ -796,7 +796,7 @@ class MangaUI(QObject):
                 return
             self.resolveEnable(False)
             comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
-            self.updateComicInfoEvent(comic, "done")
+            self.updateComicInfoEvent(comic)
 
         self.mainGUI.pushButton_biliplus_resolve_detail.clicked.connect(_)
 
@@ -833,7 +833,7 @@ class MangaUI(QObject):
             if self.mainGUI.getConfig("save_meta") and not os.path.exists(
                 os.path.join(save_path, "元数据.json")
             ):
-                comic = Comic(self.present_comic_id, self.mainGUI)
+                comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
                 self.save_meta(comic.getComicInfo())
 
             # ?###########################################################
@@ -845,6 +845,7 @@ class MangaUI(QObject):
                     item.flags() != Qt.ItemFlag.NoItemFlags
                     and item.checkState() == Qt.CheckState.Checked
                 ):
+                    comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
                     self.mainGUI.downloadUI.addTask(self.mainGUI, self.epi_list[i])
                     item.setFlags(Qt.ItemFlag.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))

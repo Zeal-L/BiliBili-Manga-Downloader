@@ -100,7 +100,7 @@ class BiliPlusComic(Comic):
             renewal_time = soup.body.div.find_all("p")[2].text
             episode_div_list = soup.body.div.find_all("div", {"class": "contents-full"})
             ep_list = []
-            for idx, episode_div in enumerate(episode_div_list):
+            for idx, episode_div in enumerate(reversed(episode_div_list)):
                 ord = idx
                 id = episode_div.find("div", {"class": "epid"}).text.split()[-1]
                 temp = episode_div.find("div").find_all("div")[-1].text.split(" / ")
