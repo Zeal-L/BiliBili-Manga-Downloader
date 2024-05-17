@@ -186,10 +186,10 @@ class BiliPlusComic(Comic):
         biliplus_html = ""
 
         @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _() -> str:
+        def _(url: str) -> str:
             try:
                 res = requests.post(
-                    biliplus_detail_url,
+                    url,
                     headers=self.headers,
                     timeout=TIMEOUT_SMALL,
                 )
@@ -207,7 +207,7 @@ class BiliPlusComic(Comic):
             return res.text
 
         try:
-            biliplus_html = _()
+            biliplus_html = _(biliplus_detail_url)
             if "" == biliplus_html:
                 return None
             if "cookie invalid" == biliplus_html:

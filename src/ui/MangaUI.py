@@ -282,7 +282,7 @@ class MangaUI(QObject):
             comic_path (str): 漫画保存路径
         """
 
-        comic = BiliPlusComic(comic_id, self.mainGUI)
+        comic = Comic(comic_id, self.mainGUI)
         data = comic.getComicInfo()
         # ? 获取漫画信息失败直接跳过
         if not data:
