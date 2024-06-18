@@ -100,8 +100,8 @@ class BiliPlusComic(Comic):
             renewal_time = soup.body.div.find_all("p")[2].text
             episode_div_list = soup.body.div.find_all("div", {"class": "contents-full"})
             ep_list = []
-            for idx, episode_div in enumerate(reversed(episode_div_list)):
-                ord = idx
+            for idx, episode_div in enumerate(episode_div_list):
+                ord = idx+1
                 id = episode_div.find("div", {"class": "epid"}).text.split()[-1]
                 temp = episode_div.find("div").find_all("div")[-1].text.split(" / ")
                 if 2 == len(temp):
@@ -110,6 +110,7 @@ class BiliPlusComic(Comic):
                     size, image_count = 0, temp[0]
                 image_count = int(image_count.replace("页", ""))
                 short_title, title = episode_div.find("a").text.split(". ")
+                pub_time = episode_div.find_all(text=True)[-1].replace('发布', '').strip()
                 ep_list.append({
                     "id": id,
                     "ord": ord,
@@ -118,6 +119,7 @@ class BiliPlusComic(Comic):
                     "title": title,
                     "is_locked": True,
                     "image_count": image_count,
+                    "pub_time": pub_time,
                 })
         except Exception as e:
             msg = f"漫画id:{self.comic_id} 处理BiliPlus解析漫画信息时意外失败!"
@@ -142,7 +144,8 @@ class BiliPlusComic(Comic):
         self.data["hall_icon_text"] = ""
         self.data["tags"] = []
         self.data["is_finish"] = True if renewal_time == "已完结" else False
-        self.data["ep_list"] = ep_list
+        self.data["last_ord"] = len(ep_list)
+        self.data["ep_list"] = ep_list[::-1]
         if self.comic_id in self.mainGUI.my_library:
             self.data["save_path"] = self.mainGUI.my_library[self.comic_id].get("comic_path")
         else:
