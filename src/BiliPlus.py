@@ -144,7 +144,7 @@ class BiliPlusComic(Comic):
         self.data["hall_icon_text"] = ""
         self.data["tags"] = []
         self.data["is_finish"] = True if renewal_time == "已完结" else False
-        self.data["last_ord"] = len(ep_list)
+        self.data["total"] = len(ep_list)
         self.data["ep_list"] = ep_list[::-1]
         if self.comic_id in self.mainGUI.my_library:
             self.data["save_path"] = self.mainGUI.my_library[self.comic_id].get("comic_path")
