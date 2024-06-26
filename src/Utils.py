@@ -49,7 +49,7 @@ RETRY_WAIT_EX = 200
 if platform == "win32":
     appdata_path = os.getenv("APPDATA")
 elif platform == "darwin":
-    appdata_path = os.getenv("HOME")
+    appdata_path = os.path.dirname(__file__)
 elif platform == "linux":
     appdata_path = os.getenv("HOME")
 
