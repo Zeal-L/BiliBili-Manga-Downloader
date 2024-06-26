@@ -30,9 +30,17 @@ pyinstaller = "^6.4.0"
 rich = "^13.7.0"
 ruff = "^0.2.2"
 
+[[tool.poetry.source]]
+name = "mirrors"
+priority = "supplemental"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+
 [tool.poetry.scripts]
 b-man-dl = 'app:main'
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
