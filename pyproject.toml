@@ -7,6 +7,7 @@ authors = ["Zeal-L <zeal.liang@gmail.com>"]
 readme = "README.md"
 packages = [
   {include = "app.py"},
+  {include = "src"},
 ]
 
 [tool.poetry.dependencies]
