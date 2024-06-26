@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 from src.ui.MainGUI import MainGUI
 from src.Utils import __main_window_title__, logger
 
-if __name__ == "__main__":
+def main():
     app = QApplication.instance() or QApplication(argv)
 
     if platform == "win32" and ctypes.windll.user32.FindWindowW(None, __main_window_title__) != 0:
@@ -50,3 +50,5 @@ if __name__ == "__main__":
     window = MainGUI(app)
     window.show()
     app.exec()
+if __name__ == "__main__":
+    main()
