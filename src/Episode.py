@@ -527,7 +527,11 @@ class Episode:
         @retry(stop_max_delay=MAX_RETRY_LARGE, wait_exponential_multiplier=RETRY_WAIT_EX)
         def _() -> bytes:
             try:
-                res = requests.get(img_url, timeout=TIMEOUT_LARGE)
+                if img_url.find("token") != -1:
+                    res = requests.get(img_url, timeout=TIMEOUT_LARGE)
+                else:
+                    res = requests.get(img_url, headers=self.headers, timeout=TIMEOUT_LARGE)
+
             except requests.RequestException as e:
                 logger.warning(
                     f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 下载图片失败! 重试中...\n{e}"
@@ -562,7 +566,7 @@ class Episode:
 
         # ?###########################################################
         # ? 保存图片
-        img_format = img_url.split(".")[-1].split("?")[0].lower()
+        img_format = img_url.split(".")[-1].split("?")[0].lower().replace("&append=", "")
         path_to_save = os.path.join(self.save_path, f"{self.real_ord}_{index}.{img_format}")
 
         @retry(stop_max_attempt_number=5)
