@@ -230,7 +230,7 @@ class BiliPlusComic(Comic):
             ep_items = soup.find_all("div", {"class": "episode-item"})
             ep_available = []
             for ep in ep_items:
-                if "https://" in ep.img["src"]:
+                if ep.img.get("_src") is not None:
                     ep_available.append(ep.a["href"].split("epid=")[1])
             total_ep_element = soup.select_one("center p")
             if total_ep_element:
@@ -244,7 +244,7 @@ class BiliPlusComic(Comic):
                     soup = BeautifulSoup(page_html, "html.parser")
                     ep_items = soup.find_all("div", {"class": "episode-item"})
                     for ep in ep_items:
-                        if "https://" in ep.img["src"]:
+                        if ep.img.get("_src") is not None:
                             ep_available.append(ep.a["href"].split("epid=")[1])
 
             unlock_times = 0
@@ -360,10 +360,30 @@ class BiliPlusEpisode(Episode):
                 return False
             soup = BeautifulSoup(biliplus_html, "html.parser")
             images = soup.find_all("img", {"class": "comic-single"})
-            for img in images:
-                img_url = img["_src"]
+
+            @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
+            def _(index, img_element) -> bool:
+                img_url = f'https://www.biliplus.com/manga/{img_element["_src"]}'
+                res = requests.get(img_url, headers=self.headers, allow_redirects=False)
+                if res.status_code != 301:
+                    logger.warning(f"《{self.comic_name}》章节：{self.title} 从BiliPlus获取图片{index + 1}的地址失败!"
+                                   f"状态码：{res.status_code}, 理由: {res.reason} 重试中...")
+                    return False
+                img_url = res.headers["Location"]
                 url, token = img_url.split("?token=")
                 biliplus_imgs_token.append({"url": url, "token": token})
+                return True
+
+            for i, img in enumerate(images):
+                if not _(i, img):
+                    msg = f"《{self.comic_name}》章节：{self.title} " \
+                          "该章节的图片地址未获取完整!\n\n"
+                    logger.error(msg)
+                    self.mainGUI.signal_message_box.emit(
+                        f"{msg}此问题可能是向BiliPlus发送的请求过于频率导致的，请稍后重试!"
+                    )
+                    return False
+
             self.imgs_token = biliplus_imgs_token
             if not biliplus_imgs_token:
                 msg = f"《{self.comic_name}》章节：{self.title} " \
