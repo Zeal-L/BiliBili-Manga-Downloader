@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 import time
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from retrying import retry
 
 from src.Comic import Comic
@@ -362,7 +362,7 @@ class BiliPlusEpisode(Episode):
             images = soup.find_all("img", {"class": "comic-single"})
 
             @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
-            def _(index, img_element) -> bool:
+            def _(index: int, img_element: Tag) -> bool:
                 img_url = f'https://www.biliplus.com/manga/{img_element["_src"]}'
                 res = requests.get(img_url, headers=self.headers, allow_redirects=False)
                 if res.status_code != 301:
