@@ -1,20 +1,20 @@
 """
 这是一个哔哩哔哩漫画下载器的应用程序，它提供了一个GUI界面，可以让用户下载漫画。这个文件是程序的入口文件，用于启动程序。
 """
-
-
+ 
+ 
 import ctypes
 import subprocess
 from sys import argv, exit, platform
-
+ 
 from PySide6.QtWidgets import QApplication, QMessageBox
-
+ 
 from src.ui.MainGUI import MainGUI
 from src.Utils import __main_window_title__, logger
-
-if __name__ == "__main__":
+ 
+def main():
     app = QApplication.instance() or QApplication(argv)
-
+ 
     if platform == "win32" and ctypes.windll.user32.FindWindowW(None, __main_window_title__) != 0:
         box = QMessageBox.information(
             None, "提示", "有一个我已经不满足不了你吗？\n\t...(｡•ˇ‸ˇ•｡) ..."
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         end tell
         return false
         """.format(__main_window_title__)
-
+ 
         try:
             output = subprocess.check_output(["osascript", "-e", script], text=True).strip()
             if output == "true":
@@ -46,7 +46,10 @@ if __name__ == "__main__":
         except subprocess.CalledProcessError as e:
             logger.error("检查是否有重复窗口时出错：", e)
             exit(1)
-
+ 
     window = MainGUI(app)
     window.show()
     app.exec()
+ 
+if __name__ == '__main__':
+    main()
