@@ -230,7 +230,7 @@ class BiliPlusComic(Comic):
             ep_items = soup.find_all("div", {"class": "episode-item"})
             ep_available = []
             for ep in ep_items:
-                if "https://" in ep.img["src"]:
+                if ep.img.get("_src") is not None:
                     ep_available.append(ep.a["href"].split("epid=")[1])
             total_ep_element = soup.select_one("center p")
             if total_ep_element:
@@ -244,7 +244,7 @@ class BiliPlusComic(Comic):
                     soup = BeautifulSoup(page_html, "html.parser")
                     ep_items = soup.find_all("div", {"class": "episode-item"})
                     for ep in ep_items:
-                        if "https://" in ep.img["src"]:
+                        if ep.img.get("_src") is not None:
                             ep_available.append(ep.a["href"].split("epid=")[1])
 
             unlock_times = 0
@@ -361,9 +361,8 @@ class BiliPlusEpisode(Episode):
             soup = BeautifulSoup(biliplus_html, "html.parser")
             images = soup.find_all("img", {"class": "comic-single"})
             for img in images:
-                img_url = img["_src"]
-                url, token = img_url.split("?token=")
-                biliplus_imgs_token.append({"url": url, "token": token})
+                img_url = f'https://www.biliplus.com/manga/{img["_src"]}'
+                biliplus_imgs_token.append({"url": img_url})
             self.imgs_token = biliplus_imgs_token
             if not biliplus_imgs_token:
                 msg = f"《{self.comic_name}》章节：{self.title} " \

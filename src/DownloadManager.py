@@ -151,7 +151,10 @@ class DownloadManager:
             if self.terminated:
                 epi.clear(imgs_path)
                 return
-            img_url = f"{img['url']}?token={img['token']}"
+            if img.get("token") is not None:
+                img_url = f"{img['url']}?token={img['token']}"
+            else:
+                img_url = img["url"]
             img_path = epi.downloadImg(index, img_url)
             if img_path is None:
                 self.reportError(curr_id)
