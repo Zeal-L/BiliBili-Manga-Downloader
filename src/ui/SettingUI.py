@@ -56,6 +56,7 @@ class SettingUI(QObject):
         self.init_theme()
         self.init_exif_setting()
         self.init_save_meta_setting()
+        self.init_skip_check_setting()
         self.qr_ui = QrCodeUI()
 
     ############################################################
@@ -520,3 +521,17 @@ class SettingUI(QObject):
             self.mainGUI.updateConfig("save_meta", checked)
 
         self.mainGUI.checkBox_save_meta.toggled.connect(_)
+
+    def init_skip_check_setting(self) -> None:
+        """绑定保存元数据设置"""
+        flag = self.mainGUI.getConfig("skip_check")
+        if flag is not None:
+            self.mainGUI.checkBox_save_meta.setChecked(flag)
+        else:
+            self.mainGUI.updateConfig("skip_check", True)
+
+        def _(checked: bool) -> None:
+            self.mainGUI.updateConfig("skip_check", checked)
+
+        self.mainGUI.checkBox_save_meta.toggled.connect(_)
+

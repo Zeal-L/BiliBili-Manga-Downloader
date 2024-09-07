@@ -9,6 +9,7 @@ import hashlib
 import logging
 import os
 import re
+import io
 from ctypes import CDLL, c_int
 from logging.handlers import TimedRotatingFileHandler
 from sys import platform
@@ -19,6 +20,7 @@ from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
+from PIL import Image
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -154,6 +156,17 @@ def isCheckSumValid(etag, content) -> tuple[bool, str]:
     md5 = hashlib.md5(content).hexdigest()
     return etag == md5, md5
 
+def isDataValid(content) -> bool:
+    """判断内容是否有效
+
+    Returns:
+        bool: 是否有效
+    """
+    try:
+        Image.open(io.BytesIO(content)).load()
+        return True
+    except (FileNotFoundError, OSError):
+        return False
 
 ############################################################
 

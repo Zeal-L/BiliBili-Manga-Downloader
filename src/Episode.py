@@ -30,6 +30,7 @@ from src.Utils import (
     __copyright__,
     __version__,
     isCheckSumValid,
+    isDataValid,
     logger,
     myStrFilter,
 )
@@ -55,6 +56,7 @@ class Episode:
         self.author = comic_info["author_name"]
         self.save_method = mainGUI.getConfig("save_method")
         self.exif_setting = mainGUI.getConfig("exif")
+        self.skip_check = mainGUI.getConfig("skip_check")
 
         # if self.ord != self.real_ord:
         #     logger.warning(
@@ -543,11 +545,17 @@ class Episode:
                     f"状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
-            if not isValid:
+            if not self.skip_check:
+                isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
+                if not isValid:
+                    logger.warning(
+                        f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
+                        f"\t{res.headers['Etag']} ≠ {md5}"
+                    )
+                    raise requests.HTTPError()
+            elif not isDataValid(res.content):
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
-                    f"\t{res.headers['Etag']} ≠ {md5}"
+                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容不正确! 重试中...\n"
                 )
                 raise requests.HTTPError()
             return res.content

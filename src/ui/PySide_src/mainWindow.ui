@@ -1096,6 +1096,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
             </property>
            </widget>
           </item>
+		  <item>
+           <widget class="QCheckBox" name="checkBox_skip_check">
+            <property name="text">
+             <string>哈希检查错误时，改为文件内容检查（影响性能，重新解析生效）</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item>
            <spacer name="horizontalSpacer_12">
             <property name="orientation">
