@@ -9,10 +9,12 @@ from functools import partial
 from sys import platform
 from typing import Any, Optional
 
+import requests
 from PySide6.QtCore import QEvent, QObject, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
+from retrying import retry, RetryError
 
 from src.ui.DownloadUI import DownloadUI
 from src.ui.MangaUI import MangaUI
@@ -22,7 +24,7 @@ if platform == "darwin":
 else:
     from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.Utils import __version__, data_path, logger
+from src.Utils import __version__, data_path, logger, MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL
 
 
 class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
@@ -74,6 +76,26 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             self.lineEdit_save_path.setText(os.getcwd())
             self.updateConfig("save_path", os.getcwd())
         logger.info(f"save_method: {self.getConfig('save_method')}")
+
+        if not self.getConfig("buvid3"):
+            @retry(stop_max_delay=MAX_RETRY_SMALL, wait_exponential_multiplier=RETRY_WAIT_EX)
+            def _() -> bytes:
+                try:
+                    res = requests.get("https://api.bilibili.com/x/web-frontend/getbuvid", timeout=TIMEOUT_SMALL)
+                except requests.RequestException() as e:
+                    logger.warning(f"获取buvid3失败! 重试中...\n{e}")
+                    raise e
+                if res.status_code != 200:
+                    logger.warning(
+                        f"获取buvid3失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    )
+                    raise requests.HTTPError()
+                return res.json()["data"]["buvid"]
+            try:
+                buvid3 = _()
+                self.updateConfig("buvid3", buvid3)
+            except RetryError as e:
+                logger.error(f"获取buvid3多次后失败，跳过!\n{e}")
 
         # ?###########################################################
         # ? 初始化 my_library，方便读取本地漫画元数据

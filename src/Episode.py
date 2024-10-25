@@ -97,7 +97,7 @@ class Episode:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}/{self.id}?from=manga_homepage",
-            "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+            "cookie": f"SESSDATA={mainGUI.getConfig('cookie')};buvid3={mainGUI.getConfig('buvid3')};",
         }
         self.save_path = comic_info["save_path"]
         self.epi_path = os.path.join(self.save_path, f"{self.title}")
