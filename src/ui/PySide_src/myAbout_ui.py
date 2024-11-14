@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'myAbout.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.8.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_My_about(object):
             My_about.setObjectName(u"My_about")
         My_about.resize(821, 610)
         icon = QIcon()
-        icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         My_about.setWindowIcon(icon)
         self.horizontalLayout = QHBoxLayout(My_about)
         self.horizontalLayout.setObjectName(u"horizontalLayout")

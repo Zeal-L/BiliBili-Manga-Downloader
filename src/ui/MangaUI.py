@@ -241,6 +241,7 @@ class MangaUI(QObject):
                 self.updateMyLibrarySingle,
                 comic_id,
                 comic_info["comic_path"],
+                comic_info["root_path"],
             )
             for comic_id, comic_info in self.mainGUI.my_library.items()
         )
@@ -274,15 +275,16 @@ class MangaUI(QObject):
         self.mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
 
     ############################################################
-    def updateMyLibrarySingle(self, comic_id: int, comic_path: str) -> int | None:
+    def updateMyLibrarySingle(self, comic_id: int, comic_path: str, root_path: str) -> int | None:
         """添加单个漫画到我的库存
 
         Args:
             comic_id (int): 漫画ID
             comic_path (str): 漫画保存路径
+            root_path (str): 漫画保存路径上级
         """
 
-        comic = Comic(comic_id, self.mainGUI)
+        comic = Comic(comic_id, self.mainGUI, root_path)
         data = comic.getComicInfo()
         # ? 获取漫画信息失败直接跳过
         if not data:
@@ -547,6 +549,7 @@ class MangaUI(QObject):
                 background = QColor(0, 255, 0, 50)
             if not epi.isAvailable():
                 flags = Qt.ItemFlag.NoItemFlags
+                background = QColor(0, 0, 0, 40)
             else:
                 num_unlocked += 1
 
@@ -922,15 +925,17 @@ class MangaUI(QObject):
 
         meta_dict = {}
         try:
-            for item in os.listdir(path):
-                if os.path.exists(os.path.join(path, item, "元数据.json")):
-                    with open(os.path.join(path, item, "元数据.json"), "r", encoding="utf-8") as f:
-                        comic_path = os.path.join(path, item)
-                        data = json.load(f)
-                        meta_dict[data["id"]] = {
-                            "comic_name": data["title"],
-                            "comic_path": comic_path,
-                        }
+            for dirpath, dirs, files in os.walk(path):
+                for item in dirs:
+                    if os.path.exists(os.path.join(dirpath, item, "元数据.json")):
+                        with open(os.path.join(dirpath, item, "元数据.json"), "r", encoding="utf-8") as f:
+                            comic_path = os.path.join(dirpath, item)
+                            data = json.load(f)
+                            meta_dict[data["id"]] = {
+                                "comic_name": data["title"],
+                                "comic_path": comic_path,
+                                "root_path": path,
+                            }
         except (OSError, ValueError) as e:
             logger.error(f"读取元数据时发生错误\n {e}")
         return meta_dict

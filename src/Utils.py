@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import base64
 import ctypes
 import hashlib
 import logging
@@ -13,6 +14,8 @@ from ctypes import CDLL, c_int
 from logging.handlers import TimedRotatingFileHandler
 from sys import platform
 from typing import TYPE_CHECKING
+from Crypto.Util.Padding import unpad
+from Crypto.Cipher import AES
 
 import requests
 from PySide6.QtCore import Qt, QUrl
@@ -145,14 +148,36 @@ def sizeToBytes(size_str: str) -> int:
 ############################################################
 
 
-def isCheckSumValid(etag, content) -> tuple[bool, str]:
+def isCheckSumValid(etag: str, content) -> tuple[bool, str]:
     """判断MD5是否有效
 
     Returns:
         tuple[bool, str]: (是否有效, MD5)
     """
-    md5 = hashlib.md5(content).hexdigest()
-    return etag == md5, md5
+    md5 = base64.b64encode(hashlib.md5(content).digest()).decode()
+    if md5 == etag:
+        return md5 == etag, etag
+    else:
+        md5 = hashlib.md5(content).hexdigest()
+    return md5 == etag, etag
+
+############################################################
+
+
+def AES_CBCDecrypt(cipher_data: bytes, key: bytes, iv: bytes) -> bytes:
+    """使用AES-CBC进行解密
+
+    Args:
+        cipher_data (str): 加密数据
+        key (str): 密钥
+        iv (str): 初始化向量
+
+    Returns:
+        bytes: 解密数据
+    """
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted_data = unpad(cipher.decrypt(cipher_data), AES.block_size)
+    return decrypted_data
 
 
 ############################################################

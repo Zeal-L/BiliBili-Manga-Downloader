@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainWindow_mac.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.8.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1152, 699)
         icon = QIcon()
-        icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         MainWindow.setWindowIcon(icon)
         self.actiondd = QAction(MainWindow)
         self.actiondd.setObjectName(u"actiondd")
@@ -328,7 +328,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.label_resolve_status.sizePolicy().hasHeightForWidth())
         self.label_resolve_status.setSizePolicy(sizePolicy1)
-        self.label_resolve_status.setCursor(QCursor(Qt.IBeamCursor))
+        self.label_resolve_status.setCursor(QCursor(Qt.CursorShape.IBeamCursor))
         self.label_resolve_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.h_Layout_biliplus_detail.addWidget(self.label_resolve_status)
@@ -353,7 +353,7 @@ class Ui_MainWindow(object):
         self.listWidget_chp_detail.setDragEnabled(True)
         self.listWidget_chp_detail.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.listWidget_chp_detail.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.listWidget_chp_detail.setProperty("isWrapping", True)
+        self.listWidget_chp_detail.setProperty(u"isWrapping", True)
         self.listWidget_chp_detail.setResizeMode(QListView.ResizeMode.Adjust)
         self.listWidget_chp_detail.setSpacing(5)
         self.listWidget_chp_detail.setViewMode(QListView.ViewMode.IconMode)
@@ -524,7 +524,7 @@ class Ui_MainWindow(object):
         self.pushButton_qrcode = QPushButton(self.tab_setting)
         self.pushButton_qrcode.setObjectName(u"pushButton_qrcode")
         icon1 = QIcon()
-        icon1.addFile(u":/imgs/Scan-qr-code.512.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/imgs/Scan-qr-code.512.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.pushButton_qrcode.setIcon(icon1)
         self.pushButton_qrcode.setIconSize(QSize(25, 25))
         self.pushButton_qrcode.setAutoRepeat(False)

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'qrCode.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.8.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_QrCode(object):
             QrCode.setObjectName(u"QrCode")
         QrCode.resize(418, 447)
         icon = QIcon()
-        icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/imgs/BiliBili_favicon.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         QrCode.setWindowIcon(icon)
         self.verticalLayout = QVBoxLayout(QrCode)
         self.verticalLayout.setObjectName(u"verticalLayout")

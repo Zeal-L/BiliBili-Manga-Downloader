@@ -2,6 +2,7 @@
 该模块包含了一个下载管理器类，用于管理漫画下载任务的创建、更新和删除等操作
 """
 
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -151,11 +152,16 @@ class DownloadManager:
             if self.terminated:
                 epi.clear(imgs_path)
                 return
-            if img.get("token") is not None:
+            if img.get("token"):
                 img_url = f"{img['url']}?token={img['token']}"
+            elif img.get("complete_url"):
+                img_url = img["complete_url"]
             else:
                 img_url = img["url"]
-            img_path = epi.downloadImg(index, img_url)
+            img_url = re.sub(r"@[^?]*\?", "", img_url)
+            match_cpx = re.search(r"[?&]cpx=([^&]*)", img_url)
+            cpx = match_cpx.group(1) if match_cpx else ""
+            img_path = epi.downloadImg(index, img_url, cpx)
             if img_path is None:
                 self.reportError(curr_id)
                 epi.clearAfterSave(imgs_path)

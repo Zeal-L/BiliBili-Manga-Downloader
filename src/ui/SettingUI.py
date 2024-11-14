@@ -56,6 +56,9 @@ class SettingUI(QObject):
         self.init_theme()
         self.init_exif_setting()
         self.init_save_meta_setting()
+        self.init_img_format_setting()
+        self.init_rename_rule_setting()
+        self.init_hash_check_setting()
         self.qr_ui = QrCodeUI()
 
     ############################################################
@@ -392,6 +395,9 @@ class SettingUI(QObject):
         def _(button: QRadioButton, checked: bool) -> None:
             if checked:
                 self.mainGUI.updateConfig("save_method", button.text())
+                self.mainGUI.signal_message_box.emit(
+                    "修改成功！重新解析章节后生效"
+                )
 
         for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
             button: QRadioButton = self.mainGUI.h_Layout_groupBox_save_method.itemAt(i).widget()
@@ -455,6 +461,10 @@ class SettingUI(QObject):
                 self.mainGUI.comboBox_theme_density.setEnabled(False)
             else:
                 self.mainGUI.comboBox_theme_density.setEnabled(True)
+                self.mainGUI.signal_message_box.emit(
+                    f"已成功切换主题至 [{text}]！\n"
+                    f"除默认主题外其他主题尚未完整测试，如若找不到切换选项，请缩放启动器窗口或全屏"
+                )
 
         self.mainGUI.comboBox_theme_style.currentTextChanged.connect(_)
 
@@ -520,3 +530,67 @@ class SettingUI(QObject):
             self.mainGUI.updateConfig("save_meta", checked)
 
         self.mainGUI.checkBox_save_meta.toggled.connect(_)
+
+    ############################################################
+
+    def init_rename_rule_setting(self) -> None:
+        """绑定命名风格设置"""
+        rename_rule_list = {
+            "short&long": "短标题+长标题",
+            "ord&long": "序号+长标题",
+            "ord&short&long": "序号+短标题+长标题",
+            "3ord&short&long": "3位序号+短标题+长标题",
+        }
+        reversed_rename_rule_list = {value: key for key, value in rename_rule_list.items()}
+
+        rename_rule = self.mainGUI.getConfig("rename_rule")
+        self.mainGUI.comboBox_epi_rename_rule.setCurrentText(rename_rule_list.get(rename_rule,'short&long'))
+
+        def _(rename_rule: str) -> None:
+            self.mainGUI.updateConfig("rename_rule", reversed_rename_rule_list[rename_rule])
+
+        self.mainGUI.comboBox_epi_rename_rule.currentTextChanged.connect(_)
+
+    ############################################################
+
+    def init_img_format_setting(self) -> None:
+        """绑定下载图片格式设置"""
+        img_format_list = {
+            "default": "原始格式",
+            "1700jpg": "1700宽jpg",
+            "1400jpg": "1400宽jpg",
+            "1100jpg": "1100宽jpg",
+            "800jpg": "800宽jpg",
+            "1700webp": "1700宽webp",
+            "1400webp": "1400宽webp",
+            "1100webp": "1100宽webp",
+            "800webp": "800宽webp",
+            "1700avif": "1700宽avif",
+            "1400avif": "1400宽avif",
+            "1100avif": "1100宽avif",
+            "800avif": "800宽avif",
+        }
+        reversed_img_format_list = {value: key for key, value in img_format_list.items()}
+
+        img_format = self.mainGUI.getConfig("img_format")
+        self.mainGUI.comboBox_img_format.setCurrentText(img_format_list.get(img_format,'default'))
+
+        def _(img_format: str) -> None:
+            self.mainGUI.updateConfig("img_format", reversed_img_format_list[img_format])
+
+        self.mainGUI.comboBox_img_format.currentTextChanged.connect(_)
+
+    ############################################################
+
+    def init_hash_check_setting(self) -> None:
+        """绑定哈希校验设置"""
+        flag = self.mainGUI.getConfig("hash_check")
+        if flag is not None:
+            self.mainGUI.checkBox_hash_check.setChecked(flag)
+        else:
+            self.mainGUI.updateConfig("hash_check", True)
+
+        def _(checked: bool) -> None:
+            self.mainGUI.updateConfig("hash_check", checked)
+
+        self.mainGUI.checkBox_hash_check.toggled.connect(_)

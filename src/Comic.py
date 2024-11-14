@@ -26,10 +26,13 @@ if TYPE_CHECKING:
 class Comic:
     """单本漫画 综合信息类"""
 
-    def __init__(self, comic_id: int, mainGUI: MainGUI) -> None:
+    def __init__(self, comic_id: int, mainGUI: MainGUI, save_path: str = "") -> None:
         self.mainGUI = mainGUI
         self.comic_id = comic_id
-        self.save_path = mainGUI.getConfig("save_path")
+        if save_path == "":
+            self.save_path = mainGUI.getConfig("save_path")
+        else:
+            self.save_path = save_path
         self.num_thread = mainGUI.getConfig("num_thread")
         self.num_downloaded = 0
         self.episodes = []
@@ -38,7 +41,7 @@ class Comic:
             "https://manga.bilibili.com/twirp/comic.v1.Comic/ComicDetail?device=pc&platform=web"
         )
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}?from=manga_homepage",
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",

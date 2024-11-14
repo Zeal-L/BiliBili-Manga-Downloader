@@ -4,12 +4,14 @@
 
 from __future__ import annotations
 
+import base64
 import glob
 import json
 import os
 import re
 import shutil
 from typing import TYPE_CHECKING
+from urllib.parse import unquote
 from zipfile import ZipFile, ZIP_DEFLATED
 
 import piexif
@@ -30,6 +32,7 @@ from src.Utils import (
     __copyright__,
     __version__,
     isCheckSumValid,
+    AES_CBCDecrypt,
     logger,
     myStrFilter,
 )
@@ -94,7 +97,7 @@ class Episode:
             self.title = re.sub(r"^([0-9\-\.]+)$", r"第\1话", self.title)
 
         self.headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}/{self.id}?from=manga_homepage",
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
@@ -511,12 +514,13 @@ class Episode:
 
     ############################################################
 
-    def downloadImg(self, index: int, img_url: str) -> str:
-        """根据 url 和 token 下载图片
+    def downloadImg(self, index: int, img_url: str, cpx: str) -> str:
+        """根据 url 和 cpx 下载图片
 
         Args:
             index (int): 章节中图片的序号
             img_url (str): 图片的合法 url
+            cpx (str): 图片的加密密钥
 
         Returns:
             str: 图片的保存路径
@@ -525,12 +529,14 @@ class Episode:
         # ?###########################################################
         # ? 下载图片
         @retry(stop_max_delay=MAX_RETRY_LARGE, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _() -> bytes:
+        def _() -> list[bytes, str, bool]:
             try:
                 if img_url.find("token") != -1:
                     res = requests.get(img_url, timeout=TIMEOUT_LARGE)
-                else:
+                elif img_url:
                     res = requests.get(img_url, headers=self.headers, timeout=TIMEOUT_LARGE)
+                else:
+                    raise requests.RequestException
 
             except requests.RequestException as e:
                 logger.warning(
@@ -543,17 +549,12 @@ class Episode:
                     f"状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            isValid, md5 = isCheckSumValid(res.headers["Etag"], res.content)
-            if not isValid:
-                logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
-                    f"\t{res.headers['Etag']} ≠ {md5}"
-                )
-                raise requests.HTTPError()
-            return res.content
+            md5 = res.headers["Etag"]
+            hit_encrypt = not res.headers.get("content-type").startswith("image/")
+            return res.content, md5, hit_encrypt
 
         try:
-            img = _()
+            img, md5, hit_encrypt = _()
         except requests.RequestException as e:
             logger.error(
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 重复下载图片多次后失败!\n{e}"
@@ -563,6 +564,47 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 重复下载图片多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
+
+        # ?###########################################################
+        # ? 解密图片
+        @retry(stop_max_attempt_number=1)
+        def _() -> None:
+            nonlocal img
+            if not cpx or not hit_encrypt or not img:
+                return
+            cpx_text = unquote(cpx)
+            cpx_char = base64.b64decode(cpx_text)
+            iv = cpx_char[60:76]
+            img_flag = img[0]
+            if img_flag == 0:
+                raise ValueError("图片文件读取异常!")
+            data_length = int.from_bytes(img[1: 5])
+            key = img[data_length + 5:]
+            content = img[5:data_length + 5]
+            head = AES_CBCDecrypt(content[0:20496], key, iv)
+            img = head + content[20496:]
+
+        try:
+            _()
+            isValid, img_md5 = isCheckSumValid(md5, img)
+            if not isValid:
+                logger.warning(
+                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
+                    f"\t{md5} ≠ {img_md5}"
+                )
+                raise requests.HTTPError()
+        except OSError as e:
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 处理图片失败!\n{e}"
+            )
+            logger.exception(e)
+            self.mainGUI.signal_message_box.emit(
+                f"《{self.comic_name}》章节：{self.title} - {index} - 处理图片失败!\n"
+                f"已暂时跳过此章节, 并删除所有缓存文件！\n"
+                f"请重新尝试或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
+            )
+            raise e
 
         # ?###########################################################
         # ? 保存图片
