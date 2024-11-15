@@ -542,18 +542,37 @@ class SettingUI(QObject):
     def init_rename_rule_setting(self) -> None:
         """绑定命名风格设置"""
         rename_rule_list = {
+            "default": "默认命名",
+            "idx&default": "序号+默认命名",
+            "3idx&default": "3位序号+默认命名",
+            "4idx&default": "4位序号+默认命名",
+            "ord&default": "B漫序号+默认命名",
+            "3ord&default": "3位B漫序号+默认命名",
+            "4ord&default": "4位B漫序号+默认命名",
             "short&long": "短标题+长标题",
-            "ord&long": "序号+长标题",
-            "ord&short&long": "序号+短标题+长标题",
-            "3ord&short&long": "3位序号+短标题+长标题",
+            "idx&long": "序号+长标题",
+            "idx&short&long": "序号+短标题+长标题",
+            "3idx&long": "3位序号+长标题",
+            "3idx&short&long": "3位序号+短标题+长标题",
+            "4idx&long": "4位序号+长标题",
+            "4idx&short&long": "4位序号+短标题+长标题",
+            "ord&short&long": "B漫序号+短标题+长标题",
+            "ord&long": "B漫序号+长标题",
+            "3ord&long": "3位B漫序号+长标题",
+            "3ord&short&long": "3位B漫序号+短标题+长标题",
+            "4ord&long": "4位B漫序号+长标题",
+            "4ord&short&long": "4位B漫序号+短标题+长标题",
         }
         reversed_rename_rule_list = {value: key for key, value in rename_rule_list.items()}
 
         rename_rule = self.mainGUI.getConfig("rename_rule")
-        self.mainGUI.comboBox_epi_rename_rule.setCurrentText(rename_rule_list.get(rename_rule,'short&long'))
+        self.mainGUI.comboBox_epi_rename_rule.setCurrentText(rename_rule_list.get(rename_rule,'default'))
 
         def _(rename_rule: str) -> None:
             self.mainGUI.updateConfig("rename_rule", reversed_rename_rule_list[rename_rule])
+            self.mainGUI.signal_message_box.emit(
+                f"请注意！修改命名格式后，无法识别现有的已下载文件",
+            )
 
         self.mainGUI.comboBox_epi_rename_rule.currentTextChanged.connect(_)
 

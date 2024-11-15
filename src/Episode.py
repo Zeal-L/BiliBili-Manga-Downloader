@@ -51,7 +51,7 @@ class Episode:
         self.id = episode["id"]
         self.available = not episode["is_locked"]
         self.ord = episode["ord"]
-        self.real_ord = idx
+        self.idx = idx
         self.comic_name = comic_info["title"]
         self.size = episode["size"]
         self.imgs_token = None
@@ -59,42 +59,13 @@ class Episode:
         self.save_method = mainGUI.getConfig("save_method")
         self.exif_setting = mainGUI.getConfig("exif")
 
-        # if self.ord != self.real_ord:
+        # if self.ord != self.idx:
         #     logger.warning(
-        #         f"章节序号错误！{self.comic_name} - {episode["title"]}; ord: {self.ord} ≠ real_ord: {self.real_ord}, 请责怪B站"
+        #         f"章节序号错误！{self.comic_name} - {episode["title"]}; ord: {self.ord} ≠ idx: {self.idx}, 请责怪B站"
         #     )
 
         if self.save_method == "Cbz压缩包":
             self.comicinfoxml = ComicInfoXML(comic_info, episode)
-
-        # ?###########################################################
-        # ? 修复标题中的特殊字符
-        episode["short_title"] = myStrFilter(episode["short_title"])
-        episode["title"] = myStrFilter(episode["title"])
-
-        # ?###########################################################
-        # ? 修复重复标题
-        if episode["short_title"] == episode["title"] or episode["title"] == "":
-            self.title = episode["short_title"]
-        else:
-            self.title = f"{episode['short_title']} {episode['title']}"
-        temp = re.search(r"^(\d+)\s+第(\d+)话", self.title)
-        if temp and temp[1] == temp[2]:
-            self.title = re.sub(r"^\d+\s+(第\d+话)", r"\1", self.title)
-        temp = re.search(r"^(\d+)\s+第(\d+)$", self.title)
-        if temp and temp[1] == temp[2]:
-            self.title = re.sub(r"^\d+\s+(第\d+)$", r"\1话", self.title)
-        if re.search(r"^特别篇\s+特别篇", self.title):
-            self.title = re.sub(r"^特别篇\s+特别篇", r"特别篇", self.title)
-
-        # ?###########################################################
-        # ? 修复短标题中的数字
-        if re.search(r"^[0-9\-\.]+话", self.title):
-            self.title = re.sub(r"^([0-9\-\.]+)话", r"第\1话", self.title)
-        elif re.search(r"^[0-9\-\.]+ ", self.title):
-            self.title = re.sub(r"^([0-9\-\.]+) ", r"第\1话 ", self.title)
-        elif re.search(r"^[0-9\-\.]+$", self.title):
-            self.title = re.sub(r"^([0-9\-\.]+)$", r"第\1话", self.title)
 
         self.headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
@@ -103,7 +74,110 @@ class Episode:
             "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
         }
         self.save_path = comic_info["save_path"]
+
+        # ?###########################################################
+        # ? 修复标题中的特殊字符
+        episode["short_title"] = myStrFilter(episode["short_title"])
+        self.short_title = episode["short_title"]
+        episode["title"] = myStrFilter(episode["title"])
+        self.long_title = episode["title"]
+
+        # ?###########################################################
+        # ? 获取章节名
+        self.title = self.get_default_title()
+        try:
+            self.rename_title()
+        except Exception as e:
+            logger.error(
+                f"《{self.comic_name}》章节：{self.title} - 应用命名规则时发生错误!\n{e}"
+            )
+            logger.exception(e)
+            self.mainGUI.signal_message_box.emit(
+                f"《{self.comic_name}》章节：{self.title} - 应用命名规则时发生错误!\n"
+                f"已取消命名规则的应用！\n"
+                f"请重新尝试或者重启软件!\n\n"
+                f"更多详细信息请查看日志文件, 或联系开发者！"
+            )
+
         self.epi_path = os.path.join(self.save_path, f"{self.title}")
+
+    ############################################################
+    def rename_title(self) -> None:
+        """重命名当前设置下的章节名
+        """
+
+        rename_rule = self.mainGUI.getConfig("rename_rule")
+        if "default" == rename_rule:
+            return
+
+        rules = str(rename_rule).split("&")
+        if not self.long_title and "long" in rules and "short" not in rules:
+            self.long_title = self.short_title
+        if self.long_title.startswith(self.short_title) and "short&long" in rules:
+            self.short_title = self.long_title
+            self.long_title = ""
+
+        title = ""
+        decimal = ""
+        for rule in rules:
+            if rule.endswith("ord") and "." in str(self.ord):
+                self.ord, decimal = str(self.ord).split(".")
+                decimal = "." + decimal
+            if "default" == rule:
+                title += f" {self.title}"
+            elif "idx" == rule:
+                title += f" {self.idx}"
+            elif "3idx" == rule:
+                title += f" {self.idx:03d}"
+            elif "4idx" == rule:
+                title += f" {self.idx:04d}"
+            elif "ord" == rule:
+                title += f" {self.ord}{decimal}"
+            elif "3ord" == rule:
+                title += f" {int(self.ord):03d}{decimal}"
+            elif "4ord" == rule:
+                title += f" {int(self.ord):04d}{decimal}"
+            elif "short" == rule:
+                title += f" {self.short_title}"
+            elif "long" == rule:
+                title += f" {self.long_title}"
+
+        self.title = title.strip()
+            
+
+    ############################################################
+    def get_default_title(self) -> str:
+        """获取默认规则的章节名
+
+        Returns
+            str: 默认规则重命名后的章节名
+        """
+
+        # ?###########################################################
+        # ? 修复重复标题
+        if self.short_title == self.long_title or self.long_title == "":
+            title = self.short_title
+        else:
+            title = f"{self.short_title} {self.long_title}"
+        temp = re.search(r"^(\d+)\s+第(\d+)话", title)
+        if temp and temp[1] == temp[2]:
+            title = re.sub(r"^\d+\s+(第\d+话)", r"\1", title)
+        temp = re.search(r"^(\d+)\s+第(\d+)$", title)
+        if temp and temp[1] == temp[2]:
+            title = re.sub(r"^\d+\s+(第\d+)$", r"\1话", title)
+        if re.search(r"^特别篇\s+特别篇", title):
+            title = re.sub(r"^特别篇\s+特别篇", r"特别篇", title)
+
+        # ?###########################################################
+        # ? 修复短标题中的数字
+        if re.search(r"^[0-9\-\.]+话", title):
+            title = re.sub(r"^([0-9\-\.]+)话", r"第\1话", title)
+        elif re.search(r"^[0-9\-\.]+ ", title):
+            title = re.sub(r"^([0-9\-\.]+) ", r"第\1话 ", title)
+        elif re.search(r"^[0-9\-\.]+$", title):
+            title = re.sub(r"^([0-9\-\.]+)$", r"第\1话", title)
+ 
+        return title
 
     ############################################################
     def init_imgsList(self) -> bool:
@@ -112,6 +186,7 @@ class Episode:
         Returns
             bool: 是否初始化成功
         """
+
         # ?###########################################################
         # ? 获取图片列表
         GetImageIndexURL = (
@@ -632,7 +707,7 @@ class Episode:
         # ?###########################################################
         # ? 保存图片
         img_format = img_url.split(".")[-1].split("?")[0].lower().replace("&append=", "")
-        path_to_save = os.path.join(self.save_path, f"{self.real_ord}_{index}.{img_format}")
+        path_to_save = os.path.join(self.save_path, f"{self.idx}_{index}.{img_format}")
 
         @retry(stop_max_attempt_number=5)
         def _() -> None:
@@ -679,6 +754,7 @@ class Episode:
         Returns:
             bool: True: 已下载; False: 未下载
         """
+        # 此处将方括号用方括号包起来防止glob通配符匹配失败
         file_name = re.sub(r"(\[|\])", r"[\1]", self.epi_path)
         file_list = glob.glob(f"{file_name}*")
         return len(file_list) > 0

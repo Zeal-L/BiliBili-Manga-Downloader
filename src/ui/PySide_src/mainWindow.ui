@@ -1121,12 +1121,47 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </item>
           <item>
            <widget class="QComboBox" name="comboBox_epi_rename_rule">
-            <property name="minimumSize">
-             <size>
-              <width>120</width>
-              <height>0</height>
-             </size>
+            <property name="maxVisibleItems">
+             <number>20</number>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+            </property>
+            <item>
+             <property name="text">
+              <string>默认命名</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>序号+默认命名</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>3位序号+默认命名</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4位序号+默认命名</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>B漫序号+默认命名</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>3位B漫序号+默认命名</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4位B漫序号+默认命名</string>
+             </property>
+            </item>
             <item>
              <property name="text">
               <string>短标题+长标题</string>
@@ -1144,7 +1179,52 @@ li.checked::marker { content: &quot;\2612&quot;; }
             </item>
             <item>
              <property name="text">
+              <string>3位序号+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>3位序号+短标题+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4位序号+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4位序号+短标题+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>B漫序号+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>B漫序号+短标题+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>3位B漫序号+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>3位B漫序号+短标题+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4位B漫序号+长标题</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4位B漫序号+短标题+长标题</string>
              </property>
             </item>
            </widget>
