@@ -146,7 +146,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 524, 191))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -692,10 +692,10 @@ class Ui_MainWindow(object):
         self.h_Layout_save_prefer = QHBoxLayout()
         self.h_Layout_save_prefer.setObjectName(u"h_Layout_save_prefer")
         self.h_Layout_save_prefer.setContentsMargins(0, 0, 0, 0)
-        self.label_img_format = QLabel(self.tab_setting)
-        self.label_img_format.setObjectName(u"label_img_format")
+        self.label_epi_rename_rule = QLabel(self.tab_setting)
+        self.label_epi_rename_rule.setObjectName(u"label_epi_rename_rule")
 
-        self.h_Layout_save_prefer.addWidget(self.label_img_format)
+        self.h_Layout_save_prefer.addWidget(self.label_epi_rename_rule)
 
         self.horizontalSpacer = QSpacerItem(20, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 
@@ -715,10 +715,10 @@ class Ui_MainWindow(object):
 
         self.h_Layout_save_prefer.addItem(self.horizontalSpacer_15)
 
-        self.label_epi_rename_rule = QLabel(self.tab_setting)
-        self.label_epi_rename_rule.setObjectName(u"label_epi_rename_rule")
+        self.label_img_format = QLabel(self.tab_setting)
+        self.label_img_format.setObjectName(u"label_img_format")
 
-        self.h_Layout_save_prefer.addWidget(self.label_epi_rename_rule)
+        self.h_Layout_save_prefer.addWidget(self.label_img_format)
 
         self.horizontalSpacer_14 = QSpacerItem(20, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 
@@ -1025,13 +1025,13 @@ class Ui_MainWindow(object):
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u9644\u52a0\u4fe1\u606f\uff1a", None))
         self.checkBox_exif_info.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u5728\u4fdd\u5b58\u6587\u4ef6\u5c5e\u6027\u4e2d\u8bb0\u5f55\u7ae0\u8282\u6807\u9898\u3001\u4f5c\u8005\u3001\u51fa\u7248\u793e\u7b49\u9644\u52a0\u4fe1\u606f", None))
         self.checkBox_save_meta.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u521b\u5efa\u6f2b\u753b\u5143\u6570\u636e\u6587\u4ef6", None))
-        self.label_img_format.setText(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u547d\u540d\u89c4\u5219\uff1a", None))
+        self.label_epi_rename_rule.setText(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u547d\u540d\u89c4\u5219\uff1a", None))
         self.comboBox_epi_rename_rule.setItemText(0, QCoreApplication.translate("MainWindow", u"\u77ed\u6807\u9898+\u957f\u6807\u9898", None))
         self.comboBox_epi_rename_rule.setItemText(1, QCoreApplication.translate("MainWindow", u"\u5e8f\u53f7+\u957f\u6807\u9898", None))
         self.comboBox_epi_rename_rule.setItemText(2, QCoreApplication.translate("MainWindow", u"\u5e8f\u53f7+\u77ed\u6807\u9898+\u957f\u6807\u9898", None))
         self.comboBox_epi_rename_rule.setItemText(3, QCoreApplication.translate("MainWindow", u"3\u4f4d\u5e8f\u53f7+\u77ed\u6807\u9898+\u957f\u6807\u9898", None))
 
-        self.label_epi_rename_rule.setText(QCoreApplication.translate("MainWindow", u"\u4e0b\u8f7d\u56fe\u7247\u683c\u5f0f\uff1a", None))
+        self.label_img_format.setText(QCoreApplication.translate("MainWindow", u"\u8bf7\u6c42\u56fe\u7247\u683c\u5f0f\uff1a", None))
         self.comboBox_img_format.setItemText(0, QCoreApplication.translate("MainWindow", u"\u539f\u59cb\u683c\u5f0f", None))
         self.comboBox_img_format.setItemText(1, QCoreApplication.translate("MainWindow", u"\u5168\u5c3a\u5bf8jpg", None))
         self.comboBox_img_format.setItemText(2, QCoreApplication.translate("MainWindow", u"\u5168\u5c3a\u5bf8webp", None))

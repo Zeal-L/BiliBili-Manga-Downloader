@@ -155,6 +155,25 @@ class Episode:
             return False
 
         # ?###########################################################
+        # ? 配置图片下载格式
+        img_format_list = {
+            "default": "",
+            "jpg": "@10000w.jpg",
+            "webp": "@10000w.webp",
+            "avif": "@10000w.avif",
+            "1700jpg": "@1700w.jpg",
+            "1400jpg": "@1400w.jpg",
+            "1100jpg": "@1100w.jpg",
+            "1700webp": "@1700w.webp",
+            "1400webp": "@1400w.webp",
+            "1700avif": "@1700w.avif",
+            "1400avif": "@1400w.avif",
+            "1100avif": "@1100w.avif",
+        }
+        img_format = self.mainGUI.getConfig("img_format")
+        imgs_urls = [img_url + img_format_list[img_format] for img_url in imgs_urls]
+
+        # ?###########################################################
         # ? 获取图片token
         ImageTokenURL = (
             "https://manga.bilibili.com/twirp/comic.v1.Comic/ImageToken?device=pc&platform=web"

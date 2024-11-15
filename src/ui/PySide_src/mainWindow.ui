@@ -192,8 +192,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>524</width>
-                   <height>191</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
@@ -1097,7 +1097,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_img_format">
+           <widget class="QLabel" name="label_epi_rename_rule">
             <property name="text">
              <string>章节命名规则：</string>
             </property>
@@ -1166,9 +1166,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label_epi_rename_rule">
+           <widget class="QLabel" name="label_img_format">
             <property name="text">
-             <string>下载图片格式：</string>
+             <string>请求图片格式：</string>
             </property>
            </widget>
           </item>

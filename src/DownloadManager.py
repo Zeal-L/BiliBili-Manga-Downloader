@@ -158,7 +158,6 @@ class DownloadManager:
                 img_url = img["complete_url"]
             else:
                 img_url = img["url"]
-            img_url = re.sub(r"@[^?]*\?", "", img_url)
             match_cpx = re.search(r"[?&]cpx=([^&]*)", img_url)
             cpx = match_cpx.group(1) if match_cpx else ""
             img_path = epi.downloadImg(index, img_url, cpx)

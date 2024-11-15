@@ -402,7 +402,7 @@ class SettingUI(QObject):
             if checked:
                 self.mainGUI.updateConfig("save_method", button.text())
                 self.mainGUI.signal_information_box.emit(
-                    "修改成功！重新解析章节后生效"
+                    f"修改成功！重新解析章节后生效"
                 )
 
         for i in range(self.mainGUI.h_Layout_groupBox_save_method.count()):
@@ -560,12 +560,12 @@ class SettingUI(QObject):
     ############################################################
 
     def init_img_format_setting(self) -> None:
-        """绑定下载图片格式设置"""
+        """绑定请求图片格式设置"""
         img_format_list = {
             "default": "原始格式",
-            "10000jpg": "全尺寸jpg",
-            "10000webp": "全尺寸webp",
-            "10000avif": "全尺寸avif",
+            "jpg": "全尺寸jpg",
+            "webp": "全尺寸webp",
+            "avif": "全尺寸avif",
             "1700jpg": "1700宽jpg",
             "1400jpg": "1400宽jpg",
             "1100jpg": "1100宽jpg",
@@ -582,6 +582,17 @@ class SettingUI(QObject):
 
         def _(img_format: str) -> None:
             self.mainGUI.updateConfig("img_format", reversed_img_format_list[img_format])
+            self.mainGUI.signal_information_box.emit(
+                f"已成功切换图片质量至 [{img_format}]！重新解析章节后生效\n"
+                f"注意！此设置对Biliplus不一定有效"
+            )
+            if self.mainGUI.getConfig("save_method") == "PDF" and (
+                img_format.endswith("webp")
+                or img_format.endswith("avif")
+            ):
+                self.mainGUI.signal_message_box.emit(
+                    f"请注意！PDF格式保存时，非JPG格式文件会被二次压缩为JPG编码存入PDF",
+                )
 
         self.mainGUI.comboBox_img_format.currentTextChanged.connect(_)
 
@@ -596,6 +607,10 @@ class SettingUI(QObject):
             self.mainGUI.updateConfig("hash_check", True)
 
         def _(checked: bool) -> None:
+            if not checked:
+                self.mainGUI.signal_message_box.emit(
+                    f"请注意！图片下载完整性校验已取消，可能会造成缺页与其它预料之外的严重问题！",
+                )
             self.mainGUI.updateConfig("hash_check", checked)
 
         self.mainGUI.checkBox_hash_check.toggled.connect(_)
