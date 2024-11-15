@@ -1203,6 +1203,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
             </item>
             <item>
              <property name="text">
+              <string>全尺寸jpg</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>全尺寸webp</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>全尺寸avif</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>1700宽jpg</string>
              </property>
             </item>
@@ -1214,11 +1229,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <item>
              <property name="text">
               <string>1100宽jpg</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>800宽jpg</string>
              </property>
             </item>
             <item>
@@ -1238,11 +1248,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
             </item>
             <item>
              <property name="text">
-              <string>800宽webp</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
               <string>1700宽avif</string>
              </property>
             </item>
@@ -1254,11 +1259,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <item>
              <property name="text">
               <string>1100宽avif</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>800宽avif</string>
              </property>
             </item>
            </widget>

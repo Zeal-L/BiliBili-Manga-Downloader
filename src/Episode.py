@@ -586,13 +586,14 @@ class Episode:
 
         try:
             _()
-            isValid, img_md5 = isCheckSumValid(md5, img)
-            if not isValid:
-                logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
-                    f"\t{md5} ≠ {img_md5}"
-                )
-                raise requests.HTTPError()
+            if self.mainGUI.getConfig("hash_check"):
+                isValid, img_md5 = isCheckSumValid(md5, img)
+                if not isValid:
+                    logger.warning(
+                        f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 下载内容Checksum不正确! 重试中...\n"
+                        f"\t{md5} ≠ {img_md5}"
+                    )
+                    raise requests.HTTPError()
         except OSError as e:
             logger.error(
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 处理图片失败!\n{e}"

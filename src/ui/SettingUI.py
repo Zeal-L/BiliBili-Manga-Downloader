@@ -302,6 +302,9 @@ class SettingUI(QObject):
             else:
                 self.mainGUI.lineEdit_save_path.setText(os.getcwd())
                 self.mainGUI.updateConfig("save_path", os.getcwd())
+            self.mainGUI.signal_information_box.emit(
+                "修改成功！重新解析章节后生效"
+            )
 
         self.mainGUI.pushButton_save_path.clicked.connect(_)
 
@@ -314,6 +317,9 @@ class SettingUI(QObject):
                 self.mainGUI.lineEdit_save_path.setText(os.getcwd())
                 self.mainGUI.updateConfig("save_path", os.getcwd())
             self.mainGUI.lineEdit_save_path.clearFocus()
+            self.mainGUI.signal_information_box.emit(
+                "修改成功！重新解析章节后生效"
+            )
 
         self.mainGUI.lineEdit_save_path.returnPressed.connect(_)
 
@@ -395,7 +401,7 @@ class SettingUI(QObject):
         def _(button: QRadioButton, checked: bool) -> None:
             if checked:
                 self.mainGUI.updateConfig("save_method", button.text())
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_information_box.emit(
                     "修改成功！重新解析章节后生效"
                 )
 
@@ -557,18 +563,17 @@ class SettingUI(QObject):
         """绑定下载图片格式设置"""
         img_format_list = {
             "default": "原始格式",
+            "10000jpg": "全尺寸jpg",
+            "10000webp": "全尺寸webp",
+            "10000avif": "全尺寸avif",
             "1700jpg": "1700宽jpg",
             "1400jpg": "1400宽jpg",
             "1100jpg": "1100宽jpg",
-            "800jpg": "800宽jpg",
             "1700webp": "1700宽webp",
             "1400webp": "1400宽webp",
-            "1100webp": "1100宽webp",
-            "800webp": "800宽webp",
             "1700avif": "1700宽avif",
             "1400avif": "1400宽avif",
             "1100avif": "1100宽avif",
-            "800avif": "800宽avif",
         }
         reversed_img_format_list = {value: key for key, value in img_format_list.items()}
 
