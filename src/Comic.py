@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 import requests
 from retrying import RetryError, retry
 
+from PySide6.QtCore import QFile
+
 from src.Episode import Episode
 from src.Utils import (
     MAX_RETRY_SMALL,
@@ -71,12 +73,15 @@ class Comic:
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 获取漫画信息失败! 重试中...\n{e}")
                 raise e
-            if res.status_code != 200:
+            if res.status_code != 200 or res.json().get("code") != 0:
+                if res.json().get("code") == 404:
+                    return None
+                reason = res.reason if res.status_code != 200 else res.json().get("msg")
                 logger.warning(
-                    f"漫画id:{self.comic_id} 爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"漫画id:{self.comic_id} 爬取漫画信息失败! 状态码：{res.status_code}, 理由: {reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            return res.json()["data"]
+            return res.json().get("data")
 
         try:
             self.data = _()
@@ -143,7 +148,9 @@ class Comic:
                 "请检查网络连接或者重启软件!\n\n"
                 "更多详细信息请查看日志文件, 或联系开发者！"
             )
-            return open(":/imgs/fail_img.jpg", encoding="utf-8")
+            fail_img = QFile(":/imgs/fail_img.jpg")
+            fail_img.open(QFile.ReadOnly)
+            return bytes(fail_img.readAll())
 
     ############################################################
     def getEpisodesInfo(self) -> list[Episode]:

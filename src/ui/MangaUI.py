@@ -117,12 +117,16 @@ class MangaUI(QObject):
         def _() -> None:
             comic_id = self.mainGUI.lineEdit_manga_search_id.text().strip()
             # ? 如果输入框为空，或者不是五位数字，提示用户输入正确的id
+            if str(comic_id).startswith("mc"):
+                comic_id = comic_id[2:]
             if len(comic_id) < 5:
                 QMessageBox.critical(self.mainGUI, "警告", "请输入五位漫画ID！")
                 return
             self.present_comic_id = comic_id
             self.resolveEnable(False)
-            comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
+            comic = Comic(self.present_comic_id, self.mainGUI)
+            if not comic.getComicInfo():
+                comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic)
 
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)

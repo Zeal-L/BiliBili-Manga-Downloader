@@ -7,6 +7,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import requests
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
@@ -58,6 +60,11 @@ class SearchComic:
                     f"获取搜索结果失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
+            elif res.json().get("code") != 0:
+                self.mainGUI.signal_information_box.emit(
+                    f"测试Cookie是否有效失败! 理由: {res.json().get("msg")} "
+                )
+                return []
             return res.json()["data"]["list"]
 
         logger.info(f"正在搜索漫画:《{self.comic_name}》中...")

@@ -88,7 +88,8 @@ class DownloadUI(QObject):
             mainGUI.progressBar_total_progress.setValue(total_progress)
             # ? 更新系统任务栏进度条
             if platform == "win32":
-                self.sysProgressbar.set_mode(TBPF_NORMAL)
+                if total_progress == 0:
+                    self.sysProgressbar.set_mode(TBPF_NORMAL)
                 self.sysProgressbar.set_progress(int(total_progress), 100)
 
             if total_progress != 100:

@@ -174,9 +174,10 @@ class Episode:
                     f"《{self.comic_name}》章节：{self.title}, 获取图片token失败! 重试中...\n{e}"
                 )
                 raise e
-            if res.status_code != 200:
+            if res.status_code != 200 or res.json().get("code") != 0:
+                reason = res.reason if res.status_code != 200 else res.json().get("msg")
                 logger.warning(
-                    f"《{self.comic_name}》章节：{self.title} 获取图片token失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"《{self.comic_name}》章节：{self.title} 获取图片token失败! 状态码：{res.status_code}, 理由: {reason} 重试中..."
                 )
                 raise requests.HTTPError()
             return res.json()["data"]
@@ -549,7 +550,9 @@ class Episode:
                     f"状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            md5 = res.headers["Etag"]
+            md5 = res.headers.get("Etag")
+            if not md5:
+                raise requests.HTTPError()
             hit_encrypt = not res.headers.get("content-type").startswith("image/")
             return res.content, md5, hit_encrypt
 
@@ -596,7 +599,7 @@ class Episode:
                     raise requests.HTTPError()
         except OSError as e:
             logger.error(
-                f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 处理图片失败!\n{e}"
+                f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 处理图片失败!\n{e}"
             )
             logger.exception(e)
             self.mainGUI.signal_message_box.emit(

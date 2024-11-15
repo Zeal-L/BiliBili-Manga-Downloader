@@ -50,9 +50,10 @@ class QrCode:
             except requests.RequestException as e:
                 logger.warning(f"获取登入二维码失败! 重试中...\n {e}")
                 raise e
-            if res.status_code != 200:
+            if res.status_code != 200 or res.json().get("code") != 0:
+                reason = res.reason if res.status_code != 200 else res.json().get("msg")
                 logger.warning(
-                    f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"获取登入二维码失败! 状态码：{res.status_code}, 理由: {reason} 重试中..."
                 )
                 raise requests.HTTPError()
             return res.json()["data"]
@@ -102,9 +103,10 @@ class QrCode:
             except requests.RequestException as e:
                 logger.warning(f"确认二维码登入失败! 重试中...\n {e}")
                 raise e
-            if res.status_code != 200:
+            if res.status_code != 200 or res.json().get("code") != 0:
+                reason = res.reason if res.status_code != 200 else res.json().get("msg")
                 logger.warning(
-                    f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
+                    f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {reason} 重试中..."
                 )
                 raise requests.HTTPError()
             return res.json()["data"]

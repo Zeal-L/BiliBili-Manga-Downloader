@@ -61,7 +61,7 @@ class BiliPlusComic(Comic):
                 res = requests.post(
                     biliplus_detail_url,
                     headers=self.headers,
-                    timeout=TIMEOUT_SMALL - 3,
+                    timeout=TIMEOUT_SMALL,
                 )
             except requests.RequestException as e:
                 logger.warning(f"漫画id:{self.comic_id} 在BiliPlus爬取漫画信息失败! \n{e}")
