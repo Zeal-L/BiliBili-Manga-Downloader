@@ -61,14 +61,18 @@ class SearchComic:
                 )
                 raise requests.HTTPError()
             elif res.json().get("code") == 401:
-
                 mainGUI.signal_confirm_box.emit(
-                    f"搜索次数过多，需要人机验证，请使用本账号完成滑动验证哦～ {getRamdomKaomojis()}\n"
+                    f"搜索次数过多，需要人机验证，验证完毕关闭即可～ {getRamdomKaomojis("sad")}\n"
                     f"点击确定打开打开网页完成滑动验证",
-                    lambda: QDesktopServices.openUrl(QUrl("https://manga.bilibili.com/search?keyword=%10"))
+                    lambda: mainGUI.signal_open_web_view.emit("风险验证", "https://manga.bilibili.com/search?keyword=%10")
                 )
                 return []
-            elif res.json().get("code") != "0":
+            elif res.json().get("code") == 403:
+                mainGUI.signal_warning_box.emit(
+                    f"您的搜索次数已达今日上限 {getRamdomKaomojis("helpless")}"
+                )
+                return []
+            elif res.json().get("code") != 0:
                 mainGUI.signal_warning_box.emit(
                     f"获取搜索结果失败! 理由: {res.json().get("msg")} "
                 )

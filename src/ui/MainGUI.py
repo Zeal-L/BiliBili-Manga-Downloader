@@ -23,6 +23,7 @@ if platform == "darwin":
 else:
     from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
+from src.ui.WebUI import WebWindow
 from src.Utils import __version__, data_path, logger
 
 
@@ -34,6 +35,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
     signal_warning_box = Signal(str)
     signal_info_box = Signal(str)
     signal_confirm_box = Signal(str, FunctionType)
+    signal_open_web_view = Signal(str, str)
 
     # ? 用于多线程报告程序详情
     signal_resolve_status = Signal(str)
@@ -57,6 +59,12 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 callback()
         self.signal_confirm_box.connect(_)
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
+        self.web_view = None
+        def _(title, url):
+            self.web_view = None
+            self.web_view = WebWindow(self, title, url, self.getConfig('cookie'))
+            self.web_view.show()
+        self.signal_open_web_view.connect(_)
 
         # ?###########################################################
         # ? 初始化功能键状态
