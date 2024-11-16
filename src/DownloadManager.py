@@ -18,12 +18,10 @@ class DownloadManager:
         self,
         max_workers: int,
         signal_rate_progress: SignalInstance,
-        signal_message_box: SignalInstance,
     ) -> None:
         self.id_count = 0
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.signal_rate_progress = signal_rate_progress
-        self.signal_message_box = signal_message_box
 
         self.terminated = False
         self.all_tasks = {}

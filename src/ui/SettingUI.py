@@ -189,12 +189,12 @@ class SettingUI(QObject):
         try:
             _()
             if notice:
-                self.mainGUI.signal_information_box.emit("Cookie有效！")
+                self.mainGUI.signal_info_box.emit("Cookie有效！")
             is_cookie_valid = True
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 "重复测试Cookie是否有效多次后失败!\n请核对输入的Cookie值或者检查网络连接!\n\n更多详细信息请查看日志文件",
             )
         self.mainGUI.lineEdit_my_cookie.setEnabled(True)
@@ -266,22 +266,22 @@ class SettingUI(QObject):
         try:
             result = _()
             if None is result:
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     "BiliPlus访问异常!\n暂时无法检测是否有效!\n请自行判断BiliPlus可访问状态或联系开发者"
                 )
             elif False is result:
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     "BiliPlus Cookie检测无效!\n请核对输入的Cookie是否正确以及完整!"
                 )
             elif True is result:
                 is_cookie_valid = True
                 if notice:
-                    self.mainGUI.signal_information_box.emit("BiliPlus Cookie有效！")
+                    self.mainGUI.signal_info_box.emit("BiliPlus Cookie有效！")
         except requests.RequestException as e:
             msg = "重复测试biliplus Cookie是否有效多次后失败!"
             logger.error(msg)
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"{msg}\n请检查网络连接或者重启软件!\n\n"
                 f"更多详细信息请查看日志文件, 或联系开发者！"
             )
@@ -302,7 +302,7 @@ class SettingUI(QObject):
             else:
                 self.mainGUI.lineEdit_save_path.setText(os.getcwd())
                 self.mainGUI.updateConfig("save_path", os.getcwd())
-            self.mainGUI.signal_information_box.emit(
+            self.mainGUI.signal_info_box.emit(
                 "修改成功！重新解析章节后生效"
             )
 
@@ -317,7 +317,7 @@ class SettingUI(QObject):
                 self.mainGUI.lineEdit_save_path.setText(os.getcwd())
                 self.mainGUI.updateConfig("save_path", os.getcwd())
             self.mainGUI.lineEdit_save_path.clearFocus()
-            self.mainGUI.signal_information_box.emit(
+            self.mainGUI.signal_info_box.emit(
                 "修改成功！重新解析章节后生效"
             )
 
@@ -401,7 +401,7 @@ class SettingUI(QObject):
         def _(button: QRadioButton, checked: bool) -> None:
             if checked:
                 self.mainGUI.updateConfig("save_method", button.text())
-                self.mainGUI.signal_information_box.emit(
+                self.mainGUI.signal_info_box.emit(
                     f"修改成功！重新解析章节后生效"
                 )
 
@@ -467,7 +467,7 @@ class SettingUI(QObject):
                 self.mainGUI.comboBox_theme_density.setEnabled(False)
             else:
                 self.mainGUI.comboBox_theme_density.setEnabled(True)
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     f"已成功切换主题至 [{text}]！\n"
                     f"除默认主题外其他主题尚未完整测试，如若找不到切换选项，请缩放启动器窗口或全屏"
                 )
@@ -570,7 +570,7 @@ class SettingUI(QObject):
 
         def _(rename_rule: str) -> None:
             self.mainGUI.updateConfig("rename_rule", reversed_rename_rule_list[rename_rule])
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"请注意！修改命名格式后，无法识别现有的已下载文件",
             )
 
@@ -601,7 +601,7 @@ class SettingUI(QObject):
 
         def _(img_format: str) -> None:
             self.mainGUI.updateConfig("img_format", reversed_img_format_list[img_format])
-            self.mainGUI.signal_information_box.emit(
+            self.mainGUI.signal_info_box.emit(
                 f"已成功切换图片质量至 [{img_format}]！重新解析章节后生效\n"
                 f"注意！此设置对Biliplus不一定有效"
             )
@@ -609,7 +609,7 @@ class SettingUI(QObject):
                 img_format.endswith("webp")
                 or img_format.endswith("avif")
             ):
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     f"请注意！PDF格式保存时，非JPG格式文件会被二次压缩为JPG编码存入PDF",
                 )
 
@@ -627,7 +627,7 @@ class SettingUI(QObject):
 
         def _(checked: bool) -> None:
             if not checked:
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     f"请注意！图片下载完整性校验已取消，可能会造成缺页与其它预料之外的严重问题！",
                 )
             self.mainGUI.updateConfig("hash_check", checked)

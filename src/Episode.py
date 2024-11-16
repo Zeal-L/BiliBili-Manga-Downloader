@@ -92,7 +92,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - 应用命名规则时发生错误!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} - 应用命名规则时发生错误!\n"
                 f"已取消命名规则的应用！\n"
                 f"请重新尝试或者重启软件!\n\n"
@@ -221,7 +221,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败! 跳过!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片列表多次后失败!\n"
                 f"已暂时跳过此章节!\n"
                 f"请检查网络连接或者重启软件!\n\n"
@@ -283,7 +283,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败! 跳过!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n"
                 f"已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n"
                 f"更多详细信息请查看日志文件, 或联系开发者！"
@@ -322,7 +322,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n{imgs_path}\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 删除临时图片多次后失败!\n请手动删除!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -423,7 +423,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n{e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 合并PDF多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -489,7 +489,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到文件夹多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -526,7 +526,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到7z多次后失败!\n{e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到7z多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -564,7 +564,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Zip多次后失败!\n{e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到Zip多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -603,7 +603,7 @@ class Episode:
         except OSError as e:
             logger.error(f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz多次后失败!\n{e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 保存图片到Cbz多次后失败!\n已暂时跳过此章节!\n请重新尝试或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
 
@@ -657,7 +657,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} 重复下载图片多次后失败!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} 重复下载图片多次后失败!\n已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return None
@@ -696,7 +696,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - 处理图片失败!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} - {index} - 处理图片失败!\n"
                 f"已暂时跳过此章节, 并删除所有缓存文件！\n"
                 f"请重新尝试或者重启软件!\n\n"
@@ -727,7 +727,7 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} - {index} - {img_url} - {path_to_save} - 保存图片多次后失败!\n{e}"
             )
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"《{self.comic_name}》章节：{self.title} - {index} - 保存图片多次后失败!\n"
                 f"已暂时跳过此章节, 并删除所有缓存文件！\n"
                 f"请重新尝试或者重启软件!\n\n"

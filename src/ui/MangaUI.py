@@ -80,33 +80,42 @@ class MangaUI(QObject):
                 QMessageBox.critical(self.mainGUI, "警告", "请输入漫画名！")
                 return
 
-            self.search_info = SearchComic(
-                self.mainGUI.lineEdit_manga_search_name.text(),
-                self.mainGUI.getConfig("cookie"),
-            ).getResults(self.mainGUI)
-            self.mainGUI.listWidget_manga_search.clear()
-            self.mainGUI.label_manga_search.setText(f"{len(self.search_info)}条结果")
-            for item in self.search_info:
-                # ?###########################################################
-                # ? 替换爬取信息里的html标签
-                item["title"] = sub(r"</[^>]+>", "</span>", item["title"])
-                item["title"] = sub(
-                    r"<[^/>]+>",
-                    '<span style="color:red;font-weight:bold">',
-                    item["title"],
-                )
-                # ?###########################################################
-                temp = QListWidgetItem()
-                self.mainGUI.listWidget_manga_search.addItem(temp)
-                self.mainGUI.listWidget_manga_search.setItemWidget(
-                    temp,
-                    QLabel(
-                        f"{item['title']} by <span style='color:blue'>{item['author_name'][0]}</span>"
-                    ),
-                )
+            # ?###########################################################
+            # ? 用子线程搜索漫画
+            self.mainGUI.pushButton_manga_search_name.setEnabled(False)
+            self.executor.submit(self.mangaSearch)
 
         self.mainGUI.lineEdit_manga_search_name.returnPressed.connect(_)
         self.mainGUI.pushButton_manga_search_name.clicked.connect(_)
+
+    def mangaSearch(self) -> None:
+        self.search_info = SearchComic(
+            self.mainGUI.lineEdit_manga_search_name.text(),
+            self.mainGUI.getConfig("cookie"),
+        ).getResults(self.mainGUI)
+        self.mainGUI.listWidget_manga_search.clear()
+        self.mainGUI.label_manga_search.setText(f"{len(self.search_info)}条结果")
+        for item in self.search_info:
+            # ?###########################################################
+            # ? 替换爬取信息里的html标签
+            item["title"] = sub(r"</[^>]+>", "</span>", item["title"])
+            item["title"] = sub(
+                r"<[^/>]+>",
+                '<span style="color:red;font-weight:bold">',
+                item["title"],
+            )
+            # ?###########################################################
+            temp = QListWidgetItem()
+            self.mainGUI.listWidget_manga_search.addItem(temp)
+            self.mainGUI.listWidget_manga_search.setItemWidget(
+                temp,
+                QLabel(
+                    f"{item['title']} by <span style='color:blue'>{item['author_name'][0]}</span>"
+                ),
+            )
+        self.mainGUI.pushButton_manga_search_name.setEnabled(True)
+        
+
 
     ############################################################
     def init_mangaDetails(self) -> None:
@@ -125,8 +134,6 @@ class MangaUI(QObject):
             self.present_comic_id = comic_id
             self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
-            if not comic.getComicInfo():
-                comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic)
 
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)
@@ -268,11 +275,11 @@ class MangaUI(QObject):
 
         if fail_comic := [future.result() for future in as_completed(futures) if future.result()]:
             temp = "".join(self.mainGUI.my_library[i]["comic_name"] + "\n" for i in fail_comic)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"以下漫画获取更新多次后失败!\n{temp}\n请检查网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
             )
         elif notice:
-            self.mainGUI.signal_information_box.emit("更新完成！")
+            self.mainGUI.signal_info_box.emit("更新完成！")
 
         self.mainGUI.pushButton_myLibrary_update.setEnabled(True)
         self.mainGUI.pushButton_myLibrary_update.setText("检查更新")
@@ -401,6 +408,9 @@ class MangaUI(QObject):
 
         self.mainGUI.signal_resolve_status.emit("正在解析漫画详情...")
         data = comic.getComicInfo()
+        if not data:
+            comic = BiliPlusComic(comic.comic_id, self.mainGUI)
+            data = comic.getComicInfo()
         self.signal_my_comic_detail_widget.emit(
             {
                 "mainGUI": self.mainGUI,
@@ -423,11 +433,10 @@ class MangaUI(QObject):
         self.present_comic_id = comic.comic_id
         # ? 获取漫画信息失败直接跳过
         if not data:
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             self.resolveEnable(True)
-            self.mainGUI.signal_resolve_status.emit("")
             return
         self.mainGUI.label_manga_title.setText(
             "<span style='color:blue;font-weight:bold'>标题：</span>" + data["title"]
@@ -598,7 +607,6 @@ class MangaUI(QObject):
         self.mainGUI.label_chp_detail_num_downloaded.setText(f"已下载：{comic.getNumDownloaded()}")
         self.mainGUI.label_chp_detail_num_selected.setText(f"已选中：{self.num_selected}")
         self.resolveEnable(True)
-        self.mainGUI.signal_resolve_status.emit("")
 
     ############################################################
     def updateEpisodeList(self, info: dict) -> None:
@@ -882,11 +890,14 @@ class MangaUI(QObject):
             enable (str): 是否允许解析
         """
         if enable:
+            self.mainGUI.signal_resolve_status.emit("")
             self.mainGUI.pushButton_resolve_detail.setEnabled(True)
+            self.mainGUI.pushButton_manga_search_id.setEnabled(True)
             self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(True)
             self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(True)
         else:
             self.mainGUI.pushButton_resolve_detail.setEnabled(False)
+            self.mainGUI.pushButton_manga_search_id.setEnabled(False)
             self.mainGUI.pushButton_biliplus_resolve_detail.setEnabled(False)
             self.mainGUI.pushButton_chp_detail_download_selected.setEnabled(False)
 

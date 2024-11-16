@@ -12,7 +12,7 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QMessageBox
 from retrying import retry
 
-from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, logger
+from src.Utils import MAX_RETRY_SMALL, RETRY_WAIT_EX, TIMEOUT_SMALL, getRamdomKaomojis, logger
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -60,9 +60,17 @@ class SearchComic:
                     f"获取搜索结果失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            elif res.json().get("code") != 0:
-                self.mainGUI.signal_information_box.emit(
-                    f"测试Cookie是否有效失败! 理由: {res.json().get("msg")} "
+            elif res.json().get("code") == 401:
+
+                mainGUI.signal_confirm_box.emit(
+                    f"搜索次数过多，需要人机验证，请使用本账号完成滑动验证哦～ {getRamdomKaomojis()}\n"
+                    f"点击确定打开打开网页完成滑动验证",
+                    lambda: QDesktopServices.openUrl(QUrl("https://manga.bilibili.com/search?keyword=%10"))
+                )
+                return []
+            elif res.json().get("code") != "0":
+                mainGUI.signal_warning_box.emit(
+                    f"获取搜索结果失败! 理由: {res.json().get("msg")} "
                 )
                 return []
             return res.json()["data"]["list"]
@@ -74,10 +82,8 @@ class SearchComic:
         except requests.RequestException as e:
             logger.error(f"重复获取搜索结果多次后失败!\n{e}")
             logger.exception(e)
-            QMessageBox.warning(
-                mainGUI,
-                "警告",
-                "重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件",
+            mainGUI.signal_warning_box.emit(
+                f"重复获取搜索结果多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件",
             )
             return []
 

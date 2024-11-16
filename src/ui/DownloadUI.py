@@ -36,7 +36,6 @@ class DownloadUI(QObject):
         self.downloadManager = DownloadManager(
             max_workers=mainGUI.getConfig("num_thread"),
             signal_rate_progress=self.signal_rate_progress,
-            signal_message_box=mainGUI.signal_message_box,
         )
         if platform == "win32":
             self.sysProgressbar = EasyProgressBar()

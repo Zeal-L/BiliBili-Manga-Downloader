@@ -125,7 +125,7 @@ class BiliPlusComic(Comic):
             msg = f"漫画id:{self.comic_id} 处理BiliPlus解析漫画信息时意外失败!"
             logger.error(msg)
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            self.mainGUI.signal_warning_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
         
         self.data = {}
         self.data["id"] = self.comic_id
@@ -214,7 +214,7 @@ class BiliPlusComic(Comic):
             if "" == biliplus_html:
                 return None
             if "cookie invalid" == biliplus_html:
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     "您的BiliPlus Cookie无效, 请更新您的BiliPlus Cookie!"
                 )
                 return None
@@ -261,7 +261,7 @@ class BiliPlusComic(Comic):
                 msg = f"BiliPlus为本漫画额外解锁{unlock_times}个章节\n\n"
             else:
                 msg = "BiliPlus未能为此漫画解锁更多章节\n\n"
-            self.mainGUI.signal_information_box.emit(
+            self.mainGUI.signal_info_box.emit(
                 f"{msg}Ciallo～(∠・ω< )⌒★\n"
                 "您的主动分享能温暖每一个漫画人\n"
                 "请在BiliPlus漫画主页进入功能“查看已购漫画”展示你的实力!"
@@ -270,7 +270,7 @@ class BiliPlusComic(Comic):
             msg = f"漫画id:{self.comic_id} 处理BiliPlus解锁章节数据多次后失败!"
             logger.error(msg)
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"{msg}\n请检查网络连接或者重启软件!\n\n"
                 f"更多详细信息请查看日志文件, 或联系开发者！"
             )
@@ -278,7 +278,7 @@ class BiliPlusComic(Comic):
             msg = f"漫画id:{self.comic_id} 处理BiliPlus解锁章节数据时意外失败!"
             logger.error(msg)
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            self.mainGUI.signal_warning_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
 
 
 ############################################################
@@ -341,7 +341,7 @@ class BiliPlusEpisode(Episode):
             msg = f"《{self.comic_name}》章节：{self.title} 从BiliPlus重复获取图片列表多次后失败!"
             logger.error(msg)
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 f"{msg}\n已暂时跳过此章节!\n"
                 f"请检查网络连接或者重启软件!\n\n"
                 f"更多详细信息请查看日志文件, 或联系开发者！"
@@ -356,7 +356,7 @@ class BiliPlusEpisode(Episode):
                 msg = f"《{self.comic_name}》章节：{self.title} " \
                        "在BiliPlus上的章节共享者已退出登陆, 下载失败！"
                 logger.error(msg)
-                self.mainGUI.signal_message_box.emit(msg)
+                self.mainGUI.signal_warning_box.emit(msg)
                 return False
             soup = BeautifulSoup(biliplus_html, "html.parser")
             images = soup.find_all("img", {"class": "comic-single"})
@@ -368,7 +368,7 @@ class BiliPlusEpisode(Episode):
                 msg = f"《{self.comic_name}》章节：{self.title} " \
                        "在处理BiliPlus章节图片地址时因获取的Token无效导致失败!\n\n"
                 logger.error(msg)
-                self.mainGUI.signal_message_box.emit(
+                self.mainGUI.signal_warning_box.emit(
                     f"{msg}此问题不是下载器引发的, 请在BiliPlus本章节页面上查看失败原因!"
                 )
                 return False
@@ -376,7 +376,7 @@ class BiliPlusEpisode(Episode):
             msg = f"《{self.comic_name}》章节：{self.title} 在处理BiliPlus解锁章节图片地址时意外失败!"
             logger.error(msg)
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
+            self.mainGUI.signal_warning_box.emit(f"{msg}\n\n更多详细信息请查看日志文件, 或联系开发者！")
             return False
 
         return True

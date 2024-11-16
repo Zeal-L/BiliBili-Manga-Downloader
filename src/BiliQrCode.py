@@ -116,7 +116,7 @@ class QrCode:
         except (requests.RequestException, requests.HTTPError) as e:
             logger.error(f"重复确认登入多次后失败! {e}")
             logger.exception(e)
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 "重复确认登入多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件"
             )
             return None

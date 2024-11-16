@@ -8,6 +8,7 @@ import base64
 import ctypes
 import hashlib
 import logging
+import random
 import os
 import re
 from ctypes import CDLL, c_int
@@ -143,6 +144,29 @@ def sizeToBytes(size_str: str) -> int:
     else:
         logger.error("文件大小转化错误! 不支持的文件大小格式: {size_str}")
     return 0
+
+
+def getRamdomKaomojis(select_type: str = "") -> str:
+    """获取指定类型的颜文字
+       类型有angry、happy、shock、sad、helpless
+       未填写类型则随机返回全部颜文字中的任意一个
+
+    Args:
+        type (str): 颜文字类型
+
+    Returns:
+        str: 颜文字
+    """
+    kaomojis = {
+    "angry": [r",,Ծ‸Ծ,,", r"(╯‵□′)╯︵┻━┻", r"╰（‵□′）╯"],
+    "happy": [r"=‿=✧", r"●ω●", r"(°▽°)ﾉ", r"(/ ▽ \\)", r"(=・ω・=)", r"(●'◡'●)ﾉ♥", r"<(▰˘◡˘▰)>", r"(⁄ ⁄•⁄ω⁄•⁄ ⁄)", r"(ง,,• ᴗ •,,)ง ✧", r">ㅂ<ﾉ ☆", r"ヽ(✿ﾟ▽ﾟ)ノ", r"✪ ω ✪", r"(*ﾟ▽ﾟ*)"],
+    "shock": [r"Σ( ° △ °|||)︴", r"(ﾟДﾟ≡ﾟдﾟ)!?", r"∑(っ °Д °;)っ", r"Σ(ﾟдﾟ;)"],
+    "sad": [r"＞︿＜", r"＞△＜", r"●︿●", r"(´；ω；`)", r"( ´･_･)ﾉ(._.`)"],
+    "helpless": [r"◐▽◑", r"ʅ（´◔౪◔）ʃ", r"_(:3 」∠)_", r"_(:3」∠ ❀)_", r"_(┐「ε:)_", r"←◡←", r"_(•̀ᴗ•́ 」∠ ❀)_", r"_φ(･ω･` )", r"¯\\_(ツ)_/¯"]
+    }
+    if select_type:
+        return random.choice(kaomojis[select_type])
+    return random.choice([kaomoji for i in kaomojis for kaomoji in kaomojis[i]])
 
 
 ############################################################

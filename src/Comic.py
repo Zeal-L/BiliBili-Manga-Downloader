@@ -143,7 +143,7 @@ class Comic:
             return img
         except RetryError as e:
             logger.error(f"获取封面图片多次后失败, 跳过!\n{e}")
-            self.mainGUI.signal_message_box.emit(
+            self.mainGUI.signal_warning_box.emit(
                 "获取封面图片多次后失败!\n"
                 "请检查网络连接或者重启软件!\n\n"
                 "更多详细信息请查看日志文件, 或联系开发者！"

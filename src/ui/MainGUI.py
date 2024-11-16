@@ -9,8 +9,9 @@ from functools import partial
 from sys import platform
 from typing import Any, Optional
 
+from types import FunctionType
 from PySide6.QtCore import QEvent, QObject, Qt, Signal
-from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent
+from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent, QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
 
@@ -30,8 +31,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
 
     # ? 主要是为了 Episode 类里面的提示框准备的，
     # ? 因为 Episode 类是在另一个线程里面运行的，而只有主线程才能修改 GUI
-    signal_message_box = Signal(str)
-    signal_information_box = Signal(str)
+    signal_warning_box = Signal(str)
+    signal_info_box = Signal(str)
+    signal_confirm_box = Signal(str, FunctionType)
 
     # ? 用于多线程报告程序详情
     signal_resolve_status = Signal(str)
@@ -45,8 +47,15 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             self.setFont(QFont("PingFang SC", 12))
         else:
             self.setFont(QFont("Microsoft YaHei", 10))
-        self.signal_message_box.connect(lambda msg: QMessageBox.warning(self, "警告", msg))
-        self.signal_information_box.connect(lambda msg: QMessageBox.information(self, "通知", msg))
+
+        # ? 用于链接信号
+        self.signal_warning_box.connect(lambda msg: QMessageBox.warning(self, "通知", msg))
+        self.signal_info_box.connect(lambda msg: QMessageBox.information(self, "警告", msg))
+        def _(msg, callback: FunctionType = None):
+            res = QMessageBox.question(self, "提示", msg, QMessageBox.Yes | QMessageBox.No)
+            if callback and res == QMessageBox.Yes:
+                callback()
+        self.signal_confirm_box.connect(_)
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
 
         # ?###########################################################
