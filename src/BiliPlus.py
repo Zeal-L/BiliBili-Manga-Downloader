@@ -37,8 +37,28 @@ class BiliPlusComic(Comic):
         self.biliplus_detail_url = 'https://www.biliplus.com/manga/?act=detail&mangaid='
         self.headers = {
             "User-Agent": f"{__app_name__}/{__version__}",
-            "cookie": f"{self.cookie};manga_sharing=on;manga_pic_format=jpg-full;",
+            "cookie": f"{self.cookie};manga_sharing=on;",
         }
+
+        # ?###########################################################
+        # ? 配置图片下载格式
+        img_format_list = {
+            "default": "jpg-full",
+            "jpg": "jpg-full",
+            "webp": "webp-full",
+            "avif": "avif-full",
+            "1700jpg": "jpg-1700w",
+            "1400jpg": "jpg-1400w",
+            "1100jpg": "jpg-1100w",
+            "1400webp": "webp-1700w",
+            "1700webp": "webp-1400w",
+            "1700webp": "webp-1100w",
+            "1700avif": "avif-1700w",
+            "1400avif": "avif-1400w",
+            "1100avif": "avif-1700w",
+        }
+        img_format = self.mainGUI.getConfig("img_format")
+        self.headers["cookie"] += f"manga_pic_format_http={img_format_list.get("img_format", "jpg-full")};"
 
     ############################################################
     def getComicInfo(self) -> dict:

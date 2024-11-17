@@ -12,8 +12,11 @@ from PySide6.QtCore import QUrl, QDate
 from PySide6.QtGui import QIcon
 
 
+if TYPE_CHECKING:
+    from src.ui.MainGUI import MainGUI
+
 class WebWindow(QMainWindow):
-    def __init__(self, mainGUI, title: str,  url: str, cookie: str):
+    def __init__(self, mainGUI: MainGUI, title: str,  url: str, cookie: str):
         self.mainGUI = mainGUI
         mainGUI.web_ui = self
         super().__init__()

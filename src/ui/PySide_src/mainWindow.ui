@@ -1083,7 +1083,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QCheckBox" name="checkBox_save_meta">
             <property name="text">
-             <string>是否创建漫画元数据文件</string>
+             <string>是否创建漫画元数据文件和封面</string>
             </property>
             <property name="checked">
              <bool>true</bool>

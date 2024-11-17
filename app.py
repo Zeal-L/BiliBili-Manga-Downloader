@@ -8,17 +8,20 @@ import subprocess
 from sys import argv, exit, platform
 
 from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtGui import QIcon
 
 from src.ui.MainGUI import MainGUI
-from src.Utils import __main_window_title__, logger
+from src.Utils import __main_window_title__, logger, getRamdomKaomojis
 
 if __name__ == "__main__":
     app = QApplication.instance() or QApplication(argv)
 
     if platform == "win32" and ctypes.windll.user32.FindWindowW(None, __main_window_title__) != 0:
-        _box = QMessageBox.information(
-            None, "提示", "有一个我已经满足不了你吗？\n\t...(｡•ˇ‸ˇ•｡) ..."
-        )
+        box = QMessageBox()
+        box.setWindowTitle("提示")
+        box.setText(f"有一个我已经满足不了你吗？\n{getRamdomKaomojis("sad")}")
+        box.setWindowIcon(QIcon(":/imgs/BiliBili_favicon.ico"))
+        box.exec()
         exit(0)
     elif platform == "darwin":
         script = """

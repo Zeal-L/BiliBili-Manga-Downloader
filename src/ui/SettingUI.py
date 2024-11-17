@@ -140,10 +140,9 @@ class SettingUI(QObject):
 
         def _() -> None:
             new_cookie = self.mainGUI.lineEdit_my_cookie.text().strip()
-            if new_cookie == "":
-                QMessageBox.information(self.mainGUI, "提示", "请输入Cookie！")
-                return
             self.mainGUI.updateConfig("cookie", new_cookie)
+            if "" == new_cookie:
+                return
             self.mainGUI.lineEdit_my_cookie.setEnabled(False)
             self.mainGUI.pushButton_my_cookie.clearFocus()
             self.mainGUI.pushButton_my_cookie.setEnabled(False)
@@ -238,10 +237,9 @@ class SettingUI(QObject):
 
         def _() -> None:
             new_cookie = self.mainGUI.lineEdit_biliplus_cookie.text().strip()
-            if new_cookie == "":
-                QMessageBox.information(self.mainGUI, "提示", "请输入Cookie！")
-                return
             self.mainGUI.updateConfig("biliplus_cookie", new_cookie)
+            if "" == new_cookie:
+                return
             self.mainGUI.lineEdit_biliplus_cookie.setEnabled(False)
             self.mainGUI.pushButton_biliplus_cookie.clearFocus()
             self.mainGUI.pushButton_biliplus_cookie.setEnabled(False)
@@ -617,6 +615,7 @@ class SettingUI(QObject):
             "1100jpg": "1100宽jpg",
             "1700webp": "1700宽webp",
             "1400webp": "1400宽webp",
+            "1400webp": "1100宽webp",
             "1700avif": "1700宽avif",
             "1400avif": "1400宽avif",
             "1100avif": "1100宽avif",

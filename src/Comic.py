@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING
 
 import requests
@@ -151,6 +152,7 @@ class Comic:
             fail_img = QFile(":/imgs/fail_img.jpg")
             fail_img.open(QFile.ReadOnly)
             return bytes(fail_img.readAll())
+
 
     ############################################################
     def getEpisodesInfo(self) -> list[Episode]:

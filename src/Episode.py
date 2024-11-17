@@ -106,7 +106,7 @@ class Episode:
         """
 
         rename_rule = self.mainGUI.getConfig("rename_rule")
-        if "default" == rename_rule:
+        if not rename_rule or "default" == rename_rule:
             return
 
         rules = str(rename_rule).split("&")
@@ -243,6 +243,7 @@ class Episode:
             "1100jpg": "@1100w.jpg",
             "1700webp": "@1700w.webp",
             "1400webp": "@1400w.webp",
+            "1400webp": "@1100w.webp",
             "1700avif": "@1700w.avif",
             "1400avif": "@1400w.avif",
             "1100avif": "@1100w.avif",

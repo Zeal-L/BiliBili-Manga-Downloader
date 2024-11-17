@@ -1051,7 +1051,7 @@ class Ui_MainWindow(object):
         self.checkBox_recursive_read.setText(QCoreApplication.translate("MainWindow", u"\u9012\u5f52\u8bfb\u53d6\u672c\u5730\u6f2b\u753b\u4ed3\u5e93", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u9644\u52a0\u4fe1\u606f\uff1a", None))
         self.checkBox_exif_info.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u5728\u4fdd\u5b58\u6587\u4ef6\u5c5e\u6027\u4e2d\u8bb0\u5f55\u7ae0\u8282\u6807\u9898\u3001\u4f5c\u8005\u3001\u51fa\u7248\u793e\u7b49\u9644\u52a0\u4fe1\u606f", None))
-        self.checkBox_save_meta.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u521b\u5efa\u6f2b\u753b\u5143\u6570\u636e\u6587\u4ef6", None))
+        self.checkBox_save_meta.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u521b\u5efa\u6f2b\u753b\u5143\u6570\u636e\u6587\u4ef6\u548c\u5c01\u9762", None))
         self.label_epi_rename_rule.setText(QCoreApplication.translate("MainWindow", u"\u7ae0\u8282\u547d\u540d\u89c4\u5219\uff1a", None))
         self.comboBox_epi_rename_rule.setItemText(0, QCoreApplication.translate("MainWindow", u"\u9ed8\u8ba4\u547d\u540d", None))
         self.comboBox_epi_rename_rule.setItemText(1, QCoreApplication.translate("MainWindow", u"\u5e8f\u53f7+\u9ed8\u8ba4\u547d\u540d", None))

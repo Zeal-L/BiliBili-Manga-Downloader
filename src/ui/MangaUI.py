@@ -36,6 +36,9 @@ class MangaUI(QObject):
     """漫画UI类，用于搜索、下载、管理漫画"""
 
     # ?###########################################################
+    # ? 用于多线程更新搜索结果
+    signal_search_result = Signal()
+
     # ? 用于多线程更新我的库存
     signal_my_library_add_widget = Signal(dict)
 
@@ -71,10 +74,13 @@ class MangaUI(QObject):
     def init_mangaSearch(self) -> None:
         """链接搜索漫画功能"""
 
+        self.signal_search_result.connect(self.updateSearchResult)
+
         def _() -> None:
-            if not self.mainGUI.getConfig("cookie"):
-                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
-                return
+            # 使用客户端搜索API无需cookie
+            # if not self.mainGUI.getConfig("cookie"):
+            #     QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+            #     return
             # ? 如果输入框为空，只有空格，提示用户输入
             if not self.mainGUI.lineEdit_manga_search_name.text().strip():
                 QMessageBox.critical(self.mainGUI, "警告", "请输入漫画名！")
@@ -93,6 +99,9 @@ class MangaUI(QObject):
             self.mainGUI.lineEdit_manga_search_name.text(),
             self.mainGUI.getConfig("cookie"),
         ).getResults(self.mainGUI)
+        self.signal_search_result.emit()
+
+    def updateSearchResult(self) -> None:
         self.mainGUI.listWidget_manga_search.clear()
         self.mainGUI.label_manga_search.setText(f"{len(self.search_info)}条结果")
         for item in self.search_info:
@@ -114,7 +123,6 @@ class MangaUI(QObject):
                 ),
             )
         self.mainGUI.pushButton_manga_search_name.setEnabled(True)
-        
 
 
     ############################################################
@@ -180,19 +188,20 @@ class MangaUI(QObject):
     def init_myLibrary(self) -> None:
         """初始化我的库存"""
 
-        # ?###########################################################
-        # ? 检测cookie有效性并初始化我的库存漫画元数据
-        stored_cookie = self.mainGUI.getConfig("cookie")
+        # 获取漫画详情不需要登陆
+        # # ?###########################################################
+        # # ? 检测cookie有效性并初始化我的库存漫画元数据
+        # stored_cookie = self.mainGUI.getConfig("cookie")
 
-        def _() -> None:
-            self.mainGUI.lineEdit_my_cookie.setEnabled(False)
-            self.mainGUI.pushButton_my_cookie.setEnabled(False)
-            if self.mainGUI.settingUI.check_cookie_valid(stored_cookie):
-                self.updateMyLibrary()
+        # def _() -> None:
+        #     self.mainGUI.lineEdit_my_cookie.setEnabled(False)
+        #     self.mainGUI.pushButton_my_cookie.setEnabled(False)
+        #     if self.mainGUI.settingUI.check_cookie_valid(stored_cookie):
+        #         self.updateMyLibrary()
 
-        self.readMyLibrary()
-        if stored_cookie:
-            self.executor.submit(_)
+        # self.readMyLibrary()
+        # if stored_cookie:
+        #     self.executor.submit(_)
 
         # ?###########################################################
         # ? 绑定更新我的库存事件
@@ -201,9 +210,10 @@ class MangaUI(QObject):
         self.signal_my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
 
         def _() -> None:
-            if not self.mainGUI.getConfig("cookie"):
-                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
-                return
+            # 使用客户端搜索API无需cookie
+            # if not self.mainGUI.getConfig("cookie"):
+            #     QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+            #     return
             self.readMyLibrary()
             self.updateMyLibrary(notice=True)
 
@@ -789,9 +799,10 @@ class MangaUI(QObject):
             if self.present_comic_id == 0:
                 QMessageBox.critical(self.mainGUI, "警告", "请先在搜索或库存列表选择一个漫画！")
                 return
-            if not self.mainGUI.getConfig("cookie"):
-                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
-                return
+            # 使用客户端搜索API无需cookie
+            # if not self.mainGUI.getConfig("cookie"):
+            #     QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+            #     return
             self.resolveEnable(False)
             comic = Comic(self.present_comic_id, self.mainGUI)
             self.updateComicInfoEvent(comic)
@@ -844,12 +855,27 @@ class MangaUI(QObject):
                 os.makedirs(save_path)
 
             # ?###########################################################
-            # ? 保存元数据
-            if self.mainGUI.getConfig("save_meta") and not os.path.exists(
-                os.path.join(save_path, "元数据.json")
-            ):
-                comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
-                self.save_meta(comic.getComicInfo())
+            # ? 初始漫画对象
+            comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
+
+            if self.mainGUI.getConfig("save_meta"):
+                # ?###########################################################
+                # ? 保存元数据
+                try:
+                    if not os.path.exists(os.path.join(save_path, "元数据.json")):
+                        self.save_meta(comic.getComicInfo())
+                except Exception as e:
+                    logger.error(f"保存封面元数据失败, 跳过!\n{e}")
+
+                # ?###########################################################
+                # ? 保存漫画封面
+                try:
+                    cover_path = os.path.join(save_path, "cover.jpg")
+                    if not os.path.exists(cover_path):
+                        cover = comic.getComicCover(comic.getComicInfo())
+                        open(cover_path, "wb").write(cover)
+                except Exception as e:
+                    logger.error(f"保存封面图片失败, 跳过!\n{e}")
 
             # ?###########################################################
             # ? 开始下载选中章节
@@ -860,7 +886,6 @@ class MangaUI(QObject):
                     item.flags() != Qt.ItemFlag.NoItemFlags
                     and item.checkState() == Qt.CheckState.Checked
                 ):
-                    comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
                     self.mainGUI.need_sms_verify = False
                     self.mainGUI.downloadUI.addTask(self.mainGUI, self.epi_list[i])
                     item.setFlags(Qt.ItemFlag.NoItemFlags)
