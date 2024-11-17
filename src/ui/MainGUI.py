@@ -10,7 +10,7 @@ from sys import platform
 from typing import Any, Optional
 
 from types import FunctionType
-from PySide6.QtCore import QEvent, QObject, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, Qt, Signal, QUrl
 from PySide6.QtGui import QCloseEvent, QFont, QKeyEvent, QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from qt_material import QtStyleTools
@@ -23,7 +23,7 @@ if platform == "darwin":
 else:
     from src.ui.PySide_src.mainWindow_ui import Ui_MainWindow
 from src.ui.SettingUI import SettingUI
-from src.ui.WebUI import WebWindow
+# from src.ui.WebUI import WebWindow
 from src.Utils import __version__, data_path, logger
 
 
@@ -61,9 +61,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.signal_resolve_status.connect(partial(self.label_resolve_status.setText))
         self.web_view = None
         def _(title, url):
-            self.web_view = None
-            self.web_view = WebWindow(self, title, url, self.getConfig('cookie'))
-            self.web_view.show()
+            QDesktopServices.openUrl(QUrl(url))
+            # self.web_view = None
+            # self.web_view = WebWindow(self, title, url, self.getConfig('cookie'))
+            # self.web_view.show()
         self.signal_open_web_view.connect(_)
 
         # ?###########################################################
