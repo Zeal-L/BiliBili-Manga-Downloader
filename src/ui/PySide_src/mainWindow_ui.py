@@ -642,6 +642,15 @@ class Ui_MainWindow(object):
 
         self.h_Layout_format_type.addWidget(self.groupBox_save_method)
 
+        self.horizontalSpacer_17 = QSpacerItem(40, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+
+        self.h_Layout_format_type.addItem(self.horizontalSpacer_17)
+
+        self.checkBox_recursive_read = QCheckBox(self.tab_setting)
+        self.checkBox_recursive_read.setObjectName(u"checkBox_recursive_read")
+
+        self.h_Layout_format_type.addWidget(self.checkBox_recursive_read)
+
         self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_format_type.addItem(self.horizontalSpacer_7)
@@ -1039,6 +1048,7 @@ class Ui_MainWindow(object):
         self.radioButton_save_method_7z.setText(QCoreApplication.translate("MainWindow", u"7z\u538b\u7f29\u5305", None))
         self.radioButton_save_method_Zip.setText(QCoreApplication.translate("MainWindow", u"Zip\u538b\u7f29\u5305", None))
         self.radioButton_save_method_Cbz.setText(QCoreApplication.translate("MainWindow", u"Cbz\u538b\u7f29\u5305", None))
+        self.checkBox_recursive_read.setText(QCoreApplication.translate("MainWindow", u"\u9012\u5f52\u8bfb\u53d6\u672c\u5730\u6f2b\u753b\u4ed3\u5e93", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u9644\u52a0\u4fe1\u606f\uff1a", None))
         self.checkBox_exif_info.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u5728\u4fdd\u5b58\u6587\u4ef6\u5c5e\u6027\u4e2d\u8bb0\u5f55\u7ae0\u8282\u6807\u9898\u3001\u4f5c\u8005\u3001\u51fa\u7248\u793e\u7b49\u9644\u52a0\u4fe1\u606f", None))
         self.checkBox_save_meta.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u521b\u5efa\u6f2b\u753b\u5143\u6570\u636e\u6587\u4ef6", None))

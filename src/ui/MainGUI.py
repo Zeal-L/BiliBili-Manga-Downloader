@@ -51,8 +51,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             self.setFont(QFont("Microsoft YaHei", 10))
 
         # ? 用于链接信号
-        self.signal_warning_box.connect(lambda msg: QMessageBox.warning(self, "通知", msg))
-        self.signal_info_box.connect(lambda msg: QMessageBox.information(self, "警告", msg))
+        self.signal_warning_box.connect(lambda msg: QMessageBox.warning(self, "警告", msg))
+        self.signal_info_box.connect(lambda msg: QMessageBox.information(self, "通知", msg))
         def _(msg, callback: FunctionType = None):
             res = QMessageBox.question(self, "提示", msg, QMessageBox.Yes | QMessageBox.No)
             if callback and res == QMessageBox.Yes:

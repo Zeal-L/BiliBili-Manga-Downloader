@@ -77,10 +77,8 @@ class Episode:
 
         # ?###########################################################
         # ? 修复标题中的特殊字符
-        episode["short_title"] = myStrFilter(episode["short_title"])
-        self.short_title = episode["short_title"]
-        episode["title"] = myStrFilter(episode["title"])
-        self.long_title = episode["title"]
+        self.short_title = myStrFilter(episode["short_title"])
+        self.long_title = myStrFilter(episode["title"])
 
         # ?###########################################################
         # ? 获取章节名
@@ -157,8 +155,11 @@ class Episode:
         # ? 修复重复标题
         if self.short_title == self.long_title or self.long_title == "":
             title = self.short_title
+        if self.long_title.startswith(self.short_title):
+            title = self.long_title
         else:
             title = f"{self.short_title} {self.long_title}"
+
         temp = re.search(r"^(\d+)\s+第(\d+)话", title)
         if temp and temp[1] == temp[2]:
             title = re.sub(r"^\d+\s+(第\d+话)", r"\1", title)

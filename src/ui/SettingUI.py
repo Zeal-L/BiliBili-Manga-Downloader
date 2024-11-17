@@ -27,6 +27,7 @@ from src.Utils import (
     log_path,
     logger,
     openFileOrDir,
+    getRamdomKaomojis
 )
 
 if TYPE_CHECKING:
@@ -59,6 +60,8 @@ class SettingUI(QObject):
         self.init_img_format_setting()
         self.init_rename_rule_setting()
         self.init_hash_check_setting()
+        self.init_recursive_read_setting()
+        
         self.qr_ui = QrCodeUI()
 
     ############################################################
@@ -469,7 +472,7 @@ class SettingUI(QObject):
                 self.mainGUI.comboBox_theme_density.setEnabled(True)
                 self.mainGUI.signal_warning_box.emit(
                     f"已成功切换主题至 [{text}]！\n"
-                    f"除默认主题外其他主题尚未完整测试，如若找不到切换选项，请缩放启动器窗口或全屏"
+                    f"除默认主题外其他主题尚未完整测试，如若找不到切换选项，请缩放启动器窗口或全屏 {getRamdomKaomojis("sad")}"
                 )
 
         self.mainGUI.comboBox_theme_style.currentTextChanged.connect(_)
@@ -571,7 +574,7 @@ class SettingUI(QObject):
         def _(rename_rule: str) -> None:
             self.mainGUI.updateConfig("rename_rule", reversed_rename_rule_list[rename_rule])
             self.mainGUI.signal_warning_box.emit(
-                f"请注意！修改命名格式后，无法识别现有的已下载文件",
+                f"请注意！修改命名格式后，无法识别现有的已下载文件 {getRamdomKaomojis("helpless")}",
             )
 
         self.mainGUI.comboBox_epi_rename_rule.currentTextChanged.connect(_)
@@ -610,7 +613,7 @@ class SettingUI(QObject):
                 or img_format.endswith("avif")
             ):
                 self.mainGUI.signal_warning_box.emit(
-                    f"请注意！PDF格式保存时，非JPG格式文件会被二次压缩为JPG编码存入PDF",
+                    f"请注意！PDF格式保存时，非JPG格式文件会被二次压缩为JPG编码存入PDF {getRamdomKaomojis("helpless")}",
                 )
 
         self.mainGUI.comboBox_img_format.currentTextChanged.connect(_)
@@ -628,8 +631,27 @@ class SettingUI(QObject):
         def _(checked: bool) -> None:
             if not checked:
                 self.mainGUI.signal_warning_box.emit(
-                    f"请注意！图片下载完整性校验已取消，可能会造成缺页与其它预料之外的严重问题！",
+                    f"请注意！图片下载完整性校验已取消，可能会造成缺页与其它预料之外的严重问题！ {getRamdomKaomojis("shock")}",
                 )
             self.mainGUI.updateConfig("hash_check", checked)
 
         self.mainGUI.checkBox_hash_check.toggled.connect(_)
+
+    ############################################################
+
+    def init_recursive_read_setting(self) -> None:
+        """绑定递归读取漫画仓库设置"""
+        flag = self.mainGUI.getConfig("recursive_read")
+        if flag is not None:
+            self.mainGUI.checkBox_recursive_read.setChecked(flag)
+        else:
+            self.mainGUI.updateConfig("recursive_read", True)
+
+        def _(checked: bool) -> None:
+            if checked:
+                self.mainGUI.signal_warning_box.emit(
+                    f"递归读取漫画仓库后，将会对仓库路径下所有子文件夹都进行检测，可能会造成性能负担！ {getRamdomKaomojis("helpless")}",
+                )
+            self.mainGUI.updateConfig("recursive_read", checked)
+
+        self.mainGUI.checkBox_recursive_read.toggled.connect(_)
