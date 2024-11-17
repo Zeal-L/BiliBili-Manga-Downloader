@@ -146,7 +146,7 @@ class Ui_MainWindow(object):
         self.scrollArea_myLibrary.setWidgetResizable(True)
         self.scrollAreaWidgetContents_myLibrary = QWidget()
         self.scrollAreaWidgetContents_myLibrary.setObjectName(u"scrollAreaWidgetContents_myLibrary")
-        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_myLibrary.setGeometry(QRect(0, 0, 524, 191))
         self.v_Layout_myLibrary = QVBoxLayout(self.scrollAreaWidgetContents_myLibrary)
         self.v_Layout_myLibrary.setObjectName(u"v_Layout_myLibrary")
         self.scrollArea_myLibrary.setWidget(self.scrollAreaWidgetContents_myLibrary)
@@ -154,6 +154,48 @@ class Ui_MainWindow(object):
         self.verticalLayout_10.addWidget(self.scrollArea_myLibrary)
 
         self.tabWidget_my_manga.addTab(self.tab_myLibrary, "")
+        self.tab_myFavorite = QWidget()
+        self.tab_myFavorite.setObjectName(u"tab_myFavorite")
+        self.verticalLayout_8 = QVBoxLayout(self.tab_myFavorite)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.h_Layout_myFavorite = QHBoxLayout()
+        self.h_Layout_myFavorite.setObjectName(u"h_Layout_myFavorite")
+        self.h_Layout_myFavorite.setContentsMargins(-1, 0, -1, -1)
+        self.label_myFavorite_count = QLabel(self.tab_myFavorite)
+        self.label_myFavorite_count.setObjectName(u"label_myFavorite_count")
+
+        self.h_Layout_myFavorite.addWidget(self.label_myFavorite_count)
+
+        self.label_myFavorite_tip = QLabel(self.tab_myFavorite)
+        self.label_myFavorite_tip.setObjectName(u"label_myFavorite_tip")
+
+        self.h_Layout_myFavorite.addWidget(self.label_myFavorite_tip)
+
+        self.h_Spacer_myFavorite = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.h_Layout_myFavorite.addItem(self.h_Spacer_myFavorite)
+
+        self.pushButton_myFavorite_update = QPushButton(self.tab_myFavorite)
+        self.pushButton_myFavorite_update.setObjectName(u"pushButton_myFavorite_update")
+
+        self.h_Layout_myFavorite.addWidget(self.pushButton_myFavorite_update)
+
+
+        self.verticalLayout_8.addLayout(self.h_Layout_myFavorite)
+
+        self.scrollArea_myFavorite = QScrollArea(self.tab_myFavorite)
+        self.scrollArea_myFavorite.setObjectName(u"scrollArea_myFavorite")
+        self.scrollArea_myFavorite.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_myFavorite = QWidget()
+        self.scrollAreaWidgetContents_myFavorite.setObjectName(u"scrollAreaWidgetContents_myFavorite")
+        self.scrollAreaWidgetContents_myFavorite.setGeometry(QRect(0, 0, 524, 191))
+        self.v_Layout_myFavorite = QVBoxLayout(self.scrollAreaWidgetContents_myFavorite)
+        self.v_Layout_myFavorite.setObjectName(u"v_Layout_myFavorite")
+        self.scrollArea_myFavorite.setWidget(self.scrollAreaWidgetContents_myFavorite)
+
+        self.verticalLayout_8.addWidget(self.scrollArea_myFavorite)
+
+        self.tabWidget_my_manga.addTab(self.tab_myFavorite, "")
 
         self.v_lLayout_my_manga.addWidget(self.tabWidget_my_manga)
 
@@ -449,7 +491,7 @@ class Ui_MainWindow(object):
         self.scrollArea_processing.setWidgetResizable(True)
         self.scrollAreaWidgetContents_processing = QWidget()
         self.scrollAreaWidgetContents_processing.setObjectName(u"scrollAreaWidgetContents_processing")
-        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 1082, 557))
+        self.scrollAreaWidgetContents_processing.setGeometry(QRect(0, 0, 98, 28))
         self.verticalLayout_processing = QVBoxLayout(self.scrollAreaWidgetContents_processing)
         self.verticalLayout_processing.setObjectName(u"verticalLayout_processing")
         self.scrollArea_processing.setWidget(self.scrollAreaWidgetContents_processing)
@@ -980,6 +1022,10 @@ class Ui_MainWindow(object):
         self.label_myLibrary_tip.setText("")
         self.pushButton_myLibrary_update.setText(QCoreApplication.translate("MainWindow", u"\u68c0\u67e5\u66f4\u65b0", None))
         self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myLibrary), QCoreApplication.translate("MainWindow", u"\u672c\u5730\u5e93\u5b58", None))
+        self.label_myFavorite_count.setText(QCoreApplication.translate("MainWindow", u"\u5c1a\u672a\u521d\u59cb\u5316", None))
+        self.label_myFavorite_tip.setText("")
+        self.pushButton_myFavorite_update.setText(QCoreApplication.translate("MainWindow", u"\u540c\u6b65", None))
+        self.tabWidget_my_manga.setTabText(self.tabWidget_my_manga.indexOf(self.tab_myFavorite), QCoreApplication.translate("MainWindow", u"\u6211\u7684\u8ffd\u6f2b", None))
         self.groupBox_my_manga.setTitle(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4fe1\u606f", None))
         self.label_manga_image.setText("")
         self.label_manga_title.setText("")

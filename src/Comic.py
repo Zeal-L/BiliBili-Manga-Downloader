@@ -77,9 +77,13 @@ class Comic:
             if res.status_code != 200 or res.json().get("code") != 0:
                 if res.json().get("code") == 404:
                     return None
-                reason = res.reason if res.status_code != 200 else res.json().get("msg")
+                reason = res.reason
+                status_code = res.status_code
+                if res.status_code != 200:
+                    reason = res.json().get("msg")
+                    status_code = res.json().get("code")
                 logger.warning(
-                    f"漫画id:{self.comic_id} 爬取漫画信息失败! 状态码：{res.status_code}, 理由: {reason} 重试中..."
+                    f"漫画id:{self.comic_id} 爬取漫画信息失败! 状态码：{status_code}, 理由: {reason} 重试中..."
                 )
                 raise requests.HTTPError()
             return res.json().get("data")
@@ -184,3 +188,52 @@ class Comic:
             int: 已下载章节数
         """
         return self.num_downloaded
+
+def getMyFavoriteComic(mainGUI: MainGUI) -> list[dict]:
+    favorite_list_url = "https://manga.bilibili.com/twirp/bookshelf.v1.Bookshelf/ListFavorite?device=pc&platform=web"
+    headers = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "origin": "https://manga.bilibili.com",
+        "referer": f"https://manga.bilibili.com/account-center/my-favourite",
+        "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+    }
+    payload = {"page_num":1,"page_size":99,"order":1,"wait_free":0}
+
+    @retry(
+        stop_max_delay=MAX_RETRY_SMALL - 5000,
+        wait_exponential_multiplier=RETRY_WAIT_EX,
+    )
+    def _() -> dict:
+        try:
+            res = requests.post(
+                favorite_list_url,
+                headers=headers,
+                data=payload,
+                timeout=TIMEOUT_SMALL - 3,
+            )
+        except requests.RequestException as e:
+            logger.warning(f"获取我的追漫失败! 重试中...\n{e}")
+            raise e
+        if res.status_code != 200 or res.json().get("code") != 0:
+            if res.json().get("code") == 404:
+                return None
+            reason = res.reason
+            status_code = res.status_code
+            if res.status_code != 200:
+                reason = res.json().get("msg")
+                status_code = res.json().get("code")
+                
+            logger.warning(
+                f"获取我的追漫失败! 状态码：{status_code}, 理由: {reason} 重试中..."
+            )
+            raise requests.HTTPError()
+        return res.json().get("data")
+
+    try:
+        data = _()
+        return data
+    except requests.RequestException as e:
+        logger.error(f"获取我的追漫多次后失败!\n{e}")
+        logger.exception(e)
+        return []
+    

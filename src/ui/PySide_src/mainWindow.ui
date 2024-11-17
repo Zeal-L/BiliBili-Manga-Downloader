@@ -192,11 +192,77 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>98</width>
-                   <height>28</height>
+                   <width>524</width>
+                   <height>191</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="v_Layout_myLibrary"/>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_myFavorite">
+             <attribute name="title">
+              <string>我的追漫</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <layout class="QHBoxLayout" name="h_Layout_myFavorite">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_myFavorite_count">
+                  <property name="text">
+                   <string>尚未初始化</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_myFavorite_tip">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="h_Spacer_myFavorite">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_myFavorite_update">
+                  <property name="text">
+                   <string>同步</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QScrollArea" name="scrollArea_myFavorite">
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_myFavorite">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>524</width>
+                   <height>191</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="v_Layout_myFavorite"/>
                 </widget>
                </widget>
               </item>
@@ -654,8 +720,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>1082</width>
-                   <height>557</height>
+                   <width>98</width>
+                   <height>28</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_processing"/>

@@ -31,8 +31,8 @@ if TYPE_CHECKING:
 class BiliPlusComic(Comic):
     """BiliPlus 单本漫画 综合信息类"""
 
-    def __init__(self, comic_id: int, mainGUI: MainGUI) -> None:
-        super().__init__(comic_id, mainGUI)
+    def __init__(self, comic_id: int, mainGUI: MainGUI, save_path: str = "") -> None:
+        super().__init__(comic_id, mainGUI, save_path)
         self.cookie = mainGUI.getConfig("biliplus_cookie")
         self.biliplus_detail_url = 'https://www.biliplus.com/manga/?act=detail&mangaid='
         self.headers = {

@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 )
 
 from src.BiliPlus import BiliPlusComic
-from src.Comic import Comic
+from src.Comic import Comic, getMyFavoriteComic
 from src.SearchComic import SearchComic
 from src.Utils import logger, openFileOrDir
 
@@ -41,6 +41,9 @@ class MangaUI(QObject):
 
     # ? 用于多线程更新我的库存
     signal_my_library_add_widget = Signal(dict)
+
+    # ? 用于多线程更新我的追漫
+    signal_my_favorite_add_widget = Signal(list)
 
     # ? 用于多线程更新漫画详情
     signal_my_comic_detail_widget = Signal(dict)
@@ -65,10 +68,13 @@ class MangaUI(QObject):
         self.init_mangaSearch()
         self.init_mangaDetails()
         self.init_myLibrary()
+        self.init_myFavorite()
         self.init_episodesDetails()
         self.init_episodesDownloadSelected()
         self.init_episodesResolve()
 
+    ############################################################
+    # 以下三个函数是为了实现漫画搜索功能
     ############################################################
 
     def init_mangaSearch(self) -> None:
@@ -123,7 +129,6 @@ class MangaUI(QObject):
                 ),
             )
         self.mainGUI.pushButton_manga_search_name.setEnabled(True)
-
 
     ############################################################
     def init_mangaDetails(self) -> None:
@@ -207,7 +212,7 @@ class MangaUI(QObject):
         # ? 绑定更新我的库存事件
         # 布局对齐
         self.mainGUI.v_Layout_myLibrary.setAlignment(Qt.AlignTop)
-        self.signal_my_library_add_widget.connect(self.updateMyLibrarySingleAdd)
+        self.signal_my_library_add_widget.connect(self.updateMyLibrarySingle)
 
         def _() -> None:
             # 使用客户端搜索API无需cookie
@@ -259,7 +264,7 @@ class MangaUI(QObject):
         futures = []
         futures.extend(
             self.executor.submit(
-                self.updateMyLibrarySingle,
+                self.fetchMyLibrarySingle,
                 comic_id,
                 comic_info["comic_path"],
                 comic_info["root_path"],
@@ -296,8 +301,8 @@ class MangaUI(QObject):
         self.mainGUI.label_myLibrary_tip.setText("(右键打开文件夹)")
 
     ############################################################
-    def updateMyLibrarySingle(self, comic_id: int, comic_path: str, root_path: str) -> int | None:
-        """添加单个漫画到我的库存
+    def fetchMyLibrarySingle(self, comic_id: int, comic_path: str, root_path: str) -> int | None:
+        """获取我的库存中单个漫画并返回数据
 
         Args:
             comic_id (int): 漫画ID
@@ -323,8 +328,8 @@ class MangaUI(QObject):
         return None
 
     ############################################################
-    def updateMyLibrarySingleAdd(self, info: dict) -> None:
-        """绑定我的库存中单个漫画的点击事件
+    def updateMyLibrarySingle(self, info: dict) -> None:
+        """添加单个漫画到我的库存，并绑定我的库存中单个漫画的点击事件
 
         Args:
             info (dict): 漫画信息
@@ -388,6 +393,129 @@ class MangaUI(QObject):
                 if lazy_pinyin(data["title"]) <= lazy_pinyin(left_title):
                     self.mainGUI.v_Layout_myLibrary.insertWidget(i, widget)
                     break
+
+    ############################################################
+    # 以下三个函数是为了实现我的追漫
+    ############################################################
+
+    def init_myFavorite(self) -> None:
+        """初始化我的追漫"""
+
+        # ?###########################################################
+        # ? 绑定更新我的库存事件
+        # 布局对齐
+        self.mainGUI.v_Layout_myFavorite.setAlignment(Qt.AlignTop)
+        self.signal_my_favorite_add_widget.connect(self.updateMyFavorite)
+
+        def _() -> None:
+            if not self.mainGUI.getConfig("cookie"):
+                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+                return
+
+            # ?###########################################################
+            # ? 清理h_Layout_myFavorite里的所有控件
+            for i in reversed(range(self.mainGUI.v_Layout_myFavorite.count())):
+                to_delete = self.mainGUI.v_Layout_myFavorite.itemAt(i).widget()
+                to_delete.setParent(None)
+                to_delete.deleteLater()
+
+            # ?###########################################################
+            # ? 用子线程更新我的追漫，并添加漫画到列表
+            self.mainGUI.pushButton_myFavorite_update.setEnabled(False)
+            self.mainGUI.label_myFavorite_tip.setText("同步数据中...")
+            self.executor.submit(self.fetchMyFavorite)
+
+        self.mainGUI.pushButton_myFavorite_update.clicked.connect(_)
+
+    ############################################################
+    def fetchMyFavorite(self) -> int | None:
+        """获取我的追漫并返回数据
+
+        """
+
+        comic_list = getMyFavoriteComic(self.mainGUI)
+        self.signal_my_favorite_add_widget.emit(comic_list)
+        return None
+
+    ############################################################
+    def updateMyFavorite(self, comic_list: list) -> None:
+        """添加漫画到我的追漫，并绑定我的追漫中漫画的点击事件
+
+        Args:
+            comic_list (list): 我的追漫信息
+        """
+
+        total_count = len(comic_list)
+        ongoing_count = 0
+        finish_count = 0
+        read_count = 0
+        for data in comic_list:
+            if data.get("status") == 2:
+                ongoing_count += 1
+            elif data.get("status") == 3:
+                finish_count += 1
+            if data.get("has_read_latest_ep"):
+                read_count += 1
+
+            h_Layout_myFavorite = QHBoxLayout()
+            h_Layout_myFavorite.addWidget(
+                QLabel(
+                    f"<span style='color:blue;font-weight:bold'>{data['title']}</span> by {data['author'][0]}"
+                )
+            )
+            h_Layout_myFavorite.addStretch(1)
+            if data.get("status") == 3:
+                label_text = f"看到第{data['last_ord']}话/共{data['ord_count']}话"
+            else:
+                label_text = f"看到第{data['last_ord']}话/更新至{data['ord_count']}话"
+            h_Layout_myFavorite.addWidget(QLabel(label_text))
+
+            widget = QWidget()
+            widget.setStyleSheet("font-size: 10pt;")
+
+            # ?###########################################################
+            # ? 绑定列表内漫画被点击事件：当前点击变色，剩余恢复
+            comic = Comic(data["comic_id"], self.mainGUI)
+            def _(_event: QEvent, widget: QWidget, comic: Comic) -> None:
+                self.present_comic_id = comic.comic_id
+                for i in range(self.mainGUI.v_Layout_myFavorite.count()):
+                    temp = self.mainGUI.v_Layout_myFavorite.itemAt(i).widget()
+                    temp.setStyleSheet("font-size: 10pt;")
+                widget.setStyleSheet("background-color:rgb(200, 200, 255); font-size: 10pt;")
+
+            widget.mousePressEvent = partial(_, widget=widget, comic=comic)
+            widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, comic)
+            widget.setLayout(h_Layout_myFavorite)
+
+            # ? 按照标题的拼音顺序插入我的库存列表
+            if self.mainGUI.v_Layout_myFavorite.count() == 0:
+                self.mainGUI.v_Layout_myFavorite.addWidget(widget)
+            else:
+                for i in range(self.mainGUI.v_Layout_myFavorite.count()):
+                    left: str = (
+                        self.mainGUI.v_Layout_myFavorite.itemAt(i).widget().findChild(QLabel).text()
+                    )
+                    left_title: str = left[left.find(">") + 1 : left.rfind("<")]
+                    if i == self.mainGUI.v_Layout_myFavorite.count() - 1:
+                        self.mainGUI.v_Layout_myFavorite.addWidget(widget)
+                        break
+                    if lazy_pinyin(data["title"]) <= lazy_pinyin(left_title):
+                        self.mainGUI.v_Layout_myFavorite.insertWidget(i, widget)
+                        break
+
+        self.mainGUI.pushButton_myFavorite_update.setEnabled(True)
+        self.mainGUI.label_myFavorite_count.setText(
+            f"共{total_count}部/"
+            f"已看完{read_count}部/"
+            f"连载中{ongoing_count}部/"
+            f"完结{finish_count}部"
+        )
+        self.mainGUI.label_myFavorite_tip.setText("")
+        if not comic_list:
+            self.mainGUI.signal_warning_box.emit(
+                f"未获取到我的追漫列表!\n请检查Cookie、网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
+            )
+        self.mainGUI.signal_info_box.emit("同步完成！")
 
     ############################################################
     # 以下三个函数是为了获取漫画信息详情
