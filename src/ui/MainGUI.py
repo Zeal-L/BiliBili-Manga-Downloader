@@ -101,6 +101,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         self.settingUI = SettingUI(self)
         self.mangaUI = MangaUI(self)
         self.downloadUI = DownloadUI(self)
+        
+        # ?###########################################################
+        # ? 初始化其他全局变量
+        self.need_sms_verify = False
 
     ############################################################
     def closeEvent(self, event: QCloseEvent) -> None:

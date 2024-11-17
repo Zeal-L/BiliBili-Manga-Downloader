@@ -35,6 +35,7 @@ from src.Utils import (
     AES_CBCDecrypt,
     logger,
     myStrFilter,
+    getRamdomKaomojis
 )
 
 if TYPE_CHECKING:
@@ -288,6 +289,23 @@ class Episode:
                 f"《{self.comic_name}》章节：{self.title} 重复获取图片token多次后失败!\n"
                 f"已暂时跳过此章节!\n请检查网络连接或者重启软件!\n\n"
                 f"更多详细信息请查看日志文件, 或联系开发者！"
+            )
+            return False
+
+        # ?###########################################################
+        # ? 检测是否被风控
+        if self.mainGUI.need_sms_verify:
+            return False
+        first_img = self.imgs_token[0]
+        if "token=" not in first_img.get("complete_url") and "token=" not in first_img.get("url"):
+            self.mainGUI.need_sms_verify = True
+            self.mainGUI.signal_confirm_box.emit(
+                f"检测到账号异常，漫画图片将无法正常下载\n"
+                f"请前往验证身份，完成验证后请重解析章节~ {getRamdomKaomojis("shock")}",
+                lambda: self.mainGUI.signal_open_web_view.emit(
+                    "短信验证",
+                    "https://manga.bilibili.com/blackboard/activity-XxM8KTtXNk.html"
+                )
             )
             return False
 

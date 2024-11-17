@@ -861,6 +861,7 @@ class MangaUI(QObject):
                     and item.checkState() == Qt.CheckState.Checked
                 ):
                     comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
+                    self.mainGUI.need_sms_verify = False
                     self.mainGUI.downloadUI.addTask(self.mainGUI, self.epi_list[i])
                     item.setFlags(Qt.ItemFlag.NoItemFlags)
                     item.setBackground(QColor(0, 255, 0, 50))

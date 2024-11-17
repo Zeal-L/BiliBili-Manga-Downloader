@@ -167,15 +167,15 @@ class SettingUI(QObject):
             bool: (Cookie是否有效)
         """
 
-        detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
+        detail_url = "https://manga.bilibili.com/twirp/user.v1.User/GetInitInfo"
         headers = {
             "cookie": f"SESSDATA={cookie}",
         }
-        payload = {"key_word": "test", "page_num": 1, "page_size": 1}
+        payload = {}
         is_cookie_valid = False
 
         @retry(stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _() -> None:
+        def _() -> str:
             try:
                 res = requests.post(
                     detail_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
@@ -188,12 +188,36 @@ class SettingUI(QObject):
                     f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
+            code = res.json().get("code")
+            if code != 0:
+                reason = res.json().get("msg")
+                logger.warning(
+                    f"Cookie有效但用户信息返回异常! 状态码：{code}, 理由: {reason}"
+                )
+                return reason
+            if code == 0 and res.json()["data"].get("need_sms_verify"):
+                return "need_sms_verify"
+            return ""
 
         try:
-            _()
-            if notice:
+            res = _()
+            if res != "":
+                self.mainGUI.signal_warning_box.emit(
+                    "Cookie有效但用户信息返回异常!\n\n更多详细信息请查看日志文件",
+                )
+            elif res == "need_sms_verify":
+                self.mainGUI.signal_confirm_box.emit(
+                    f"检测到账号异常，漫画图片将无法正常下载\n"
+                    f"请前往验证身份，完成验证后可继续下载哦~ {getRamdomKaomojis("shock")}",
+                    lambda: self.mainGUI.signal_open_web_view.emit(
+                        "短信验证",
+                        "https://manga.bilibili.com/blackboard/activity-XxM8KTtXNk.html"
+                    )
+                )
+            elif notice:
                 self.mainGUI.signal_info_box.emit("Cookie有效！")
             is_cookie_valid = True
+            
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)
