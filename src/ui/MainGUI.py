@@ -223,11 +223,12 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         return super().keyReleaseEvent(event)
 
     ############################################################
-    def getConfig(self, key: str) -> Any:
+    def getConfig(self, key: str, default: Any = None) -> Any:
         """读取用户配置文件, 如果key不存在则创建空值
 
         Args:
             key (str): 配置项
+            default (str): 默认值
 
         Returns:
             Any: 配置项的值
@@ -241,10 +242,10 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             try:
                 with open(self.config_path, "w", encoding="utf-8") as f:
                     json.dump({}, f)
-                    return None
+                    return default
             except OSError as e:
                 logger.error(f"创建配置文件失败: 目录:{self.config_path}\n{e}")
-                return None
+                return default
 
         # ?###########################################################
         # ? 读取配置文件
@@ -253,7 +254,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 self.config = json.load(f)
         except OSError as e:
             logger.error(f"读取配置文件失败 - 目录:{self.config_path}\n{e}")
-            return None
+            return default
         except json.JSONDecodeError as e:
             logger.error(f"解析配置文件失败 - 目录:{self.config_path}\n{e}")
             QMessageBox.warning(
@@ -261,8 +262,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                 "警告",
                 "配置文件发生异常损毁，解析失败!\n" "更多详细信息请查看日志文件, 或联系开发者！",
             )
-            return None
-        return self.config.get(key)
+            return default
+        return self.config.get(key, default)
 
     ############################################################
     def updateConfig(self, key: str, value: Any) -> None:
