@@ -622,8 +622,8 @@ class SettingUI(QObject):
         }
         reversed_img_format_list = {value: key for key, value in img_format_list.items()}
 
-        img_format = self.mainGUI.getConfig("img_format")
-        self.mainGUI.comboBox_img_format.setCurrentText(img_format_list.get(img_format,'default'))
+        img_format = self.mainGUI.getConfig("img_format","default")
+        self.mainGUI.comboBox_img_format.setCurrentText(img_format_list.get(img_format))
 
         def _(img_format: str) -> None:
             self.mainGUI.updateConfig("img_format", reversed_img_format_list[img_format])
@@ -668,7 +668,7 @@ class SettingUI(QObject):
         if flag is not None:
             self.mainGUI.checkBox_recursive_read.setChecked(flag)
         else:
-            self.mainGUI.updateConfig("recursive_read", True)
+            self.mainGUI.updateConfig("recursive_read", False)
 
         def _(checked: bool) -> None:
             if checked:

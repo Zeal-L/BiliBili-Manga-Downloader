@@ -248,7 +248,7 @@ class Episode:
             "1400avif": "@1400w.avif",
             "1100avif": "@1100w.avif",
         }
-        img_format = self.mainGUI.getConfig("img_format")
+        img_format = self.mainGUI.getConfig("img_format", "default")
         imgs_urls = [img_url + img_format_list[img_format] for img_url in imgs_urls]
 
         # ?###########################################################

@@ -1217,7 +1217,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 <number>2</number>
                </property>
                <property name="value">
-                <number>16</number>
+                <number>1</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Orientation::Horizontal</enum>

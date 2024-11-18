@@ -57,8 +57,8 @@ class BiliPlusComic(Comic):
             "1400avif": "avif-1400w",
             "1100avif": "avif-1700w",
         }
-        img_format = self.mainGUI.getConfig("img_format")
-        self.headers["cookie"] += f"manga_pic_format_http={img_format_list.get("img_format", "jpg-full")};"
+        img_format = self.mainGUI.getConfig("img_format", "default")
+        self.headers["cookie"] += f"manga_pic_format_http={img_format};"
 
     ############################################################
     def getComicInfo(self) -> dict:

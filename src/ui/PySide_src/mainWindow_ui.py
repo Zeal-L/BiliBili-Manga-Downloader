@@ -869,7 +869,7 @@ class Ui_MainWindow(object):
         self.h_Slider_num_thread.setMaximum(32)
         self.h_Slider_num_thread.setSingleStep(2)
         self.h_Slider_num_thread.setPageStep(2)
-        self.h_Slider_num_thread.setValue(16)
+        self.h_Slider_num_thread.setValue(1)
         self.h_Slider_num_thread.setOrientation(Qt.Orientation.Horizontal)
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
