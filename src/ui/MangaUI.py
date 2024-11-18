@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
 )
 
 from src.BiliPlus import BiliPlusComic
-from src.Comic import Comic, getMyFavoriteComic
+from src.Comic import Comic, getMyFavoriteComic, addComicToFavorite, delComicFromFavorite
 from src.SearchComic import SearchComic
 from src.Utils import logger, openFileOrDir
 
@@ -110,6 +110,35 @@ class MangaUI(QObject):
     def updateSearchResult(self) -> None:
         self.mainGUI.listWidget_manga_search.clear()
         self.mainGUI.label_manga_search.setText(f"{len(self.search_info)}条结果")
+        self.mainGUI.listWidget_manga_search.setContextMenuPolicy(Qt.CustomContextMenu)
+
+
+        # ?###########################################################
+        # ? 绑定右键漫画追漫事件
+        def myMenu_addToFavorite(widget: QWidget, pos: QPoint) -> None:
+            item = widget.itemAt(pos)
+            if not item:
+                return
+            if not self.mainGUI.getConfig("cookie"):
+                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
+                return
+
+            def _():
+                info = item.data(Qt.UserRole)
+                res = addComicToFavorite(self.mainGUI, info["id"])
+                if res:
+                    self.mainGUI.signal_info_box.emit(f"追漫《{info["title"]}》成功！")
+                else:
+                    self.mainGUI.signal_info_box.emit(f"追漫《{info["title"]}》失败！详情请查看日志文件！")
+
+            menu = QMenu()
+            menu.addAction("添加到我的追漫", lambda: self.executor.submit(_))
+            menu.exec_(widget.mapToGlobal(pos))
+
+        self.mainGUI.listWidget_manga_search.customContextMenuRequested.connect(
+            partial(myMenu_addToFavorite, self.mainGUI.listWidget_manga_search)
+        )
+
         for item in self.search_info:
             # ?###########################################################
             # ? 替换爬取信息里的html标签
@@ -121,6 +150,7 @@ class MangaUI(QObject):
             )
             # ?###########################################################
             temp = QListWidgetItem()
+            temp.setData(Qt.UserRole, item)
             self.mainGUI.listWidget_manga_search.addItem(temp)
             self.mainGUI.listWidget_manga_search.setItemWidget(
                 temp,
@@ -128,6 +158,7 @@ class MangaUI(QObject):
                     f"{item['title']} by <span style='color:blue'>{item['author_name'][0]}</span>"
                 ),
             )
+
         self.mainGUI.pushButton_manga_search_name.setEnabled(True)
 
     ############################################################
@@ -487,6 +518,23 @@ class MangaUI(QObject):
             widget.mouseDoubleClickEvent = partial(self.updateComicInfoEvent, comic)
             widget.setLayout(h_Layout_myFavorite)
 
+            # ?###########################################################
+            # ? 绑定右键取消追漫功能
+            def myMenu_removeFavorite(widget: QWidget, pos: QPoint) -> None:
+                def _():
+                    res = delComicFromFavorite(self.mainGUI, data["comic_id"])
+                    if res:
+                        self.mainGUI.signal_info_box.emit(f"追漫《{data["title"]}》成功！")
+                    else:
+                        self.mainGUI.signal_info_box.emit(f"追漫《{data["title"]}》失败！详情请查看日志文件！")
+
+                menu = QMenu()
+                menu.addAction("取消追漫", lambda: self.executor.submit(_))
+                menu.exec_(widget.mapToGlobal(pos))
+
+            widget.setContextMenuPolicy(Qt.CustomContextMenu)
+            widget.customContextMenuRequested.connect(partial(myMenu_removeFavorite, widget))
+
             # ? 按照标题的拼音顺序插入我的库存列表
             if self.mainGUI.v_Layout_myFavorite.count() == 0:
                 self.mainGUI.v_Layout_myFavorite.addWidget(widget)
@@ -515,7 +563,8 @@ class MangaUI(QObject):
             self.mainGUI.signal_warning_box.emit(
                 f"未获取到我的追漫列表!\n请检查Cookie、网络连接或者重启软件\n更多详细信息请查看日志文件, 或联系开发者！"
             )
-        self.mainGUI.signal_info_box.emit("同步完成！")
+        else:
+            self.mainGUI.signal_info_box.emit("同步完成！")
 
     ############################################################
     # 以下三个函数是为了获取漫画信息详情

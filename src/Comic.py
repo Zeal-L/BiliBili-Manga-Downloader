@@ -17,6 +17,7 @@ from src.Utils import (
     MAX_RETRY_SMALL,
     RETRY_WAIT_EX,
     TIMEOUT_SMALL,
+    __user_agent__,
     isCheckSumValid,
     logger,
     myStrFilter,
@@ -190,6 +191,14 @@ class Comic:
         return self.num_downloaded
 
 def getMyFavoriteComic(mainGUI: MainGUI) -> list[dict]:
+    """获取我的追漫列表
+
+    Args:
+        mainGUI (MainGUI): 主页面
+
+    Returns:
+        list[dict]: 我的追漫漫画详情列表
+    """    
     favorite_list_url = "https://manga.bilibili.com/twirp/bookshelf.v1.Bookshelf/ListFavorite?device=pc&platform=web"
     headers = {
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
@@ -236,4 +245,114 @@ def getMyFavoriteComic(mainGUI: MainGUI) -> list[dict]:
         logger.error(f"获取我的追漫多次后失败!\n{e}")
         logger.exception(e)
         return []
-    
+
+def addComicToFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
+    """添加漫画到我的追漫列表
+
+    Args:
+        mainGUI (MainGUI): 主页面
+        comic_id (int): 漫画ID
+
+    Returns:
+        bool: 是否请求成功
+    """    
+    add_favorite_url = "https://manga.bilibili.com/twirp/bookshelf.v1.Bookshelf/AddFavorite?device=pc&platform=web"
+    headers = {
+        "user-agent": __user_agent__,
+        "origin": "https://manga.bilibili.com",
+        "referer": f"https://manga.bilibili.com/detail/mc{comic_id}",
+        "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+    }
+    payload = {"comic_ids": str(comic_id)}
+
+    @retry(
+        stop_max_delay=MAX_RETRY_SMALL - 5000,
+        wait_exponential_multiplier=RETRY_WAIT_EX,
+    )
+    def _() -> None:
+        try:
+            res = requests.post(
+                add_favorite_url,
+                headers=headers,
+                data=payload,
+                timeout=TIMEOUT_SMALL - 3,
+            )
+        except requests.RequestException as e:
+            logger.warning(f"添加到我的追漫列表失败! 重试中...\n{e}")
+            raise e
+        print(res.json())
+        if res.status_code != 200 or res.json().get("code") != 0:
+            reason = res.reason
+            status_code = res.status_code
+            if res.status_code != 200:
+                reason = res.json().get("msg")
+                status_code = res.json().get("code")
+
+            logger.warning(
+                f"添加到我的追漫列表失败! 状态码：{status_code}, 理由: {reason} 重试中..."
+            )
+            raise requests.HTTPError()
+
+    try:
+        _()
+        return True
+    except requests.RequestException as e:
+        logger.error(f"添加到我的追漫列表多次后失败!\n{e}")
+        logger.exception(e)
+        return False
+
+def delComicFromFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
+    """从我的追漫列表移除
+
+    Args:
+        mainGUI (MainGUI): 主页面
+        comic_id (int): 漫画ID
+
+    Returns:
+        bool: 是否请求成功
+    """    
+    del_favorite_url = "https://manga.bilibili.com/twirp/bookshelf.v1.Bookshelf/DeleteFavorite?device=pc&platform=web"
+    headers = {
+        "user-agent": __user_agent__,
+        "origin": "https://manga.bilibili.com",
+        "referer": f"https://manga.bilibili.com/detail/mc{comic_id}",
+        "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+    }
+    payload = {"comic_ids": str(comic_id)}
+
+    @retry(
+        stop_max_delay=MAX_RETRY_SMALL - 5000,
+        wait_exponential_multiplier=RETRY_WAIT_EX,
+    )
+    def _() -> None:
+        try:
+            res = requests.post(
+                del_favorite_url,
+                headers=headers,
+                data=payload,
+                timeout=TIMEOUT_SMALL - 3,
+            )
+        except requests.RequestException as e:
+            logger.warning(f"从我的追漫列表中移除失败! 重试中...\n{e}")
+            raise e
+        print(res.json())
+        if res.status_code != 200 or res.json().get("code") != 0:
+            reason = res.reason
+            status_code = res.status_code
+            if res.status_code != 200:
+                reason = res.json().get("msg")
+                status_code = res.json().get("code")
+
+            logger.warning(
+                f"从我的追漫列表中移除失败! 状态码：{status_code}, 理由: {reason} 重试中..."
+            )
+            raise requests.HTTPError()
+
+    try:
+        _()
+        return True
+    except requests.RequestException as e:
+        logger.error(f"从我的追漫列表中移除多次后失败!\n{e}")
+        logger.exception(e)
+        return False
+

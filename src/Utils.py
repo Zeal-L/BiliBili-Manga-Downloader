@@ -32,6 +32,7 @@ __version__ = "1.6.0"
 __author__ = "Zeal L"
 __copyright__ = "Copyright (C) 2023-2024 Zeal L"
 __main_window_title__ = f"哔哩哔哩漫画下载器 v{__version__}"
+__user_agent__ = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
 
 ############################################################
 # 配置全局网络请求的 timeout 以及 max retry
