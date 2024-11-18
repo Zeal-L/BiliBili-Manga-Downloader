@@ -280,7 +280,6 @@ def addComicToFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
         except requests.RequestException as e:
             logger.warning(f"添加到我的追漫列表失败! 重试中...\n{e}")
             raise e
-        print(res.json())
         if res.status_code != 200 or res.json().get("code") != 0:
             reason = res.reason
             status_code = res.status_code
@@ -335,7 +334,6 @@ def delComicFromFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
         except requests.RequestException as e:
             logger.warning(f"从我的追漫列表中移除失败! 重试中...\n{e}")
             raise e
-        print(res.json())
         if res.status_code != 200 or res.json().get("code") != 0:
             reason = res.reason
             status_code = res.status_code
