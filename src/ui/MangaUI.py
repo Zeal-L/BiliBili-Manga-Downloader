@@ -119,11 +119,11 @@ class MangaUI(QObject):
             item = widget.itemAt(pos)
             if not item:
                 return
-            if not self.mainGUI.getConfig("cookie"):
-                QMessageBox.critical(self.mainGUI, "警告", "请先在设置界面填写自己的Cookie！")
-                return
 
             def _():
+                if not self.mainGUI.getConfig("cookie"):
+                    self.mainGUI.signal_warning_box.emit("请先在设置界面填写自己的Cookie！")
+                    return
                 info = item.data(Qt.UserRole)
                 res = addComicToFavorite(self.mainGUI, info["id"])
                 if res:
@@ -522,6 +522,9 @@ class MangaUI(QObject):
             # ? 绑定右键取消追漫功能
             def myMenu_removeFavorite(widget: QWidget, pos: QPoint) -> None:
                 def _():
+                    if not self.mainGUI.getConfig("cookie"):
+                        self.mainGUI.signal_warning_box.emit("请先在设置界面填写自己的Cookie！")
+                        return
                     res = delComicFromFavorite(self.mainGUI, data["comic_id"])
                     if res:
                         self.mainGUI.signal_info_box.emit(f"追漫《{data["title"]}》成功！")
