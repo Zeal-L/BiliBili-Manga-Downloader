@@ -1036,7 +1036,7 @@ class MangaUI(QObject):
 
             # ?###########################################################
             # ? 初始漫画对象
-            comic = BiliPlusComic(self.present_comic_id, self.mainGUI)
+            comic = Comic(self.present_comic_id, self.mainGUI)
 
             if self.mainGUI.getConfig("save_meta"):
                 # ?###########################################################

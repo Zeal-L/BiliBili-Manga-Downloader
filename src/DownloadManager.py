@@ -184,7 +184,7 @@ class DownloadManager:
             self.signal_rate_progress.emit(
                 {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
-            time.sleep(self.mainGUI.getConfig("download_gap"))
+            time.sleep(self.mainGUI.getConfig("download_gap", 0))
 
     ############################################################
     # ? 为以后的特典下载留的接口

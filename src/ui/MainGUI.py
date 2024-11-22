@@ -235,7 +235,7 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             Any: 配置项的值
         """
         if self.config:
-            return self.config.get(key)
+            return self.config.get(key, default)
 
         # ?###########################################################
         # ? 检测配置文件是否存在， 不存在则创建
@@ -292,5 +292,9 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
         Returns:
             str: Cookie
         """
-        return f"SESSDATA={self.getConfig('cookie')};buvid3={uuid.uuid4()}infoc;"
+        cookie = ""
+        if sess_data := self.getConfig('cookie'):
+            cookie += f"SESSDATA={self.getConfig('cookie')};"
+        cookie += f"buvid3={uuid.uuid4()}infoc;"
+        return cookie
 
