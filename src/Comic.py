@@ -48,7 +48,7 @@ class Comic:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
             "origin": "https://manga.bilibili.com",
             "referer": f"https://manga.bilibili.com/detail/mc{comic_id}?from=manga_homepage",
-            "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+            "cookie": mainGUI.getCookie(),
         }
         self.payload = {"comic_id": self.comic_id}
 
@@ -80,7 +80,7 @@ class Comic:
                     return None
                 reason = res.reason
                 status_code = res.status_code
-                if res.status_code != 200:
+                if res.status_code == 200:
                     reason = res.json().get("msg")
                     status_code = res.json().get("code")
                 logger.warning(
@@ -204,7 +204,7 @@ def getMyFavoriteComic(mainGUI: MainGUI) -> list[dict]:
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
         "origin": "https://manga.bilibili.com",
         "referer": f"https://manga.bilibili.com/account-center/my-favourite",
-        "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+        "cookie": mainGUI.getCookie(),
     }
     payload = {"page_num":1,"page_size":99,"order":1,"wait_free":0}
 
@@ -228,7 +228,7 @@ def getMyFavoriteComic(mainGUI: MainGUI) -> list[dict]:
                 return None
             reason = res.reason
             status_code = res.status_code
-            if res.status_code != 200:
+            if res.status_code == 200:
                 reason = res.json().get("msg")
                 status_code = res.json().get("code")
                 
@@ -261,7 +261,7 @@ def addComicToFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
         "user-agent": __user_agent__,
         "origin": "https://manga.bilibili.com",
         "referer": f"https://manga.bilibili.com/detail/mc{comic_id}",
-        "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+        "cookie": mainGUI.getCookie(),
     }
     payload = {"comic_ids": str(comic_id)}
 
@@ -283,7 +283,7 @@ def addComicToFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
         if res.status_code != 200 or res.json().get("code") != 0:
             reason = res.reason
             status_code = res.status_code
-            if res.status_code != 200:
+            if res.status_code == 200:
                 reason = res.json().get("msg")
                 status_code = res.json().get("code")
 
@@ -315,7 +315,7 @@ def delComicFromFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
         "user-agent": __user_agent__,
         "origin": "https://manga.bilibili.com",
         "referer": f"https://manga.bilibili.com/detail/mc{comic_id}",
-        "cookie": f"SESSDATA={mainGUI.getConfig('cookie')}",
+        "cookie": mainGUI.getCookie(),
     }
     payload = {"comic_ids": str(comic_id)}
 
@@ -337,7 +337,7 @@ def delComicFromFavorite(mainGUI: MainGUI, comic_id: int) -> bool:
         if res.status_code != 200 or res.json().get("code") != 0:
             reason = res.reason
             status_code = res.status_code
-            if res.status_code != 200:
+            if res.status_code == 200:
                 reason = res.json().get("msg")
                 status_code = res.json().get("code")
 

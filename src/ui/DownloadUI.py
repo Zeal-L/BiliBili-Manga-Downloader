@@ -34,6 +34,7 @@ class DownloadUI(QObject):
         super().__init__()
         self.tasks_bar = {}
         self.downloadManager = DownloadManager(
+            mainGUI=mainGUI,
             max_workers=mainGUI.getConfig("num_thread"),
             signal_rate_progress=self.signal_rate_progress,
         )

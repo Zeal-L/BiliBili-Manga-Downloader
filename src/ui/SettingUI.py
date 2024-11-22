@@ -12,7 +12,7 @@ from urllib.parse import parse_qs, quote, urlparse
 
 import requests
 from PySide6.QtCore import QObject, Signal
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QImage, QPixmap, QDoubleValidator
 from PySide6.QtWidgets import QFileDialog, QMessageBox, QRadioButton
 from retrying import retry
 
@@ -61,6 +61,7 @@ class SettingUI(QObject):
         self.init_rename_rule_setting()
         self.init_hash_check_setting()
         self.init_recursive_read_setting()
+        self.init_download_gap_setting()
         
         self.qr_ui = QrCodeUI()
 
@@ -678,3 +679,24 @@ class SettingUI(QObject):
             self.mainGUI.updateConfig("recursive_read", checked)
 
         self.mainGUI.checkBox_recursive_read.toggled.connect(_)
+
+    ############################################################
+
+    def init_download_gap_setting(self) -> None:
+        """绑定下载间隙时长设置"""
+
+        # 设置其只能输入数字
+        self.mainGUI.lineEdit_download_gap.setValidator(QDoubleValidator())
+
+        download_gap = self.mainGUI.getConfig("download_gap")
+        if download_gap is not None:
+            self.mainGUI.lineEdit_download_gap.setText(str(download_gap))
+        else:
+            self.mainGUI.updateConfig("recursive_read", 0)
+
+        def _() -> None:
+            download_gap = float(self.mainGUI.lineEdit_download_gap.text())
+            self.mainGUI.updateConfig("download_gap", download_gap)
+            self.mainGUI.lineEdit_download_gap.clearFocus()
+
+        self.mainGUI.lineEdit_download_gap.returnPressed.connect(_)

@@ -1587,6 +1587,39 @@ li.checked::marker { content: &quot;\2612&quot;; }
               </widget>
              </item>
              <item>
+              <spacer name="horizontalSpacer_18">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Preferred</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_download_gap">
+               <property name="text">
+                <string>每页下载间隔（秒）：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_download_gap">
+               <property name="maximumSize">
+                <size>
+                 <width>40</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
               <spacer name="horizontalSpacer_9">
                <property name="orientation">
                 <enum>Qt::Orientation::Horizontal</enum>
@@ -1598,16 +1631,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 </size>
                </property>
               </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_num_thread">
-               <property name="text">
-                <string>线程数并不是越多越好，请根据自己的网络情况和平均任务大小合理配置（推荐：16）</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
              </item>
              <item>
               <spacer name="horizontalSpacer_2">

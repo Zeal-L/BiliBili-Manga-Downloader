@@ -183,7 +183,7 @@ class MangaUI(QObject):
         self.mainGUI.lineEdit_manga_search_id.returnPressed.connect(_)
         self.mainGUI.pushButton_manga_search_id.clicked.connect(_)
 
-        # 漫画id搜索框只能输入数字
+        # 漫画id搜索框只能输入整数
         self.mainGUI.lineEdit_manga_search_id.setValidator(QIntValidator())
 
         # ?###########################################################

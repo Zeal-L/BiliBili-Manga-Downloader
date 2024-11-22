@@ -3,6 +3,7 @@
 """
 
 import json
+import uuid
 import logging
 import os
 from functools import partial
@@ -283,3 +284,13 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
             logger.error(
                 f"更新配置文件失败 - 目录:{self.config_path} - key: {key} - value: {value}\n{e}"
             )
+
+    ############################################################
+    def getCookie(self) -> str:
+        """获取Bilibili Cookie
+
+        Returns:
+            str: Cookie
+        """
+        return f"SESSDATA={self.getConfig('cookie')};buvid3={uuid.uuid4()}infoc;"
+

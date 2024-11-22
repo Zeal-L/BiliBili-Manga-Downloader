@@ -4,6 +4,7 @@
 
 import re
 import time
+from typing import TYPE_CHECKING
 from concurrent.futures import ThreadPoolExecutor
 
 from PySide6.QtCore import SignalInstance
@@ -11,14 +12,19 @@ from PySide6.QtCore import SignalInstance
 from src.Episode import Episode
 
 
+if TYPE_CHECKING:
+    from ui.MainGUI import MainGUI
+
 class DownloadManager:
     """下载管理器类，用于管理漫画下载任务的创建、更新和删除等操作"""
 
     def __init__(
         self,
+        mainGUI,
         max_workers: int,
         signal_rate_progress: SignalInstance,
     ) -> None:
+        self.mainGUI = mainGUI
         self.id_count = 0
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.signal_rate_progress = signal_rate_progress
@@ -178,6 +184,7 @@ class DownloadManager:
             self.signal_rate_progress.emit(
                 {"taskID": curr_id, "rate": int(rate * 100), "path": save_path}
             )
+            time.sleep(self.mainGUI.getConfig("download_gap"))
 
     ############################################################
     # ? 为以后的特典下载留的接口

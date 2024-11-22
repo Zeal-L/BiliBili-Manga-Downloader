@@ -874,15 +874,24 @@ class Ui_MainWindow(object):
 
         self.h_Layout_num_thread.addWidget(self.h_Slider_num_thread)
 
+        self.horizontalSpacer_18 = QSpacerItem(40, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+
+        self.h_Layout_num_thread.addItem(self.horizontalSpacer_18)
+
+        self.label_download_gap = QLabel(self.groupBox)
+        self.label_download_gap.setObjectName(u"label_download_gap")
+
+        self.h_Layout_num_thread.addWidget(self.label_download_gap)
+
+        self.lineEdit_download_gap = QLineEdit(self.groupBox)
+        self.lineEdit_download_gap.setObjectName(u"lineEdit_download_gap")
+        self.lineEdit_download_gap.setMaximumSize(QSize(40, 16777215))
+
+        self.h_Layout_num_thread.addWidget(self.lineEdit_download_gap)
+
         self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.h_Layout_num_thread.addItem(self.horizontalSpacer_9)
-
-        self.label_num_thread = QLabel(self.groupBox)
-        self.label_num_thread.setObjectName(u"label_num_thread")
-        self.label_num_thread.setWordWrap(False)
-
-        self.h_Layout_num_thread.addWidget(self.label_num_thread)
 
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -1138,7 +1147,7 @@ class Ui_MainWindow(object):
         self.checkBox_hash_check.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u8fdb\u884c\u54c8\u5e0c\u6821\u9a8c(\u6211\u77e5\u9053\u6211\u5728\u505a\u4ec0\u4e48)", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u6ce8\u610f\uff1a\u4ee5\u4e0b\u8bbe\u7f6e\u53ea\u5728\u4e0b\u6b21\u542f\u52a8\u65f6\u751f\u6548\uff01", None))
         self.label_num_thread_count.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
-        self.label_num_thread.setText(QCoreApplication.translate("MainWindow", u"\u7ebf\u7a0b\u6570\u5e76\u4e0d\u662f\u8d8a\u591a\u8d8a\u597d\uff0c\u8bf7\u6839\u636e\u81ea\u5df1\u7684\u7f51\u7edc\u60c5\u51b5\u548c\u5e73\u5747\u4efb\u52a1\u5927\u5c0f\u5408\u7406\u914d\u7f6e\uff08\u63a8\u8350\uff1a16\uff09", None))
+        self.label_download_gap.setText(QCoreApplication.translate("MainWindow", u"\u6bcf\u9875\u4e0b\u8f7d\u95f4\u9694\uff08\u79d2\uff09\uff1a", None))
         self.groupBox_theme.setTitle(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898\u8bbe\u7f6e", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898\u6837\u5f0f\uff1a ", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898\u5bc6\u5ea6\uff1a ", None))
