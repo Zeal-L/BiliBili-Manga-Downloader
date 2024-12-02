@@ -154,18 +154,6 @@
 
 [**详细日志**](UPDATE.md)
 
-## 🍻 联系方式
-
-欢迎进群讨论程序，漫画，资源分享, 提交问题等等
-
-- Q群号：244029317
-
-## 🙈 PS
-
-**做项目不易，求星星！求赞助！如果本项目对你有帮助，请作者喝杯☕吧~**
-
-<img src="https://user-images.githubusercontent.com/72005386/223096480-8d57ceef-0b33-4653-86bf-55e6094fcb9b.jpg" width=20%> <img src="https://user-images.githubusercontent.com/72005386/223096520-e5d95ac8-044d-4644-8500-3770e5ad81f8.jpg" width=18.5%>
-
 ## 🔒️ 许可协议
 
 - 本项目在遵循 [**GNU Affero General Public License v3.0**](https://www.gnu.org/licenses/agpl-3.0.en.html) 许可协议下进行发布
