@@ -282,7 +282,7 @@ def checkNewVersion(mainGUI: MainGUI):
 
 ############################################################
 
-DLL_PATH = "./src/assets/easy-taskbar-progress.dll"
+DLL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "easy-taskbar-progress.dll")
 
 TBPF_NOPROGRESS = 0x0  # 没有加载条
 TBPF_INDETERMINATE = 0x1  # 正在加载中

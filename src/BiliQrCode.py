@@ -107,7 +107,10 @@ class QrCode:
                     f"确认二维码登入失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
-            return res.json()["data"]
+            data = res.json()["data"]
+            if data.get("code") == 0:
+                data["SESSDATA"] = res.cookies.get("SESSDATA", "")
+            return data
 
         try:
             data = _()

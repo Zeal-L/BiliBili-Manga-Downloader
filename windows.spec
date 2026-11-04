@@ -1,15 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_all
+
 
 block_cipher = None
+playwright_datas, playwright_binaries, playwright_hiddenimports = collect_all('playwright')
 
 
 a = Analysis(
     ['./app.py'],
     pathex=[],
-    binaries=[],
-    datas=[('./src/assets/easy-taskbar-progress.dll', '.')],
-    hiddenimports=[],
+    binaries=playwright_binaries,
+    datas=[('./src/assets/easy-taskbar-progress.dll', '.')] + playwright_datas,
+    hiddenimports=playwright_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

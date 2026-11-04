@@ -171,6 +171,8 @@ class BiliPlusComic(Comic):
 class BiliPlusEpisode(Episode):
     """BiliPlus漫画章节类，用于管理漫画章节的详细信息"""
 
+    使用浏览器下载 = False
+
     def __init__(
         self,
         episode: dict,

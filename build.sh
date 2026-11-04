@@ -1,18 +1,22 @@
 #!/bin/bash
+set -e
 
-echo -e "\033[32m\n 项目构建开始 ... \n\033[0m"
+PYTHON="${PYTHON:-python3.13}"
+export POETRY_VIRTUALENVS_CREATE=false
+
+echo -e "\033[32m\n 项目构建开始，使用系统 Python 3.13 ... \n\033[0m"
 
 echo -e "\033[34m\n 显示现有的依赖包 ... \n\033[0m"
-poetry show
+"$PYTHON" -m poetry show
 
 echo -e "\033[34m\n 更新现有的依赖包 ... \n\033[0m"
-poetry update
+"$PYTHON" -m poetry update
 
 echo -e "\033[34m\n pyinstaller 封装中 ... \n\033[0m"
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    yes | poetry run pyinstaller macos.spec
+    yes | "$PYTHON" -m poetry run pyinstaller macos.spec
 else
-    yes | poetry run pyinstaller windows.spec
+    yes | "$PYTHON" -m poetry run pyinstaller windows.spec
 fi
 
 echo -e "\033[34m\n pyinstaller 移动可执行文件到根目录 ... \n\033[0m"
