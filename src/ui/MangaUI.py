@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
     QMenu,
     QMessageBox,
+    QPushButton,
     QWidget,
 )
 
@@ -27,6 +28,7 @@ from src.BiliPlus import BiliPlusComic
 from src.Comic import Comic
 from src.SearchComic import SearchComic
 from src.Utils import logger, openFileOrDir
+from src.浏览器原始响应下载 import 浏览器原始响应下载控制器
 
 if TYPE_CHECKING:
     from src.ui.MainGUI import MainGUI
@@ -65,6 +67,19 @@ class MangaUI(QObject):
         self.init_episodesDetails()
         self.init_episodesDownloadSelected()
         self.init_episodesResolve()
+        self.init_浏览器原始响应下载()
+
+    ############################################################
+
+    def init_浏览器原始响应下载(self) -> None:
+        """新增不依赖旧章节解析接口的原始响应下载入口。"""
+        self.mainGUI.pushButton_浏览器原始响应下载 = QPushButton("浏览器原始响应下载")
+        self.mainGUI.pushButton_浏览器原始响应下载.setMaximumWidth(200)
+        self.mainGUI.h_Layout_chp_detail.addWidget(self.mainGUI.pushButton_浏览器原始响应下载)
+        self.浏览器原始响应下载控制器 = 浏览器原始响应下载控制器(self.mainGUI)
+        self.mainGUI.pushButton_浏览器原始响应下载.clicked.connect(
+            self.浏览器原始响应下载控制器.开始
+        )
 
     ############################################################
 
@@ -420,10 +435,12 @@ class MangaUI(QObject):
         resolve_type: str = info["resolve_type"]
 
         self.present_comic_id = comic.comic_id
-        # ? 获取漫画信息失败直接跳过
+        # ? 获取漫画信息失败时恢复界面，允许修正Cookie后重试
         if not data:
+            self.resolveEnable(resolve_type)
+            self.mainGUI.signal_resolve_status.emit("")
             self.mainGUI.signal_message_box.emit(
-                "重复获取漫画信息多次后失败!\n请检查网络连接或者重启软件!\n\n更多详细信息请查看日志文件, 或联系开发者！"
+                "获取漫画详情失败!\n请确认Cookie有效且未过期，或检查网络连接后重试!\n\n更多详细信息请查看日志文件, 或联系开发者！"
             )
             return
         self.mainGUI.label_manga_title.setText(

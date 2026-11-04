@@ -2,7 +2,7 @@
 
 <!-- ![GitHub top language](https://img.shields.io/github/languages/top/Zeal-L/BiliBili-Manga-Downloader) -->
 
-![GitHub Python version](https://img.shields.io/badge/python-v3.12-blue)
+![GitHub Python version](https://img.shields.io/badge/python-v3.13-blue)
 ![platform](https://img.shields.io/badge/platform-Windows_|_Macos_|_Linux-blue)
 ![Scc Count Badge](https://sloc.xyz/github/Zeal-L/BiliBili-Manga-Downloader/)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Zeal-L/BiliBili-Manga-Downloader)
@@ -30,7 +30,7 @@
 
 ## ✨ 主要功能 / 特性
 
-- **黑科技下载未解锁章节！**
+- **浏览器原始响应下载：直接保存阅读器实际收到的字节，不截图、不转码、不读取 canvas！**
 - **提供多种可选的保存格式**
 - **支持已购被下架漫画下载**
 - **已打包成单个可执行文件，双击即用！**
@@ -67,7 +67,16 @@
 ## 📝 使用指南
 - **下载地址**: [**Releases**](https://github.com/Zeal-L/BiliBili-Manga-Downloader/releases)
 
-- **本软件有两种下载解析方法：**
+- **浏览器原始响应下载：**
+  1. 在“漫画解析”页面点击“浏览器原始响应下载”。
+  2. 粘贴具体章节地址，例如 `https://manga.bilibili.com/mc33584/1232755`。
+  3. 程序会打开系统 Edge；首次使用如需登录，请在浏览器内正常登录。
+  4. 程序等待阅读器请求稳定后，保存本次实际加载的响应；可以在浏览器中正常滚动加载更多页，请不要快速翻页。
+  5. 文件保存在“浏览器原始响应/章节标题”目录，标准图片保存为 AVIF、JPEG、PNG 或 WebP。
+  6. 无法识别的加密响应仅原样保存为 `.bin`，本功能不解密，也不保证所有响应都是可直接查看的图片。
+  7. `下载清单.json` 按响应到达顺序记录序号、状态、字节数和 SHA-256；未加载的页不会计入成功。保存的是 HTTP 内容解码后的响应体，不包含 TLS 或 HTTP 协议头。
+
+- **本软件有两种旧版下载解析方法：**
   - **B站解析**
     - 只能下载免费章节和用户已解锁的章节
     - **首先获得你的Cookie**
@@ -128,16 +137,13 @@
 
 ## 🏗️ 本地构建 / 编译
 
-- **首先确保你安装了 Python 3.12 和 git**
-- **本项目使用了 poetry 依靠虚拟环境进行依赖项管理，所以不必担心影响自己的本地环境**
-- **作者已经贴心的帮后来者们准备好了两个集成脚本~**
+- **首先确保你安装了系统 Python 3.13 和 git；Windows 不创建虚拟环境**
 - **接下来的操作都在项目的根目录运行命令行指令**
 - **构建项目**
   1. 执行 `git clone https://github.com/Zeal-L/BiliBili-Manga-Downloader.git`
   2. 执行 `cd BiliBili-Manga-Downloader/`
-  3. 执行 `sh setup.sh` 等待项目构建完成
-  4. 执行 `poetry shell` 进入虚拟环境
-  5. 执行 `python3 app.py` 即可运行程序
+  3. 执行 `sh setup.sh` 安装依赖；可用 `PYTHON` 环境变量指定系统 Python 3.13 的完整路径，不会创建虚拟环境
+  4. 执行 `python3.13 app.py` 即可运行程序
 - **打包编译**
   1. 执行 `sh build.sh` 等待项目打包完成
   2. 这一步可能会花费一定时间，中途需要手动确认安全漏洞检查

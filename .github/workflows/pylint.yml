@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: ["3.13"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -18,10 +18,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        bash setup.sh
+        PYTHON=python3.13 bash setup.sh
 
     - name: Analysing the code with ruff
       id: ruff
       run: |
-        poetry run ruff format -q  $(git ls-files '*.py' | grep -v "PySide_src")
+        python3.13 -m poetry run ruff format -q  $(git ls-files '*.py' | grep -v "PySide_src")
       continue-on-error: true

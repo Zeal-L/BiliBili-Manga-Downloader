@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from PySide6.QtCore import SignalInstance
 
 from src.Episode import Episode
+from src.Utils import logger
 
 
 class DownloadManager:
@@ -39,17 +40,21 @@ class DownloadManager:
         Returns:
             int: 新创建任务的ID。
         """
-        self.all_tasks[self.id_count] = {
+        task_id = self.id_count
+        self.all_tasks[task_id] = {
             "size": epi.size,
             "curr_rate": 0.0,
             "last_rate": 0.0,
             "last_time": time.time(),
             "curr_speed": 0.1,
             "avg_speed": 0.1,
-            "future": self.executor.submit(self.__thread__EpisodeTask, self.id_count, epi),
+            "future": None,
         }
+        self.all_tasks[task_id]["future"] = self.executor.submit(
+            self.__thread__EpisodeTask, task_id, epi
+        )
         self.id_count += 1
-        return self.id_count - 1
+        return task_id
 
     ############################################################
 
@@ -138,6 +143,31 @@ class DownloadManager:
             curr_id (int): 当前任务的ID
             epi (Episode): 要下载的章节
         """
+        if epi.使用浏览器下载:
+            def 更新进度(当前页: int, 总页数: int) -> None:
+                if 当前页 >= 总页数:
+                    return
+                rate = 当前页 / 总页数
+                self.updateTaskInfo(curr_id, rate)
+                self.signal_rate_progress.emit(
+                    {"taskID": curr_id, "rate": int(rate * 100), "path": None}
+                )
+
+            try:
+                save_path = epi.downloadFromBrowser(更新进度, lambda: self.terminated)
+            except Exception as e:
+                logger.error(f"《{epi.comic_name}》章节：{epi.title} 下载失败：{e}")
+                self.signal_message_box.emit(
+                    f"《{epi.comic_name}》章节：{epi.title} 下载失败!\n{e}"
+                )
+                self.reportError(curr_id)
+                return
+            self.updateTaskInfo(curr_id, 1)
+            self.signal_rate_progress.emit(
+                {"taskID": curr_id, "rate": 100, "path": save_path}
+            )
+            return
+
         # ?###########################################################
         # ? 初始化下载图片需要的参数
         if not epi.init_imgsList():

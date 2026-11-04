@@ -94,6 +94,8 @@ class MainGUI(QMainWindow, Ui_MainWindow, QtStyleTools):
                     os.remove(file_path)
             os.rmdir(path)
 
+        self.mangaUI.浏览器原始响应下载控制器.关闭()
+
         if self.settingUI.clear_user_data:
             try:
                 _(data_path)

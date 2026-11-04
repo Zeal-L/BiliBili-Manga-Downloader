@@ -18,6 +18,7 @@ from src.Utils import (
     logger,
     myStrFilter,
 )
+from src.浏览器漫画详情 import 浏览器漫画详情错误, 获取漫画详情
 
 if TYPE_CHECKING:
     from ui.MainGUI import MainGUI
@@ -47,39 +48,17 @@ class Comic:
 
     ############################################################
     def getComicInfo(self) -> dict:
-        """使用哔哩哔哩漫画 API 分析漫画数据
+        """读取哔哩哔哩漫画详情页的官方页面数据
 
         Returns:
             dict: 漫画信息
         """
-
-        @retry(
-            stop_max_delay=MAX_RETRY_SMALL - 5000,
-            wait_exponential_multiplier=RETRY_WAIT_EX,
-        )
-        def _() -> dict:
-            try:
-                res = requests.post(
-                    self.detail_url,
-                    headers=self.headers,
-                    data=self.payload,
-                    timeout=TIMEOUT_SMALL - 3,
-                )
-            except requests.RequestException as e:
-                logger.warning(f"漫画id:{self.comic_id} 获取漫画信息失败! 重试中...\n{e}")
-                raise e
-            if res.status_code != 200:
-                logger.warning(
-                    f"漫画id:{self.comic_id} 爬取漫画信息失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
-                )
-                raise requests.HTTPError()
-            return res.json()["data"]
-
         try:
-            self.data = _()
-        except requests.RequestException as e:
-            logger.error(f"漫画id:{self.comic_id} 重复获取漫画信息多次后失败!\n{e}")
-            logger.exception(e)
+            self.data = 获取漫画详情(
+                self.comic_id, self.mainGUI.getConfig("cookie") or ""
+            )
+        except 浏览器漫画详情错误 as e:
+            logger.error(f"漫画id:{self.comic_id} 获取漫画详情失败!\n{e}")
             return {}
 
         # ?###########################################################

@@ -8,7 +8,7 @@ import os
 import threading
 from functools import partial
 from typing import TYPE_CHECKING
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, quote, unquote, urlparse
 
 import requests
 from PySide6.QtCore import QObject, Signal
@@ -74,9 +74,18 @@ class SettingUI(QObject):
         if data["code"] == 0:
             self.qr_ui.close()
 
-            parsed_url = urlparse(data["url"])
+            parsed_url = urlparse(data.get("url", ""))
             query_params = parse_qs(parsed_url.query)
-            sessdata = quote(query_params["SESSDATA"][0])
+            sessdata = data.get("SESSDATA") or query_params.get("SESSDATA", [""])[0]
+            if not sessdata:
+                logger.error("扫码登录成功，但响应中未提供SESSDATA，无法保存Cookie。")
+                QMessageBox.warning(
+                    self.mainGUI,
+                    "警告",
+                    "扫码登录响应中未找到SESSDATA，Cookie未保存！\n请重新扫码，或手动填写SESSDATA。",
+                )
+                return
+            sessdata = quote(unquote(sessdata))
 
             self.mainGUI.updateConfig("cookie", sessdata)
             self.mainGUI.lineEdit_my_cookie.setText(sessdata)
@@ -160,19 +169,17 @@ class SettingUI(QObject):
             bool: (Cookie是否有效)
         """
 
-        detail_url = "https://manga.bilibili.com/twirp/comic.v1.Comic/Search?device=pc&platform=web"
+        detail_url = "https://api.bilibili.com/x/web-interface/nav"
         headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
             "cookie": f"SESSDATA={cookie}",
         }
-        payload = {"key_word": "test", "page_num": 1, "page_size": 1}
         is_cookie_valid = False
 
         @retry(stop_max_delay=MAX_RETRY_TINY, wait_exponential_multiplier=RETRY_WAIT_EX)
-        def _() -> None:
+        def _() -> dict:
             try:
-                res = requests.post(
-                    detail_url, data=payload, headers=headers, timeout=TIMEOUT_SMALL
-                )
+                res = requests.get(detail_url, headers=headers, timeout=TIMEOUT_SMALL)
             except requests.RequestException as e:
                 logger.warning(f"测试Cookie是否有效失败! 重试中...\n{e}")
                 raise e
@@ -181,12 +188,25 @@ class SettingUI(QObject):
                     f"测试Cookie是否有效失败! 状态码：{res.status_code}, 理由: {res.reason} 重试中..."
                 )
                 raise requests.HTTPError()
+            try:
+                result = res.json()
+            except ValueError as e:
+                raise requests.RequestException("Cookie校验接口返回了无效JSON") from e
+            if not isinstance(result, dict):
+                raise requests.RequestException("Cookie校验接口返回了无效数据结构")
+            return result
 
         try:
-            _()
-            if notice:
-                self.mainGUI.signal_information_box.emit("Cookie有效！")
-            is_cookie_valid = True
+            result = _()
+            if result.get("code") == 0 and result.get("data", {}).get("isLogin") is True:
+                if notice:
+                    self.mainGUI.signal_information_box.emit("Cookie有效！")
+                is_cookie_valid = True
+            else:
+                logger.error(f"Cookie校验未通过! 业务码：{result.get('code')}")
+                self.mainGUI.signal_message_box.emit(
+                    "Cookie无效、已过期或未被接口接受！\n请重新扫码登录，或重新填写正确的SESSDATA。"
+                )
         except requests.RequestException as e:
             logger.error(f"重复测试Cookie是否有效多次后失败!\n{e}")
             logger.exception(e)

@@ -9,6 +9,8 @@ import json
 import os
 import re
 import shutil
+from collections.abc import Callable
+from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -41,11 +43,14 @@ if TYPE_CHECKING:
 class Episode:
     """漫画章节类，用于管理漫画章节的详细信息"""
 
+    使用浏览器下载 = True
+
     def __init__(
         self, episode: dict, comic_id: str, comic_info: dict, mainGUI: MainGUI, idx: int
     ) -> None:
         self.mainGUI = mainGUI
         self.id = episode["id"]
+        self.comic_id = comic_id
         self.available = not episode["is_locked"]
         self.ord = episode["ord"]
         self.real_ord = idx
@@ -193,6 +198,27 @@ class Episode:
             return False
 
         return True
+
+    ############################################################
+
+    def downloadFromBrowser(
+        self,
+        进度回调: Callable[[int, int], None],
+        停止检查: Callable[[], bool],
+    ) -> str:
+        """通过阅读器取得完整标准图片，再按当前设置保存章节。"""
+        from src.浏览器章节下载 import 下载章节图片
+
+        with TemporaryDirectory(prefix="哔哩哔哩漫画_") as 临时目录:
+            图片路径 = 下载章节图片(
+                漫画ID=self.comic_id,
+                章节ID=self.id,
+                Cookie=self.mainGUI.getConfig("cookie") or "",
+                保存目录=临时目录,
+                进度回调=进度回调,
+                停止检查=停止检查,
+            )
+            return self.save(图片路径)
 
     ############################################################
 
